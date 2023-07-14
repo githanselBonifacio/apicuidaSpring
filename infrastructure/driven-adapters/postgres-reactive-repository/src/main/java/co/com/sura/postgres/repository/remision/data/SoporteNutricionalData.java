@@ -26,6 +26,15 @@ public class SoporteNutricionalData {
     @Column("id_medicamento")
     private String idMedicamento;
 
+    @Column("nombre_medicamento")
+    private String nombreMedicamento;
+
+    @Column("presentacion_medicamento")
+    private String presentacionMedicamento;
+
+    @Column("codigo_medicamento")
+    private String codigoMedicamento;
+
     @Column("cantidad_dosis")
     private Integer cantidadDosis;
 

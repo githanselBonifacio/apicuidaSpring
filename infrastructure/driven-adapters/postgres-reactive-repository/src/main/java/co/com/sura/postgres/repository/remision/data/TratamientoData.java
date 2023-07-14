@@ -1,6 +1,5 @@
 package co.com.sura.postgres.repository.remision.data;
 
-import co.com.sura.entity.remision.Medicamento;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +26,15 @@ public class TratamientoData {
 
     @Column("id_medicamento")
     private String idMedicamento;
+
+    @Column("nombre_medicamento")
+    private String nombreMedicamento;
+
+    @Column("presentacion_medicamento")
+    private String presentacionMedicamento;
+
+    @Column("codigo_medicamento")
+    private String codigoMedicamento;
 
     @Column("cantidad_dosis")
     private Integer cantidadDosis;

@@ -1,8 +1,6 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.Diagnostico;
-import co.com.sura.entity.remision.Paciente;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +29,6 @@ public class RemisionRequest {
     private CiudadRequest ciudad;
     private String tipoAdmision;
     private String institucionRemite;
-    private DatosAtencionPaciente datosAtencionPaciente;
+    private DatosAtencionPacienteRequest datosAtencionPaciente;
     private List<Diagnostico> diagnosticos;
 }

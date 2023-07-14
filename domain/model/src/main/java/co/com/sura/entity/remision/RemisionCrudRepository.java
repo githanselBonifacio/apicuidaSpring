@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface RemisionCrudRepository {
     Mono<Void> crearRemisionCita (RemisionRequest remisionRequest, List<CitaRequest> citas);
+    Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByIdRemision (String idRemision);
+    Mono<Paciente> consultarPacienteFromRemision (String idRemision);
 }

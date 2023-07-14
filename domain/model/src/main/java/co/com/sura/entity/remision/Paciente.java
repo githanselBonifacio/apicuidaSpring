@@ -16,6 +16,11 @@ public class Paciente {
     private String numeroIdentificacion;
     private String nombre;
     private String apellido;
+    private String edad;
+    private String sexo;
+    private String peso;
+    private String tipoAfiliacion;
+    private String nombreAseguradora;
     private LocalDate fechaNacimiento;
     private Ubicacion ubicacion;
 }

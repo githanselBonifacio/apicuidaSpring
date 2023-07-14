@@ -6,10 +6,13 @@ import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.remision.data.*;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,6 +35,36 @@ public class ConverterRemision {
                 .tipoAdmision(remisionRequest.getTipoAdmision())
                 .numeroIdentificacionPaciente(remisionRequest.getNumeroIdentificacion())
                 .estado(remisionRequest.getEstado())
+                .build();
+    }
+    public static  Paciente convertToPaciente (PacienteData pacienteData){
+        return new Paciente()
+                .toBuilder()
+                .tipoIdentificacion(pacienteData.getTipoIdentificacion())
+                .numeroIdentificacion(pacienteData.getNumeroIdentificacion() )
+                .nombre(pacienteData.getNombre())
+                .apellido(pacienteData.getApellido())
+                .sexo(pacienteData.getSexo())
+                .peso(pacienteData.getPeso())
+                .edad(pacienteData.getEdad())
+                .tipoAfiliacion(pacienteData.getTipoAfiliacion())
+                .nombreAseguradora(pacienteData.getNombreAseguradora())
+                .fechaNacimiento(pacienteData.getFechaNacimiento())
+                .build();
+    }
+    public static Ubicacion convertToUbicacion(UbicacionData ubicacionData){
+        return  new Ubicacion()
+                .toBuilder()
+                .latitud(ubicacionData.getLatitud())
+                .longitud(ubicacionData.getLongitud())
+                .direccion(ubicacionData.getDireccion())
+                .tipoVia(ubicacionData.getTipoVia())
+                .numero1(ubicacionData.getNumero1())
+                .numeroInterseccion(ubicacionData.getNumeroInterseccion())
+                .numero2(ubicacionData.getNumero2())
+                .barrio(ubicacionData.getBarrio())
+                .sinNomenclatura(ubicacionData.getSinNomenclatura())
+                .municipio(ubicacionData.getMunicipio())
                 .build();
     }
     public static UbicacionData extraerUbicacionData(RemisionRequest remisionRequest){
@@ -106,14 +139,14 @@ public class ConverterRemision {
                 .collect(Collectors.toList());
     }
     public static DatosAtencionPacienteData convertirDatosAtencionPacienteData(
-            DatosAtencionPaciente datosAtencionPaciente, String idRemision){
+            DatosAtencionPacienteRequest datosAtencionPacienteRequest, String idRemision){
         return new DatosAtencionPacienteData()
                 .toBuilder()
-                .nombreCuidador(datosAtencionPaciente.getNombreCuidador())
-                .nombreResponsable(datosAtencionPaciente.getNombreResponsable())
-                .telefonoPaciente(datosAtencionPaciente.getTelefonoPaciente())
-                .celularPaciente(datosAtencionPaciente.getCelularPaciente())
-                .celularPaciente2(datosAtencionPaciente.getCelularPaciente2())
+                .nombreCuidador(datosAtencionPacienteRequest.getNombreCuidador())
+                .nombreResponsable(datosAtencionPacienteRequest.getNombreResponsable())
+                .telefonoPaciente(datosAtencionPacienteRequest.getTelefonoPaciente())
+                .celularPaciente(datosAtencionPacienteRequest.getCelularPaciente())
+                .celularPaciente2(datosAtencionPacienteRequest.getCelularPaciente2())
                 .idRemision(idRemision)
                 .build();
     }
@@ -122,6 +155,9 @@ public class ConverterRemision {
                 .toBuilder()
                 .tipoTratamiento(tratamientoRequest.getTipoTratamiento().getNombre())
                 .idMedicamento(tratamientoRequest.getMedicamento().getIdMedicamento())
+                .nombreMedicamento(tratamientoRequest.getMedicamento().getNombre())
+                .codigoMedicamento(tratamientoRequest.getMedicamento().getCodigoMedicamento())
+                .presentacionMedicamento(tratamientoRequest.getMedicamento().getPresentacion())
                 .cantidadDosis((int) tratamientoRequest.getCantidadDosis())
                 .unidadDosis(tratamientoRequest.getUnidadDosis().getDescripcion())
                 .viaAdministracion(tratamientoRequest.getViaAdministracion().getDescripcion())
@@ -241,6 +277,9 @@ public class ConverterRemision {
                 .duracion(soporteNutricionalRequest.getDuracion())
                 .volumen(soporteNutricionalRequest.getVolumen())
                 .idMedicamento(soporteNutricionalRequest.getMedicamento().getIdMedicamento())
+                .nombreMedicamento(soporteNutricionalRequest.getMedicamento().getNombre())
+                .codigoMedicamento(soporteNutricionalRequest.getMedicamento().getCodigoMedicamento())
+                .presentacionMedicamento(soporteNutricionalRequest.getMedicamento().getPresentacion())
                 .cantidadDosis(soporteNutricionalRequest.getCantidadDosis())
                 .noPBS(soporteNutricionalRequest.isNoPBS())
                 .tipoPrestacion(soporteNutricionalRequest.getTipoPrestacion())
@@ -298,5 +337,17 @@ public class ConverterRemision {
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
+    }
+
+    public static DatosAtencionPaciente convertToDatosAtencionPaciente(
+            DatosAtencionPacienteData datosAtencionPacienteData){
+        return new DatosAtencionPaciente()
+                .toBuilder()
+                .nombreCuidador(datosAtencionPacienteData.getNombreCuidador())
+                .nombreResponsable(datosAtencionPacienteData.getNombreResponsable())
+                .telefonoPaciente(datosAtencionPacienteData.getTelefonoPaciente())
+                .celularPaciente2(datosAtencionPacienteData.getCelularPaciente2())
+                .celularPaciente(datosAtencionPacienteData.getCelularPaciente())
+                .build();
     }
 }

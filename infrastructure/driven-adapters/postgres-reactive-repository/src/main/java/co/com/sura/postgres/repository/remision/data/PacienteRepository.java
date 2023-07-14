@@ -1,5 +1,7 @@
 package co.com.sura.postgres.repository.remision.data;
 
+
+import co.com.sura.entity.remision.Paciente;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -8,6 +10,14 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 
 public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,String> {
+
+    @Query("SELECT public.paciente.*, to_json(public.ubicacion.*) as id_ubicacion " +
+            "FROM public.remision " +
+            "INNER JOIN public.paciente ON public.paciente.numero_identificacion = " +
+            "public.remision.numero_identificacion_paciente " +
+            "INNER JOIN public.ubicacion ON public.paciente.id_ubicacion = public.ubicacion.id_ubicacion " +
+            "WHERE public.remision.id_remision = $1;")
+    Mono<PacienteData> findPacienteByNumeroIdRemision(String idRemision);
 
     @Override
     Mono<Boolean> existsById(String numeroIdentificacion);

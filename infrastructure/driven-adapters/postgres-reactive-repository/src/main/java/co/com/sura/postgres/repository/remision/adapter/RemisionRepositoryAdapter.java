@@ -8,15 +8,12 @@ import co.com.sura.postgres.repository.agenda.data.CitaRepository;
 import co.com.sura.postgres.repository.remision.data.*;
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.util.Date;
 import java.util.List;
+
 
 
 @Repository
@@ -152,5 +149,23 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
             return deleteData.then(Mono.error(e));
         }
     }
+
+    @Override
+    public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByIdRemision(String idRemision) {
+        return datosAtencionPacienteRepository.findAllByIdRemision(idRemision)
+                .map(ConverterRemision :: convertToDatosAtencionPaciente);
+    }
+
+    @Override
+    public Mono<Paciente> consultarPacienteFromRemision(String idRemision) {
+        return pacienteRepository.findPacienteByNumeroIdRemision(idRemision)
+                .flatMap(pacienteData -> ubicacionRepository.findById(pacienteData.getIdUbicacion())
+                        .map(ubicacionData -> {
+                            Paciente paciente = ConverterRemision.convertToPaciente(pacienteData);
+                            paciente.setUbicacion(ConverterRemision.convertToUbicacion(ubicacionData));
+                            return paciente;
+                        }));
+    }
+
 
 }
