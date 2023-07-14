@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':domain-model')
+    implementation project(':domain-usecase')
+    implementation 'org.reactivecommons:async-commons-api:1.0.1'
+    //implementation 'org.reactivecommons:async-service-bus-starter:1.1.39-BETA'
+    implementation "org.springframework:spring-context:${springFrameworkVersion}"
+}

@@ -1,0 +1,22 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    //Project Dependencies
+    implementation project(':domain-model')
+    implementation project(':domain-usecase')
+    implementation project(":entry-points-reactive-web")
+//    implementation project(":entry-points-subs-events")
+    implementation project(":entry-points-async-command-handlers")
+    //implementation project(":driven-adapters-rest-adapter")
+    implementation project(":driven-adapters-postgres-reactive-repository")
+   // implementation project(":driven-adapters-async-event-bus")
+    //implementation project(":helpers-integration-soap-commons")
+    //Compile Dependencies
+    implementation('org.springframework.boot:spring-boot-starter')
+    implementation('org.springframework.boot:spring-boot-devtools')
+    implementation 'org.projectlombok:lombok:1.18.22'
+
+    //implementation "io.springfox:springfox-swagger-ui:2.9.2"
+    //implementation "io.springfox:springfox-swagger2:2.9.2"
+
+}
