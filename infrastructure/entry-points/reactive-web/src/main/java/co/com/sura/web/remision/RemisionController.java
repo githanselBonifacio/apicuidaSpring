@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/remision")
 public class RemisionController {
 

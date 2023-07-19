@@ -34,4 +34,6 @@ buildFiles.each { File buildFile ->
         project.buildFileName = buildFile.name
     }
 }
+include 'infrastructure:driven-adapters:mapbox'
+findProject(':infrastructure:driven-adapters:mapbox')?.name = 'mapbox'
 

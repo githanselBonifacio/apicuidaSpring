@@ -5,12 +5,25 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public interface AgendaRepository {
     //profesionales
     Flux<Profesional> consultarProfesionales();
-    Flux<Profesional> consultarProfesionalesByCiudad(String idCiudad);
+    Flux<Profesional> consultarProfesionalByTurnoCiudad(LocalDate fechaTurno, String idCiudad);
+
+    Flux<Profesional> consultarProfesionalFromTurnoCiudad(
+            LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno);
+
+    Mono<Void> asignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
+    Mono<Void> desasignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
+
+    Flux<Profesional> consultarProfesionalesByIdCiudad(String idCiudad);
+    Flux<Actividad> consultarActividadesByProfesionalesCiudadHorarioTurno(
+            LocalDate fechaTurno,
+            Integer idHorarioTurno,
+            String idCiudad
+    );
+
     Mono<Profesional> crearProfesional(Profesional profesional);
     Mono<Profesional> actualizarProfesional(Profesional profesional);
 

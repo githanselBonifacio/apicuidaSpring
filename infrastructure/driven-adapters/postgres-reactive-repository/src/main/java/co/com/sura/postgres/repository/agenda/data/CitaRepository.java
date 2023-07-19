@@ -19,11 +19,25 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita " +
             "WHERE turno_cita.fecha_turno = $1 " +
             "AND turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_ciudad = $3;")
+            "AND cita.id_ciudad = $3 " +
+            "AND cita.id_estado != 5;")
     Flux<CitaData> findCitasByTurnoCiudad(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
             String idCiudad );
+
+    @Query("SELECT cita.* FROM cita " +
+            "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita " +
+            "WHERE turno_cita.fecha_turno = $1 " +
+            "AND turno_cita.id_horario_turno = $2 " +
+            "AND cita.id_ciudad = $3 " +
+            "AND cita.id_estado != 5 " +
+            "AND cita.id_profesional = $4;")
+    Flux<CitaData> findCitasByTurnoCiudadProfesional(
+            LocalDate fechaTurno,
+            Integer idHorarioTurno,
+            String idCiudad,
+            String numeroIdentificacionProfesional);
 
     @Query("UPDATE public.cita " +
             "SET  id_estado=2, id_profesional=$2 " +
@@ -39,8 +53,8 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
     Mono<Void> desagendarToProfesional(String idCita);
 
     @Query("INSERT INTO cita " +
-            "(id_cita, id_remision, duracion, holgura, fecha_inicio, especialidad, id_ciudad)" +
-            " VALUES ($1, $2, $3, $4, $5, $6, $7)")
+            "(id_cita, id_remision, duracion, holgura, fecha_inicio, especialidad, id_ciudad,fecha_programada)" +
+            " VALUES ($1, $2, $3, $4, $5, $6, $7, $8);" )
     Mono<Void> insertCitaQuery(
             @Param("$1") String idCita,
             @Param("$2") String idRemision,
@@ -48,7 +62,9 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             @Param("$4") Integer holgura,
             @Param("$5") LocalDateTime fechaInicio,
             @Param("$6") String especialidad,
-            @Param("$7") String idCiudad);
+            @Param("$7") String idCiudad,
+            @Param("$8") LocalDateTime fechaProgramada
+        );
 
     default Mono<Void> insertCita(CitaData citaData){
         return  insertCitaQuery(
@@ -58,7 +74,8 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
           citaData.getHolgura(),
           citaData.getFechaInicio(),
           citaData.getEspecialidad(),
-          citaData.getIdCiudad()
+          citaData.getIdCiudad(),
+          citaData.getFechaInicio()
         );
     }
 

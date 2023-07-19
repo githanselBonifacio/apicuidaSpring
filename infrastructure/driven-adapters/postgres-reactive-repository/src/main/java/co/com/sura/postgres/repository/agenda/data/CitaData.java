@@ -27,6 +27,8 @@ public class CitaData {
     private Integer holgura;
     @Column("fecha_inicio")
     private LocalDateTime fechaInicio;
+    @Column("fecha_programada")
+    private LocalDateTime fechaProgramada;
     private String especialidad;
     @Column("id_ciudad")
     private String idCiudad;

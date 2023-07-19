@@ -14,9 +14,11 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class Cita {
     private String idCita;
+    private String idRemision;
     private Integer duracion;
     private Integer holgura;
     private LocalDateTime fechaInicio;
+    private LocalDateTime fechaProgramada;
     private String especialidad;
     private Integer idEstado;
     private String idCiudad;

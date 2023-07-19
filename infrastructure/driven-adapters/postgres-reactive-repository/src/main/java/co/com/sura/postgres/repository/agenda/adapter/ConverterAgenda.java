@@ -1,11 +1,16 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
+import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
 import co.com.sura.postgres.repository.remision.data.*;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ConverterAgenda {
@@ -20,6 +25,25 @@ public class ConverterAgenda {
                 .fechaNacimiento(profesionalData.getFechaNacimiento())
                 .idCiudad(profesionalData.getIdCiudad())
                 .activo(profesionalData.isActivo())
+                .build();
+    }
+    public static Actividad convertToActividad(ProfesionalData profesionalData){
+        return new Actividad()
+                .toBuilder()
+                .responsable(profesionalData.getNombre()+" "+profesionalData.getApellido())
+                .numeroIdentificacion(profesionalData.getNumeroIdentificacion())
+                .tareas(new ArrayList<>())
+                .build();
+    }
+    public static Tarea convertToTarea(CitaData citaData){
+        return new Tarea()
+                .toBuilder()
+                .id(citaData.getIdCita())
+                .fechaInicio(citaData.getFechaInicio())
+                .fechaProgramada(citaData.getFechaProgramada())
+                .duracion(citaData.getDuracion())
+                .holgura(citaData.getHolgura())
+                .idEstado(citaData.getIdEstado())
                 .build();
     }
 
@@ -40,9 +64,11 @@ public class ConverterAgenda {
         return new Cita()
                 .toBuilder()
                 .idCita(citaData.getIdCita())
+                .idRemision(citaData.getIdRemision())
                 .duracion(citaData.getDuracion())
                 .holgura(citaData.getHolgura())
                 .fechaInicio(citaData.getFechaInicio())
+                .fechaProgramada(citaData.getFechaProgramada())
                 .especialidad(citaData.getEspecialidad())
                 .idEstado(citaData.getIdEstado())
                 .idCiudad(citaData.getIdCiudad())

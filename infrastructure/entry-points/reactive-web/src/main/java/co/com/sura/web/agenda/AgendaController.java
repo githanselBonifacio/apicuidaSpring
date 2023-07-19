@@ -1,23 +1,20 @@
 package co.com.sura.web.agenda;
 
 import co.com.sura.agenda.AgendaUseCase;
+import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.remision.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/agenda")
 public class AgendaController {
 
@@ -30,7 +27,46 @@ public class AgendaController {
         return agendaUseCase.consultarProfesionales();
     }
 
-    @GetMapping(value = "/profesionalesbyCiudad/{idCiudad}")
+    @GetMapping(value = "/profesionalesByTurnoCiudad")
+    public Flux<Profesional> getProfesionalesbyTurnoCiudad(
+             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+             @RequestParam String idCiudad){
+        return agendaUseCase.consultarProfesionalesByTurnoCiudad(fechaTurno, idCiudad);
+    }
+
+    @GetMapping(value = "/profesionalesFromTurnoCiudad")
+    public Flux<Profesional> getProfesionalesfromTurnoCiudad(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam String idCiudad,
+            @RequestParam Integer idHorarioTurno){
+        return agendaUseCase.consultarProfesionalesFromTurnoCiudad(fechaTurno, idCiudad, idHorarioTurno);
+    }
+
+    @GetMapping(value = "/asignarProfesionalTurno")
+    public Mono<Void> asignarProfesionalTurno(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idProfesional){
+        return agendaUseCase.asignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional);
+    }
+
+    @GetMapping(value = "/deasignarProfesionalTurno")
+    public Mono<Void> desasignarProfesionalTurno(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idProfesional){
+        return agendaUseCase.desasignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional);
+    }
+
+    @GetMapping(value = "/actividadesByprofesionalesCiudadHorario")
+    public Flux<Actividad> getActividadesByProfesionalesCiudadHorario(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idCiudad){
+        return agendaUseCase.consultarActividadesProfesionalesCiudadHorario(fechaTurno,idHorarioTurno,idCiudad);
+    }
+
+    @GetMapping(value = "/profesionales/{idCiudad}")
     public Flux<Profesional> getProfesionalesByCiudad(@PathVariable String idCiudad){
         return agendaUseCase.consultarProfesionalesByCiudad(idCiudad);
     }
