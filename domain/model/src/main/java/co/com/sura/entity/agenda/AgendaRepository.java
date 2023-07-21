@@ -5,6 +5,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface AgendaRepository {
     //profesionales
@@ -28,10 +29,17 @@ public interface AgendaRepository {
     Mono<Profesional> actualizarProfesional(Profesional profesional);
 
     //citas
-    Flux<Cita>        consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);
-    Mono<Void>        agendarToProfesional(String idCita, String idProfesional);
-    Mono<Void>        desagendarToProfesional(String idCita);
+    Flux<Cita>    consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);
+    Mono<Void>    reprogramarCita(LocalDateTime fechaProgramada, String idCita);
+    Mono<Void>    agendarToProfesional(String idCita, String idProfesional);
+    Mono<Void>    desagendarToProfesional(String idCita);
+    Mono<Void>    desagendarTurnocompleto(LocalDate fechaTurno, Integer idHorarioTurno);
+    //desplazamientos
+    Flux<Desplazamiento> consultarDesplazamientoByCitaPartida(
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad);
 
+    Mono<Void> calcularDesplazamientoCitaByProfesional(
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad,String idProfesional);
     //tratamientos
     Flux<Tratamiento> consultarTratamientoByCitas(String idCita);
 

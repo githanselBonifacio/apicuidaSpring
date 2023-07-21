@@ -1,14 +1,12 @@
 package co.com.sura.agenda;
 
-import co.com.sura.entity.agenda.Actividad;
-import co.com.sura.entity.agenda.AgendaFactory;
-import co.com.sura.entity.agenda.AgendaRepository;
-import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.entity.agenda.*;
 import co.com.sura.entity.remision.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AgendaUseCase implements AgendaFactory {
 
@@ -22,20 +20,28 @@ public class AgendaUseCase implements AgendaFactory {
     public Flux<Profesional> consultarProfesionales() {
         return agendaRepository.consultarProfesionales();
     }
+
     public Flux<Profesional> consultarProfesionalesByTurnoCiudad(LocalDate fechaTurno, String idCiudad) {
         return agendaRepository.consultarProfesionalByTurnoCiudad(fechaTurno,idCiudad);
     }
+
     public Flux<Profesional> consultarProfesionalesFromTurnoCiudad(
             LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno) {
-
         return agendaRepository.consultarProfesionalFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno);
     }
+
     public Mono<Void> asignarProfesionalTurno(LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional){
         return agendaRepository.asignarProfesionalTurno(fechaTurno,idHorarioTurno,idProfesional);
     }
+
     public Mono<Void> desasignarProfesionalTurno(LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional){
         return agendaRepository.desasignarProfesionalTurno(fechaTurno,idHorarioTurno,idProfesional);
     }
+
+    public Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno,Integer idHorarioTurno){
+        return agendaRepository.desagendarTurnocompleto(fechaTurno,idHorarioTurno);
+    }
+
     public Flux<Profesional> consultarProfesionalesByCiudad(String idCiudad) {
         return agendaRepository.consultarProfesionalesByIdCiudad(idCiudad);
     }
@@ -48,6 +54,17 @@ public class AgendaUseCase implements AgendaFactory {
                 .consultarActividadesByProfesionalesCiudadHorarioTurno(fechaTurno,idHorarioTurno,idCiudad);
     }
 
+    public Flux<Desplazamiento> consultarDesplazamientoByIdCitaPartida(
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad){
+        return agendaRepository.consultarDesplazamientoByCitaPartida(
+                fechaProgramada,idHorarioTurno,idCiudad);
+    }
+    public Mono<Void> calcularDesplazamientoCitaByProfesional(
+            LocalDate fechaProgramada, Integer idHorarioTurno, String idCiudad, String idProfesional){
+        return agendaRepository.calcularDesplazamientoCitaByProfesional(
+                fechaProgramada,idHorarioTurno,idCiudad,idProfesional
+        );
+    }
 
     public Mono<Profesional> crearProfesional(Profesional profesional) {
         return agendaRepository.crearProfesional(profesional);
@@ -58,6 +75,9 @@ public class AgendaUseCase implements AgendaFactory {
 
     public Flux<Cita> consultarCitasByTurnoCiudad (LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad){
         return agendaRepository.consultarCitasByTurnoCiudad(fechaTurno, idHorarioTurno, idCiudad);
+    }
+    public Mono<Void> reprogramarCitaById (LocalDateTime fechaProgramada, String idCita){
+        return agendaRepository.reprogramarCita(fechaProgramada, idCita);
     }
 
     public Mono<Void> asignarProfesionaCita (String idCita, String idProfesional){

@@ -1,7 +1,9 @@
 package co.com.sura.web.agenda;
 
 import co.com.sura.agenda.AgendaUseCase;
+import co.com.sura.autoagendar.DesplazamientoMap;
 import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.remision.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 @RestController
@@ -58,12 +62,35 @@ public class AgendaController {
         return agendaUseCase.desasignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional);
     }
 
+    @GetMapping(value = "/desagendarTurnoCompleto")
+    public Mono<Void> desagendarTurnoCompleto(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno){
+        return agendaUseCase.desagendarTurnoCompleto(fechaTurno, idHorarioTurno);
+    }
+
     @GetMapping(value = "/actividadesByprofesionalesCiudadHorario")
     public Flux<Actividad> getActividadesByProfesionalesCiudadHorario(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idCiudad){
         return agendaUseCase.consultarActividadesProfesionalesCiudadHorario(fechaTurno,idHorarioTurno,idCiudad);
+    }
+    @GetMapping(value = "/desplazamientoVisita")
+    public Flux<Desplazamiento> getDesplazamientoByIdCitaPartida(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idCiudad ){
+        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idCiudad);
+    }
+
+    @GetMapping(value = "/calcularDesplazamientoCitasByprofesional")
+    public Mono<Void> calcularDesplazamientoCitaByProfesional(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idCiudad,
+            @RequestParam String idProfesional){
+        return agendaUseCase.calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idCiudad,idProfesional);
     }
 
     @GetMapping(value = "/profesionales/{idCiudad}")
@@ -89,6 +116,21 @@ public class AgendaController {
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idCiudad) {
         return agendaUseCase.consultarCitasByTurnoCiudad(fechaTurno,idHorarioTurno, idCiudad);
+
+    }
+    @GetMapping(value = "/reprogramarCita")
+    public Mono<Void> reprogramarCita(
+            @RequestParam("fechaProgramada")  String fechaProgramada,
+            @RequestParam String idCita,
+            @RequestParam String nuevaHora) {
+
+        var hora = nuevaHora.split(":");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime localDateTime = LocalDateTime.parse(fechaProgramada, formatter)
+                .withHour(Integer.parseInt(hora[0])).withMinute(Integer.parseInt(hora[1]));
+
+        return agendaUseCase.reprogramarCitaById(localDateTime,idCita);
 
     }
 

@@ -11,14 +11,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class Tarea {
-    private String    id;
-    private LocalDateTime fechaInicio;
+public class Desplazamiento {
+    private String idCitaPartida;
+    private String idCitaDestino;
     private LocalDateTime fechaProgramada;
-    private Integer   duracion;
-    private Integer   holgura;
-    private Double    latitud;
-    private Double    longitud;
-    private Integer   idEstado;
-    private String    tipo;
+    private Integer idHorarioTurno;
+    private String tipo;
+    private Integer duracion;
+    private Integer holgura;
 }

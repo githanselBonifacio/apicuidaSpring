@@ -1,10 +1,12 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
 import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
+import co.com.sura.postgres.repository.agenda.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
 import co.com.sura.postgres.repository.remision.data.*;
 import org.springframework.stereotype.Component;
@@ -46,6 +48,17 @@ public class ConverterAgenda {
                 .idEstado(citaData.getIdEstado())
                 .build();
     }
+    public static Tarea convertToTarea(DesplazamientoData desplazamientoData){
+        return new Tarea()
+                .toBuilder()
+                .id(String.valueOf(desplazamientoData.getIdDesplazamiento()))
+                .fechaInicio(desplazamientoData.getFechaProgramada())
+                .fechaProgramada(desplazamientoData.getFechaProgramada())
+                .tipo("dvisita")
+                .duracion(desplazamientoData.getDuracion())
+                .holgura(desplazamientoData.getHolgura())
+                .build();
+    }
 
     public static ProfesionalData convertToProfesionalData(Profesional profesional){
         return new ProfesionalData()
@@ -76,7 +89,18 @@ public class ConverterAgenda {
                 .idConductor(citaData.getIdConductor())
                 .build();
     }
-
+    public static Desplazamiento converToDesplazamiento(DesplazamientoData desplazamientoData){
+            return new Desplazamiento()
+                    .toBuilder()
+                    .idCitaPartida(desplazamientoData.getIdCitaPartida())
+                    .idCitaDestino(desplazamientoData.getIdCitaDestino())
+                    .tipo(desplazamientoData.getTipo())
+                    .duracion(desplazamientoData.getDuracion())
+                    .holgura(desplazamientoData.getHolgura())
+                    .fechaProgramada(desplazamientoData.getFechaProgramada())
+                    .idHorarioTurno(desplazamientoData.getIdHorarioTurno())
+                    .build();
+    }
     public static Tratamiento convertToTratamiento(TratamientoData tratamientoData){
         return new Tratamiento()
                 .toBuilder()

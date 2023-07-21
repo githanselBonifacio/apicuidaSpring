@@ -21,13 +21,14 @@ public interface ProfesionalRepository extends ReactiveCrudRepository<Profesiona
             "Where id_ciudad = $1;")
     Flux<ProfesionalData> findByIdCiudad(  @Param("$1") String idCiudad);
 
-    @Query("SELECT * " +
+    @Query("SELECT DISTINCT  public.profesionales.* " +
             "FROM public.profesionales " +
             "LEFT JOIN public.turno_profesional " +
             "on public.profesionales.numero_identificacion = public.turno_profesional.id_profesional " +
+            "AND public.turno_profesional.fecha_turno = $1 "+
             "WHERE public.profesionales.id_ciudad = $2 " +
             "AND public.profesionales.activo = true " +
-            "AND (public.turno_profesional.fecha_turno != $1 OR public.turno_profesional.fecha_turno IS NULL);")
+            "AND public.turno_profesional.id IS NULL;")
     Flux<ProfesionalData> findByTurnoCiudad(
             @Param("$1") LocalDate fechaTurno,
             @Param("$2") String idCiudad
