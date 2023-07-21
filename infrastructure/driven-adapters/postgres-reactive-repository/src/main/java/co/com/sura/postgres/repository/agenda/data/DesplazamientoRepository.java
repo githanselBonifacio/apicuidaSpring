@@ -36,8 +36,13 @@ public interface DesplazamientoRepository extends ReactiveCrudRepository<Desplaz
             "OR id_cita_destino IN ( SELECT id_cita FROM cita WHERE id_profesional = $3));")
     Mono<Void> deleteByFechaTurnoProfesional(LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional);
 
-    @Query("DELETE FROM public.desplazamiento " +
-            "WHERE public.desplazamiento.id_horario_turno = $2 " +
-            "AND public.desplazamiento.fecha_programada::Date = $1 ;")
-    Mono<Void> deleteAllByFechaTurno(LocalDate fechaTurno, Integer idHorarioTurno);
+    @Query("DELETE FROM desplazamiento " +
+            "WHERE fecha_programada::date = $1 " +
+            "  AND id_horario_turno = $2 " +
+            "  AND id_cita_partida IN ( " +
+            "    SELECT id_cita " +
+            "    FROM cita " +
+            "    WHERE id_ciudad = $3 " +
+            "  );")
+    Mono<Void> deleteAllByFechaTurno(LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad);
 }

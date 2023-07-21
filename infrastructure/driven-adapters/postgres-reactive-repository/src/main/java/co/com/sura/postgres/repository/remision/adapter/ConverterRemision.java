@@ -129,13 +129,17 @@ public class ConverterRemision {
     }
 
     public static List<CitaData> convertirCitasDataList(
-            List<CitaRequest> citasRequest, String idRemision, String idCiudad){
+            List<CitaRequest> citasRequest, RemisionRequest remisionRequest){
 
         return citasRequest
                 .stream()
                 .map(ConverterRemision :: convertirCitaData)
-                .peek(citaData -> citaData.setIdRemision(idRemision))
-                .peek(citaData -> citaData.setIdCiudad(idCiudad))
+                .peek(citaData -> citaData.setIdRemision(remisionRequest.getIdRemision()))
+                .peek(citaData -> citaData.setIdCiudad(remisionRequest.getCiudad().getIdCiudad()))
+                .peek(citaData -> citaData.setLatitud(remisionRequest
+                        .getDatosAtencionPaciente().getUbicacion().getLatitud()))
+                .peek(citaData -> citaData.setLongitud(remisionRequest
+                        .getDatosAtencionPaciente().getUbicacion().getLongitud()))
                 .collect(Collectors.toList());
     }
     public static DatosAtencionPacienteData convertirDatosAtencionPacienteData(

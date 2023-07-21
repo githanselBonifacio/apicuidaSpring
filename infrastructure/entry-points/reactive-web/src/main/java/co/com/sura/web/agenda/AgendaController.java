@@ -65,8 +65,17 @@ public class AgendaController {
     @GetMapping(value = "/desagendarTurnoCompleto")
     public Mono<Void> desagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam Integer idHorarioTurno){
-        return agendaUseCase.desagendarTurnoCompleto(fechaTurno, idHorarioTurno);
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idCiudad){
+        return agendaUseCase.desagendarTurnoCompleto(fechaTurno, idHorarioTurno,idCiudad);
+    }
+    @GetMapping(value = "/autoagendarTurnoCompleto")
+    public Mono<Void> autoagendarTurnoCompleto(
+            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idCiudad
+    ){
+        return agendaUseCase.autoagendarTurnoCompleto(fechaTurno, idHorarioTurno, idCiudad);
     }
 
     @GetMapping(value = "/actividadesByprofesionalesCiudadHorario")

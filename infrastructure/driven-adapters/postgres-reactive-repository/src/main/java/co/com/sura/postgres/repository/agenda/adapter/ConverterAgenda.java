@@ -1,5 +1,6 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
+import co.com.sura.autoagendar.CitaGenetic;
 import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
@@ -11,8 +12,10 @@ import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
 import co.com.sura.postgres.repository.remision.data.*;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ConverterAgenda {
@@ -87,6 +90,25 @@ public class ConverterAgenda {
                 .idCiudad(citaData.getIdCiudad())
                 .idProfesional(citaData.getIdProfesional())
                 .idConductor(citaData.getIdConductor())
+                .latitud(citaData.getLatitud())
+                .longitud(citaData.getLongitud())
+                .build();
+    }
+    public static  List<CitaGenetic> convertToListCitaGenetic(List<CitaData> citas){
+        return citas
+                .stream()
+                .map(ConverterAgenda::convertToCitaGenetic)
+                .collect(Collectors.toList());
+    }
+    public static CitaGenetic convertToCitaGenetic(CitaData CitaData){
+        return new CitaGenetic()
+                .toBuilder()
+                .idCita(CitaData.getIdCita())
+                .duracion(CitaData.getDuracion())
+                .holgura(CitaData.getHolgura())
+                .fechaInicioIso(CitaData.getFechaProgramada().toEpochSecond(ZoneOffset.UTC))
+                .latitud(CitaData.getLatitud())
+                .longitud(CitaData.getLongitud())
                 .build();
     }
     public static Desplazamiento converToDesplazamiento(DesplazamientoData desplazamientoData){

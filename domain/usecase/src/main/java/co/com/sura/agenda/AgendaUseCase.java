@@ -38,21 +38,26 @@ public class AgendaUseCase implements AgendaFactory {
         return agendaRepository.desasignarProfesionalTurno(fechaTurno,idHorarioTurno,idProfesional);
     }
 
-    public Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno,Integer idHorarioTurno){
-        return agendaRepository.desagendarTurnocompleto(fechaTurno,idHorarioTurno);
+    public Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno,Integer idHorarioTurno,String idCiudad){
+        return agendaRepository.desagendarTurnocompleto(fechaTurno,idHorarioTurno,idCiudad);
     }
 
     public Flux<Profesional> consultarProfesionalesByCiudad(String idCiudad) {
         return agendaRepository.consultarProfesionalesByIdCiudad(idCiudad);
     }
 
-  public Flux<Actividad> consultarActividadesProfesionalesCiudadHorario(
+    public Flux<Actividad> consultarActividadesProfesionalesCiudadHorario(
           LocalDate fechaTurno,
           Integer idHorarioTurno,
           String idCiudad) {
         return agendaRepository
                 .consultarActividadesByProfesionalesCiudadHorarioTurno(fechaTurno,idHorarioTurno,idCiudad);
     }
+     public Mono<Void> autoagendarTurnoCompleto( LocalDate fechaTurno,
+                                                 Integer idHorarioTurno,
+                                                 String idCiudad){
+        return agendaRepository.autoagendarTurnoCompleto(fechaTurno,idHorarioTurno,idCiudad);
+     }
 
     public Flux<Desplazamiento> consultarDesplazamientoByIdCitaPartida(
             LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad){

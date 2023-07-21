@@ -38,4 +38,8 @@ public class CitaData {
     private String idProfesional;
     @Column("id_conductor")
     private String idConductor;
+    @Column("latitud")
+    private Double latitud;
+    @Column("longitud")
+    private Double longitud;
 }

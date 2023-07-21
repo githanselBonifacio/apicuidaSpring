@@ -84,7 +84,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 .extraerRemisionDiagnosticoData(remisionRequest.getDiagnosticos(), idRemision);
 
         //citas
-        List<CitaData> citasData = ConverterRemision.convertirCitasDataList(citasRequest, idRemision,idCiudad);
+        List<CitaData> citasData = ConverterRemision.convertirCitasDataList(citasRequest, remisionRequest);
 
         List<TratamientoData> tratamientosData = ConverterRemision.extraerTratamientoData(citasRequest);
 

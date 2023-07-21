@@ -1,8 +1,12 @@
 package co.com.sura.autoagendar;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.javatuples.Pair;
+import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -12,6 +16,7 @@ import java.util.stream.Collectors;
 import static co.com.sura.autoagendar.Helper.*;
 
 @Data
+
 public class AutoAgendador {
     private CitaGenetic origen;
     private List<CitaGenetic> citas;
@@ -117,10 +122,6 @@ public class AutoAgendador {
                 int holguraAcumulada = (int) (citasIndividuo.get(c+1).getFechaInicioIso() -
                                         (citasIndividuo.get(c).getFechaInicioIso()+tiempoTotalDesplazamiento));
 
-               /* System.out.println(tiempoDesplazamiento+" :: "+citasIndividuo.get(c).getDuracion()+" :: "+
-                        citasIndividuo.get(c+1).getFechaInicioIso() +" :: "+citasIndividuo.get(c).getFechaInicioIso()
-                +":: "+(citasIndividuo.get(c+1).getFechaInicioIso()-citasIndividuo.get(c).getFechaInicioIso())
-                +":: "+holguraAcumulada);*/
 
                 if (holguraAcumulada<0){
                     holgurasAcumuladas.add((int) ( -1*Math.abs(holguraAcumulada*(this.penalizacionHolgura))));
@@ -131,7 +132,6 @@ public class AutoAgendador {
             puntajeAptitud.add(holgurasAcumuladas);
 
         }
-     //   System.out.println("///////////////////////////////////////////////////////////////////////////");
         return puntajeAptitud;
     }
     private static double calcularAptitudGlobalIndividuo(List<List<Integer>> aptitudIndiviuo){
@@ -230,11 +230,31 @@ public class AutoAgendador {
                         .collect(Collectors.toList())
         );
     }
+
     public Resultado mejorSolucion() {
-        return Collections.max(
+        var mejorResultado = Collections.max(
                 this.resultadoActual
                         .values(),Comparator.comparing(Resultado::getPuntajeAptitudGlobalIndividuo)
         );
+        List<Pair<Integer,Integer>> coordenadasHolguraNegativa = encontrarHorguraNegativa(
+                mejorResultado.getPuntajeAptitudIndividuo(),1
+        );
+        Individuo individuo = mejorResultado.getIndividuo();
+        List<List<CitaGenetic>> nuevalistaCitasGen = new ArrayList<>();
+
+        for(var i = 0;i<individuo.getCitaGen().size();i++){
+            List<CitaGenetic> itemIndividuo = new ArrayList<>();
+            for(var  j = 0; j<individuo.getCitaGen().get(i).size();j++){
+                if(!coordenadasHolguraNegativa.contains(new Pair<>(i,j))){
+                    itemIndividuo.add(individuo.getCitaGen().get(i).get(j));
+                }
+
+            }
+            nuevalistaCitasGen.add(itemIndividuo);
+        }
+
+        mejorResultado.setIndividuo( new Individuo(nuevalistaCitasGen));
+        return mejorResultado;
     }
     public void run (){
         this.crearPoblacionInicial();
@@ -249,64 +269,4 @@ public class AutoAgendador {
             }
         }
     }
-
-
-    /*public static void main(String[] args) {
-
-        List<CitaGenetic> citas = new ArrayList<>();
-        citas.add(new CitaGenetic("1",10.998867,-74.827570,1800,900,
-                LocalDateTime.of(2023, 7, 14, 8, 0).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("2",11.004831,-74.816292,3600,3600,
-                LocalDateTime.of(2023, 7, 14, 10, 15).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("3",11.001397,-74.826874,900,27000,
-                LocalDateTime.of(2023, 7, 14, 9, 30).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("4",10.993486,-74.820135,1200,900,
-                LocalDateTime.of(2023, 7, 14, 11, 0).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("5",10.977166,-74.816718,4200,1800,
-                LocalDateTime.of(2023, 7, 14, 8, 30).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("6",10.972345,-74.807658,4500,900,
-                LocalDateTime.of(2023, 7, 14, 10, 45).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("7",10.970669,-74.810724,5200,1800,
-                LocalDateTime.of(2023, 7, 14, 12, 30).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("8",10.968626,-74.804684,3600,900,
-                LocalDateTime.of(2023, 7, 14, 8, 15).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("9",10.966256,-74.810394,1800,5500,
-                LocalDateTime.of(2023, 7, 14, 10, 30).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("10",10.965350,-74.817936,7200,900,
-                LocalDateTime.of(2023, 7, 14, 11, 40).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("11",10.989135,-74.808344,4800,2200,
-                LocalDateTime.of(2023, 7, 14, 12, 0).toEpochSecond(ZoneOffset.UTC)));
-
-        citas.add(new CitaGenetic("12",10.988777,-74.814695,2700,900,
-                LocalDateTime.of(2023, 7, 14, 11, 50).toEpochSecond(ZoneOffset.UTC)));
-
-        CitaGenetic origen = new CitaGenetic("0",11.001311083973969,-74.81237704232935,0,900,
-                LocalDateTime.of(2023, 7, 14, 7, 0).toEpochSecond(ZoneOffset.UTC));
-
-        AutoAgendador autoAgendador = new AutoAgendador(
-                origen,
-                citas,
-                4,
-                500,
-                10,
-                5,
-                10e6
-        );
-        autoAgendador.run();
-        Resultado mejorResultado = autoAgendador.mejorSolucion();
-
-        System.out.println("////////////////////////////////////////////////////////////////////////////////");
-        System.out.println(mejorResultado.getPuntajeAptitudGlobalIndividuo()+"-"+mejorResultado.getIndividuo());
-        System.out.println(mejorResultado.getPuntajeAptitudIndividuo());
-    }*/
 }

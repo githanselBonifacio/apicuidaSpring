@@ -19,6 +19,8 @@ public class Cita {
     private Integer holgura;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaProgramada;
+    private Double latitud;
+    private Double longitud;
     private String especialidad;
     private Integer idEstado;
     private String idCiudad;
