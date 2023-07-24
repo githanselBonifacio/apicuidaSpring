@@ -1,0 +1,8 @@
+
+
+dependencies {
+    implementation "org.javatuples:javatuples:${javatuplesVersion}"
+    implementation "org.springframework:spring-context:${springFrameworkVersion}"
+    implementation  project(':domain-model')
+    implementation  project(':driven-adapters-mapbox')
+}

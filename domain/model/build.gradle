@@ -1,9 +1,9 @@
-dependencies {
-    implementation 'org.projectlombok:lombok:1.18.16'
 
-    dependencies {
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
-        implementation 'org.javatuples:javatuples:1.2'
+
+dependencies {
+        implementation "org.projectlombok:lombok:${lombokVersion}"
+        implementation "com.fasterxml.jackson.core:jackson-databind:${jacksondatabindVersion}"
+        implementation "org.javatuples:javatuples:${javatuplesVersion}"
     }
 
-}
+

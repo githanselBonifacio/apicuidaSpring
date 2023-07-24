@@ -1,43 +1,76 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
-import co.com.sura.autoagendar.AutoAgendador;
-import co.com.sura.autoagendar.CitaGenetic;
-import co.com.sura.autoagendar.Resultado;
-import co.com.sura.entity.agenda.*;
-import co.com.sura.entity.remision.*;
-import co.com.sura.postgres.repository.agenda.data.*;
-import co.com.sura.postgres.repository.remision.data.*;
+
+
+import co.com.sura.autoagendador.AutoAgendador;
+
+import co.com.sura.autoagendador.OrigenCiudad;
+import co.com.sura.autoagendador.Resultado;
+import co.com.sura.entity.agenda.AgendaRepository;
+import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.entity.agenda.Desplazamiento;
+import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.Tarea;
+import co.com.sura.entity.remision.Cita;
+import co.com.sura.entity.remision.Curacion;
+import co.com.sura.entity.remision.Canalizacion;
+import co.com.sura.entity.remision.Secrecion;
+import co.com.sura.entity.remision.SoporteNutricional;
+import co.com.sura.entity.remision.Sondaje;
+import co.com.sura.entity.remision.Tratamiento;
+import co.com.sura.entity.remision.Fototerapia;
+import co.com.sura.entity.remision.TomaMuestra;
+import co.com.sura.postgres.repository.agenda.data.CitaData;
+import co.com.sura.postgres.repository.agenda.data.DesplazamientoData;
+import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
+import co.com.sura.postgres.repository.agenda.data.TurnoProfesionalesData;
+import co.com.sura.postgres.repository.agenda.data.ProfesionalRepository;
+import co.com.sura.postgres.repository.agenda.data.TurnoProfesionalesRepository;
+import co.com.sura.postgres.repository.agenda.data.DesplazamientoRepository;
+import co.com.sura.postgres.repository.remision.data.TomaMuestraRepository;
+import co.com.sura.postgres.repository.remision.data.CanalizacionRepository;
+import co.com.sura.postgres.repository.remision.data.SoporteNutricionalRepository;
+import co.com.sura.postgres.repository.remision.data.SondajeRepository;
+import co.com.sura.postgres.repository.remision.data.TratamientoRepository;
+import co.com.sura.postgres.repository.remision.data.FototerapiaRepository;
+import co.com.sura.postgres.repository.remision.data.CuracionRepository;
+import co.com.sura.postgres.repository.remision.data.SecrecionRepository;
+import co.com.sura.services.mapbox.GeoUbicacion;
+import co.com.sura.services.mapbox.MapboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import static co.com.sura.autoagendar.IdCiudad.getByIdCiudad;
-import static co.com.sura.autoagendar.OrigenCiudad.getOrigenCiudadById;
+import static co.com.sura.autoagendador.IdCiudad.getByIdCiudad;
 import static co.com.sura.postgres.repository.agenda.data.DesplazamientoData.crearDesplazamientoData;
 
 @Repository
 public class AgendaRepositoryAdapter implements AgendaRepository {
 
-    private static final Integer MAXSIZE                   = 2;
-    private static final Integer NUMERO_GENERACIONES       = 2000;
-    private static final Integer SIZE_POBLACION_INICIAL    = 10;
-    private static final Integer NUMERO_PADRES_EMPAREJADOS = 5;
+    private static final Integer MAXSIZE                       = 2;
+    private static final Integer NUMERO_GENERACIONES           = 2000;
+    private static final Integer SIZE_POBLACION_INICIAL        = 10;
+    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 5;
+    private static final Integer HOLGURA_DEFECTO               = 1200;
     private static final double  PENALIZACION_HOLGURA_NEGATIVA = 1e6;
 
-    private static final String DESPLAZAMIENTO_VISITA = "dvisita";
-    private static final String TIPO_TAREA_VISITA = "visita";
+    private static final String DESPLAZAMIENTO_VISITA          = "dvisita";
+    private static final String TIPO_TAREA_VISITA              = "visita";
+
     @Autowired
-    private ProfesionalRepository profesionalRepository;
+    private MapboxService mapboxService;
 
     @Autowired
     private TurnoProfesionalesRepository turnoProfesionalesRepository;
+
+    @Autowired
+    private ProfesionalRepository profesionalRepository;
 
     @Autowired
     private CitaRepository citaRepository;
@@ -205,50 +238,57 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 .then(citaRepository.desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idCiudad));
     }
 
+    private Mono<Void> asignarListaCitaToProfesionalAutoagendar (
+            List<ProfesionalData> profesionalesDataList, Resultado mejoResultado){
+        return Flux.fromIterable(profesionalesDataList)
+           .flatMap(profesionalData -> {
+              int index = profesionalesDataList.indexOf(profesionalData);
+              int sizeCitasGen = mejoResultado.getIndividuo().getCitaGen().get(index).size();
+              return Flux.fromIterable(mejoResultado.getIndividuo().getCitaGen().get(index).subList(1, sizeCitasGen))
+                            .flatMap(citaGenetic -> {
+                                String idCita = citaGenetic.getIdCita();
+                                String idProfesional = profesionalData.getNumeroIdentificacion();
+                                return citaRepository.agendarToProfesional(idCita, idProfesional);
+                            });
+                }).then();
+    }
+    private Mono<Void> insertDesplazamientosAllCitasByProfesional(
+            LocalDate fechaTurno, String idCiudad,Integer idHorarioTurno){
+
+        return profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
+                .collectList()
+                .flatMap(profesionalListData -> Flux.fromIterable(profesionalListData)
+                        .flatMap(profesionalData -> calcularDesplazamientoCitaByProfesional(
+                                fechaTurno,
+                                idHorarioTurno,
+                                idCiudad,
+                                profesionalData.getNumeroIdentificacion()
+                        )).then());
+    }
+
     @Override
     public Mono<Void> autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
-        return desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idCiudad)
-                  .then(citaRepository.findCitasByTurnoCiudad(fechaTurno,idHorarioTurno,idCiudad)
-                  .collectList()
-                  .flatMap(citaDataList -> profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
-                        .collectList()
-                        .flatMap(profesionalesDataList -> {
-                           AutoAgendador autoAgendador = new AutoAgendador(
-                               getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
-                               ConverterAgenda.convertToListCitaGenetic(citaDataList),
-                                      profesionalesDataList.size(),
-                                      NUMERO_GENERACIONES,
-                                      SIZE_POBLACION_INICIAL,
-                                      NUMERO_PADRES_EMPAREJADOS,
-                                      PENALIZACION_HOLGURA_NEGATIVA
+      return desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idCiudad)
+         .then(citaRepository.findCitasByTurnoCiudad(fechaTurno,idHorarioTurno,idCiudad)
+         .collectList()
+         .flatMap(citaDataList -> profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
+             .collectList()
+             .flatMap(profesionalesDataList -> {
+               var autoAgendador = new AutoAgendador(
+                  OrigenCiudad.getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
+                  ConverterAgenda.convertToListCitaGenetic(citaDataList),
+                  profesionalesDataList.size(),
+                  NUMERO_GENERACIONES, SIZE_POBLACION_INICIAL, NUMERO_PADRES_EMPAREJADOS, PENALIZACION_HOLGURA_NEGATIVA
+                        );
+                        autoAgendador.run();
+                        var mejoResultado = autoAgendador.mejorSolucion();
+                        return asignarListaCitaToProfesionalAutoagendar(
+                                       profesionalesDataList,mejoResultado
                                );
-                               autoAgendador.run();
-                               var mejoResultado = autoAgendador.mejorSolucion();
-
-                               return Flux.fromIterable(profesionalesDataList)
-                                   .flatMap(profesionalData -> {
-                                      int index = profesionalesDataList.indexOf(profesionalData);
-                                      int sizeCitasGen = mejoResultado.getIndividuo().getCitaGen().get(index).size();
-                                      return Flux.fromIterable(mejoResultado.getIndividuo()
-                                                    .getCitaGen().get(index).subList(1,sizeCitasGen))
-                                                    .flatMap(citaGenetic -> {
-                                                    String idCita = citaGenetic.getIdCita();
-                                                    String idProfesional = profesionalData.getNumeroIdentificacion();
-                                                    return citaRepository.agendarToProfesional(idCita, idProfesional);
-                                                    });
-                                   }).then();
-                        })
-                   )).then(profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
-                        .collectList()
-                        .flatMap(profesionalListData -> Flux.fromIterable(profesionalListData)
-                                .flatMap(profesionalData -> calcularDesplazamientoCitaByProfesional(
-                                        fechaTurno,
-                                        idHorarioTurno,
-                                        idCiudad,
-                                        profesionalData.getNumeroIdentificacion()
-                                ))
-                                .then())
-                );
+               })
+         )).then(
+               insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno
+         ));
 
     }
 
@@ -274,10 +314,16 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                       List<DesplazamientoData> desplazamientosList = new ArrayList<>();
                       CitaData citaPartida = citas.get(0);
                       CitaData citaDestino = citas.get(1);
-                      DesplazamientoData desplazamientoData = crearDesplazamientoData(citaPartida,citaDestino)
+
+                      var duracionViaje = mapboxService.calcularTiempoViaje(
+                              new GeoUbicacion(citaPartida.getLatitud(),citaPartida.getLongitud()),
+                              new GeoUbicacion(citaDestino.getLatitud(),citaDestino.getLongitud())).block();
+
+                      var desplazamientoData = crearDesplazamientoData(citaPartida,citaDestino)
                             .toBuilder().tipo(DESPLAZAMIENTO_VISITA)
-                            .idHorarioTurno(idHorarioTurno).duracion(1200).holgura(1200).build();
+                            .idHorarioTurno(idHorarioTurno).duracion(duracionViaje).holgura(HOLGURA_DEFECTO).build();
                          desplazamientosList.add(desplazamientoData);
+
                          return desplazamientoRepository.saveAll(desplazamientosList);
                          }
                       ).then()

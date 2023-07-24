@@ -1,7 +1,7 @@
 
 dependencies {
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-geojson:6.12.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:6.12.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:6.12.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-core:6.12.0'
+    implementation "org.springframework.boot:spring-boot-starter-web:${springWebVersion}"
+    implementation "org.springframework:spring-context:${springFrameworkVersion}"
+    implementation "org.javatuples:javatuples:${javatuplesVersion}"
+    implementation  project(':domain-model')
 }

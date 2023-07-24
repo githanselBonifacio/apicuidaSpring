@@ -1,13 +1,15 @@
-package co.com.sura.autoagendar;
+package co.com.sura.autoagendador;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import static co.com.sura.autoagendar.Helper.encontrarSumandos;
+import static co.com.sura.autoagendador.Helper.encontrarSumandos;
 
 
 @Data

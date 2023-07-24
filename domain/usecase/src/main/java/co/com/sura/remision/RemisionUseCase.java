@@ -6,7 +6,6 @@ import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.Paciente;
 import co.com.sura.entity.remision.RemisionFactory;
 import co.com.sura.entity.remision.RemisionCrudRepository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -33,4 +32,5 @@ public class RemisionUseCase implements RemisionFactory {
     public Mono<Paciente> consultarPacienteFromRemision(String idRemision){
         return remisionCrudRepository.consultarPacienteFromRemision(idRemision);
     }
+
 }

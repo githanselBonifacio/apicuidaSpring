@@ -1,23 +1,24 @@
-package co.com.sura.autoagendar;
+package co.com.sura.autoagendador;
 
-
+import co.com.sura.services.mapbox.MapboxService;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.javatuples.Pair;
-import reactor.util.function.Tuple2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static co.com.sura.autoagendar.Helper.*;
+import static co.com.sura.autoagendador.Helper.*;
 
 @Data
-
 public class AutoAgendador {
+    private static final Integer DOS = 2;
+    private static final Double UMBRAL = 0.5;
+    private Helper helper;
     private CitaGenetic origen;
     private List<CitaGenetic> citas;
     private Integer numeroMoviles;
@@ -34,8 +35,6 @@ public class AutoAgendador {
 
     private final Random random;
 
-    private  final Integer DOS = 2;
-    private final Double UMBRAL = 0.5;
     public AutoAgendador(
             CitaGenetic origen,
             List<CitaGenetic> citas,
@@ -61,10 +60,10 @@ public class AutoAgendador {
 
 
     public void crearPoblacionInicial(){
-       Poblacion poblacionInicial = new Poblacion();
+       var poblacionInicial = new Poblacion();
        List<Individuo> individuos = new ArrayList<>();
        for (var i=0;i<this.sizePoblacionInicial;i++){
-          Individuo individuo =  Individuo
+          var individuo =  Individuo
                    .builder()
                    .citaGen(
                        new ArrayList<>(
@@ -107,7 +106,7 @@ public class AutoAgendador {
                 );
 
                 if (consultaTiempoDesplazamiento == null){
-                     tiempoDesplazamiento = calcularTiempoDesplazamiento(
+                     tiempoDesplazamiento = helper.calcularTiempoDesplazamiento(
                             citasIndividuo.get(c).getLatitud(),
                             citasIndividuo.get(c).getLongitud(),
                             citasIndividuo.get(c+1).getLatitud(),
@@ -205,7 +204,7 @@ public class AutoAgendador {
         for (Resultado resultado: this.resultadoActual.values()) {
 
             var coor =
-                    encontrarHorguraNegativa(resultado.getPuntajeAptitudIndividuo(), (int)(Math.random()*DOS));
+                    encontrarHorguraNegativa(resultado.getPuntajeAptitudIndividuo(), random.nextInt(DOS));
 
             if (coor.isEmpty()){
                 return new Poblacion();
@@ -239,7 +238,7 @@ public class AutoAgendador {
         List<Pair<Integer,Integer>> coordenadasHolguraNegativa = encontrarHorguraNegativa(
                 mejorResultado.getPuntajeAptitudIndividuo(),1
         );
-        Individuo individuo = mejorResultado.getIndividuo();
+        var individuo = mejorResultado.getIndividuo();
         List<List<CitaGenetic>> nuevalistaCitasGen = new ArrayList<>();
 
         for(var i = 0;i<individuo.getCitaGen().size();i++){

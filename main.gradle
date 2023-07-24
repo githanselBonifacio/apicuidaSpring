@@ -8,12 +8,14 @@ subprojects {
 
     repositories {
         mavenCentral()
+        google()
         maven { url "https://repo.spring.io/snapshot" }
         maven { url "https://repo.spring.io/milestone" }
     }
 
     dependencies {
         testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+        testImplementation "org.springframework.boot:spring-boot-starter:${springBootVersion}"
         testImplementation "io.projectreactor:reactor-test:${reactorVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"

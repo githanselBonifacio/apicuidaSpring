@@ -10,5 +10,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
     implementation 'org.modelmapper:modelmapper:3.1.1'
     implementation  project(':domain-model')
+    implementation  project(':driven-adapters-mapbox')
+    implementation  project(':driven-adapters-autoagendador')
 
 }

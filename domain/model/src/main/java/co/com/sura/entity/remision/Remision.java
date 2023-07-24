@@ -1,6 +1,5 @@
 package co.com.sura.entity.remision;
 
-import co.com.sura.dto.remision.CiudadRequest;
 import co.com.sura.entity.maestro.Ciudad;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,5 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.maestro.TipoIdentificacion;
-import co.com.sura.entity.remision.Ubicacion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

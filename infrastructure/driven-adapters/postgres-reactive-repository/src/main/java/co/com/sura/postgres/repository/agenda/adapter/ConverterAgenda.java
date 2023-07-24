@@ -1,15 +1,32 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
-import co.com.sura.autoagendar.CitaGenetic;
+
+import co.com.sura.autoagendador.CitaGenetic;
 import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.agenda.Tarea;
-import co.com.sura.entity.remision.*;
+import co.com.sura.entity.remision.Tratamiento;
+import co.com.sura.entity.remision.Fototerapia;
+import co.com.sura.entity.remision.TomaMuestra;
+import co.com.sura.entity.remision.Sondaje;
+import co.com.sura.entity.remision.Canalizacion;
+import co.com.sura.entity.remision.Cita;
+import co.com.sura.entity.remision.Curacion;
+import co.com.sura.entity.remision.SoporteNutricional;
+import co.com.sura.entity.remision.Secrecion;
+import co.com.sura.entity.remision.Medicamento;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
-import co.com.sura.postgres.repository.remision.data.*;
+import co.com.sura.postgres.repository.remision.data.TratamientoData;
+import co.com.sura.postgres.repository.remision.data.CanalizacionData;
+import co.com.sura.postgres.repository.remision.data.CuracionData;
+import co.com.sura.postgres.repository.remision.data.TomaMuestraData;
+import co.com.sura.postgres.repository.remision.data.SondajeData;
+import co.com.sura.postgres.repository.remision.data.SecrecionData;
+import co.com.sura.postgres.repository.remision.data.FototerapiaData;
+import co.com.sura.postgres.repository.remision.data.SoporteNutricionalData;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneOffset;
@@ -19,6 +36,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ConverterAgenda {
+
 
     public static Profesional convertToProfesional(ProfesionalData profesionalData){
         return new Profesional()
@@ -100,15 +118,15 @@ public class ConverterAgenda {
                 .map(ConverterAgenda::convertToCitaGenetic)
                 .collect(Collectors.toList());
     }
-    public static CitaGenetic convertToCitaGenetic(CitaData CitaData){
+    public static CitaGenetic convertToCitaGenetic(CitaData citaData){
         return new CitaGenetic()
                 .toBuilder()
-                .idCita(CitaData.getIdCita())
-                .duracion(CitaData.getDuracion())
-                .holgura(CitaData.getHolgura())
-                .fechaInicioIso(CitaData.getFechaProgramada().toEpochSecond(ZoneOffset.UTC))
-                .latitud(CitaData.getLatitud())
-                .longitud(CitaData.getLongitud())
+                .idCita(citaData.getIdCita())
+                .duracion(citaData.getDuracion())
+                .holgura(citaData.getHolgura())
+                .fechaInicioIso(citaData.getFechaProgramada().toEpochSecond(ZoneOffset.UTC))
+                .latitud(citaData.getLatitud())
+                .longitud(citaData.getLongitud())
                 .build();
     }
     public static Desplazamiento converToDesplazamiento(DesplazamientoData desplazamientoData){

@@ -1,4 +1,4 @@
-package co.com.sura.autoagendar;
+package co.com.sura.autoagendador;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Data
@@ -17,10 +15,6 @@ import java.util.List;
 public class Individuo implements Comparable<Individuo>, Cloneable{
     private List<List<CitaGenetic>> citaGen;
 
-    public Individuo(Individuo individuo) {
-        this.citaGen = individuo.citaGen;
-    }
-
     @Override
     public int compareTo(Individuo o) {
         return this.citaGen.get(0).get(0).compareTo(o.citaGen.get(0).get(0));
@@ -28,13 +22,7 @@ public class Individuo implements Comparable<Individuo>, Cloneable{
     }
     public void sortCitaGen() {
         for (List<CitaGenetic> sublist : citaGen) {
-            Collections.sort(sublist, new Comparator<CitaGenetic>() {
-
-                @Override
-                public int compare(CitaGenetic o1, CitaGenetic o2) {
-                    return o1.compareTo(o2);
-                }
-            });
+            sublist.sort(CitaGenetic::compareTo);
         }
     }
 

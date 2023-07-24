@@ -1,6 +1,5 @@
 package co.com.sura.entity.remision;
 
-import co.com.sura.dto.remision.UbicacionRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

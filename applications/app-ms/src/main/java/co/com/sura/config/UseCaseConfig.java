@@ -6,6 +6,7 @@ import co.com.sura.entity.maestro.MaestroRepository;
 import co.com.sura.entity.remision.RemisionCrudRepository;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.remision.RemisionUseCase;
+import co.com.sura.services.mapbox.MapboxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,4 +29,6 @@ public class UseCaseConfig {
     public RemisionUseCase remisionUseCase (RemisionCrudRepository remisionCrudRepository){
         return new RemisionUseCase(remisionCrudRepository);
     }
+
+
 }

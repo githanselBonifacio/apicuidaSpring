@@ -1,4 +1,4 @@
-package co.com.sura.autoagendar;
+package co.com.sura.autoagendador;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +16,4 @@ public class Resultado {
     private List<List<Integer>> puntajeAptitudIndividuo;
     private Individuo individuo;
 
-    public Resultado(Individuo individuo) {
-        this.individuo = individuo;
-    }
 }

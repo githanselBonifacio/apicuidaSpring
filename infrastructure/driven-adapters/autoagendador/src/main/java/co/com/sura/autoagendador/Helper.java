@@ -1,7 +1,9 @@
-package co.com.sura.autoagendar;
+package co.com.sura.autoagendador;
 
+import co.com.sura.services.mapbox.GeoUbicacion;
+import co.com.sura.services.mapbox.MapboxService;
 import org.javatuples.Pair;
-
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,7 +11,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+
 public class Helper {
+    @Autowired
+    private MapboxService mapboxService;
+
     public static Individuo intercambiarElementos(
             List<List<CitaGenetic>> citasGen, Pair<Integer,Integer> pos1, Pair<Integer,Integer> pos2) {
 
@@ -47,19 +53,26 @@ public class Helper {
                 .orElse(-1);
     }
 
-    public static Integer calcularTiempoDesplazamiento(Double lat1,Double lon1,Double lat2, Double lon2 ){
-        double earthRadius = 6371; // in kilometers
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = earthRadius * c;
-        double speed = 50; // in kilometers per hour
-        double time = distance / speed; // in hours
-        //System.out.println(time*3600);
-        return (int) (time*3600); // in minutes
+    public  Integer calcularTiempoDesplazamiento(Double lat1,Double lon1,Double lat2, Double lon2 ){
+
+        var pos1 = GeoUbicacion
+                .builder()
+                .latitud(lat1)
+                .longitud(lon1)
+                .build();
+
+        var pos2 =GeoUbicacion
+                .builder()
+                .latitud(lat2)
+                .longitud(lon2)
+                .build();
+
+        var tiempoViajeMono =mapboxService.calcularTiempoViaje(pos1,pos2);
+        if (tiempoViajeMono != null) {
+            return tiempoViajeMono.block();
+        } else {
+            return 0;
+        }
     }
 
     public static List<Integer> encontrarSumandos(int numero, int numerosSumandos) {

@@ -31,16 +31,6 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "WHERE turno_cita.fecha_turno = $1 " +
             "AND turno_cita.id_horario_turno = $2 " +
             "AND cita.id_ciudad = $3 " +
-            "AND cita.id_estado != 5;")
-    Flux<CitaData> findCitasByCiudadTurno(
-            LocalDate fechaTurno,
-            Integer idHorarioTurno,
-            String idCiudad );
-    @Query("SELECT cita.* FROM cita " +
-            "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita " +
-            "WHERE turno_cita.fecha_turno = $1 " +
-            "AND turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_ciudad = $3 " +
             "AND cita.id_estado != 5 " +
             "AND cita.id_profesional = $4 " +
             "ORDER BY public.cita.fecha_inicio ASC;")
@@ -50,23 +40,26 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             String idCiudad,
             String numeroIdentificacionProfesional);
 
+
     @Query("UPDATE public.cita " +
             "SET  id_estado=2, id_profesional=$2 " +
             "WHERE id_cita = $1 " +
             "AND " +
             "(SELECT id_ciudad from public.profesionales WHERE numero_identificacion = $2) = public.cita.id_ciudad;")
-
     Mono<Void> agendarToProfesional(String idCita, String idProfesional);
+
 
     @Query("UPDATE public.cita " +
             "SET  id_estado=1, id_profesional=NULL " +
             "WHERE id_cita = $1;")
     Mono<Void> desagendarToProfesional(String idCita);
 
+
     @Query("UPDATE public.cita " +
             "SET  fecha_programada= $1 " +
             "WHERE id_cita = $2;")
     Mono<Void> actualizarFechaProgramada(LocalDateTime fechaTurno, String idCita);
+
 
     @Query("UPDATE cita " +
             "SET id_estado = 1 , id_profesional=NULL " +
@@ -76,6 +69,7 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "AND turno_cita.id_horario_turno = $2 " +
             "AND cita.id_ciudad = $3;")
     Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad);
+
 
     @Query("INSERT INTO cita " +
             "(id_cita, id_remision, duracion, holgura, fecha_inicio, especialidad, id_ciudad,fecha_programada" +
@@ -117,6 +111,4 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
                 .flatMap(this::insertCita)
                 .then();
     }
-
-
 }

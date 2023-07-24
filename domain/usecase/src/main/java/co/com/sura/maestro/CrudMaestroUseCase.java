@@ -1,8 +1,13 @@
 package co.com.sura.maestro;
 
-import co.com.sura.entity.maestro.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import co.com.sura.entity.maestro.MaestroFactory;
+import co.com.sura.entity.maestro.MaestroRepository;
+import co.com.sura.entity.maestro.Ciudad;
+import co.com.sura.entity.maestro.HorarioTurno;
+import co.com.sura.entity.maestro.TipoIdentificacion;
+import co.com.sura.entity.maestro.PlanSalud;
 
 public class CrudMaestroUseCase implements MaestroFactory {
 

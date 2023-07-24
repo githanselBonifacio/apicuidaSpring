@@ -18,12 +18,6 @@ import java.util.stream.Collectors;
 @Component
 public class ConverterRemision {
 
-    public static Remision convertToRemision(RemisionData remisionData){
-        return new Remision();
-    }
-    public static RemisionData convertToRemisionData(Remision remision){
-        return new RemisionData();
-    }
     public static RemisionData convertToRemisionRequest(RemisionRequest remisionRequest){
 
         return new RemisionData()

@@ -1,7 +1,8 @@
-package co.com.sura.autoagendar;
+package co.com.sura.autoagendador;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +17,11 @@ public class Poblacion implements Cloneable{
 
     @Override
     protected Poblacion clone()  {
-        Poblacion cloned = null;
+        Poblacion cloned;
         try {
             cloned = (Poblacion) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
+            throw  new AssertionError();
         }
         cloned.individuos = new ArrayList<>(this.individuos);
         return cloned;

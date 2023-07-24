@@ -1,4 +1,4 @@
-package co.com.sura.autoagendar;
+package co.com.sura.autoagendador;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

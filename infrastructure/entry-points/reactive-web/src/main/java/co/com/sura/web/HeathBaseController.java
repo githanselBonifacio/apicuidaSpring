@@ -12,4 +12,9 @@ public class HeathBaseController {
     public Mono<String> root(){
         return Mono.just("apicuida ok");
     }
+    @GetMapping("/apicuida")
+
+    public Mono<String> api(){
+        return Mono.just("apicuida ok");
+    }
 }
