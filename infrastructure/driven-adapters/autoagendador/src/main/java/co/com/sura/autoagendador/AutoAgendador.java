@@ -1,13 +1,12 @@
 package co.com.sura.autoagendador;
 
+import co.com.sura.services.mapbox.GeoUbicacion;
 import co.com.sura.services.mapbox.MapboxService;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,6 +15,8 @@ import static co.com.sura.autoagendador.Helper.*;
 
 @Data
 public class AutoAgendador {
+
+    private MapboxService mapboxService;
     private static final Integer DOS = 2;
     private static final Double UMBRAL = 0.5;
     private Helper helper;
@@ -35,6 +36,7 @@ public class AutoAgendador {
 
     private final Random random;
 
+    @Autowired
     public AutoAgendador(
             CitaGenetic origen,
             List<CitaGenetic> citas,
@@ -42,7 +44,8 @@ public class AutoAgendador {
             Integer numeroGeneraciones,
             Integer sizePoblacionInicial,
             Integer numeroPadresEnparejados,
-            Double penalizacionHolgura) {
+            Double penalizacionHolgura,
+            MapboxService mapboxService) {
 
         this.origen = origen;
         this.citas = new ArrayList<>(citas);
@@ -56,6 +59,7 @@ public class AutoAgendador {
         this.resultadoActual = new HashMap<>();
 
         this.random = new Random();
+        this.mapboxService =mapboxService;
     }
 
 
@@ -88,6 +92,27 @@ public class AutoAgendador {
         }
         return null;
     }
+    public  Integer calcularTiempoDesplazamiento(Double lat1,Double lon1,Double lat2, Double lon2 ){
+
+        var pos1 = GeoUbicacion
+                .builder()
+                .latitud(lat1)
+                .longitud(lon1)
+                .build();
+
+        var pos2 =GeoUbicacion
+                .builder()
+                .latitud(lat2)
+                .longitud(lon2)
+                .build();
+
+        var tiempoViajeMono =mapboxService.calcularTiempoViaje(pos1,pos2);
+        if (tiempoViajeMono != null) {
+            return tiempoViajeMono.block();
+        } else {
+            return 0;
+        }
+    }
     private List<List<Integer>> calcularAptitudIndividuo(Individuo individuo){
 
         List <List<Integer>> puntajeAptitud= new ArrayList<>();
@@ -106,12 +131,12 @@ public class AutoAgendador {
                 );
 
                 if (consultaTiempoDesplazamiento == null){
-                     tiempoDesplazamiento = helper.calcularTiempoDesplazamiento(
+                     tiempoDesplazamiento = 1200;/*calcularTiempoDesplazamiento(
                             citasIndividuo.get(c).getLatitud(),
                             citasIndividuo.get(c).getLongitud(),
                             citasIndividuo.get(c+1).getLatitud(),
                             citasIndividuo.get(c+1).getLongitud()
-                    );
+                    );*/
                 }else{
                     tiempoDesplazamiento = consultaTiempoDesplazamiento;
 

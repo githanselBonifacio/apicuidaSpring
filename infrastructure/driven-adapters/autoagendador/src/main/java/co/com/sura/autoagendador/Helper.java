@@ -1,9 +1,11 @@
 package co.com.sura.autoagendador;
 
+import co.com.sura.mapbox.repository.map.services.MapboxServicesImpl;
 import co.com.sura.services.mapbox.GeoUbicacion;
 import co.com.sura.services.mapbox.MapboxService;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,14 +13,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-
 public class Helper {
-    @Autowired
-    private MapboxService mapboxService;
+
 
     public static Individuo intercambiarElementos(
             List<List<CitaGenetic>> citasGen, Pair<Integer,Integer> pos1, Pair<Integer,Integer> pos2) {
-
 
             List<List<CitaGenetic>> nuevaListaIndividuo = new ArrayList<>(citasGen);
 
@@ -53,27 +52,6 @@ public class Helper {
                 .orElse(-1);
     }
 
-    public  Integer calcularTiempoDesplazamiento(Double lat1,Double lon1,Double lat2, Double lon2 ){
-
-        var pos1 = GeoUbicacion
-                .builder()
-                .latitud(lat1)
-                .longitud(lon1)
-                .build();
-
-        var pos2 =GeoUbicacion
-                .builder()
-                .latitud(lat2)
-                .longitud(lon2)
-                .build();
-
-        var tiempoViajeMono =mapboxService.calcularTiempoViaje(pos1,pos2);
-        if (tiempoViajeMono != null) {
-            return tiempoViajeMono.block();
-        } else {
-            return 0;
-        }
-    }
 
     public static List<Integer> encontrarSumandos(int numero, int numerosSumandos) {
         List<Integer> sumandos = new ArrayList<>();

@@ -54,9 +54,9 @@ import static co.com.sura.postgres.repository.agenda.data.DesplazamientoData.cre
 public class AgendaRepositoryAdapter implements AgendaRepository {
 
     private static final Integer MAXSIZE                       = 2;
-    private static final Integer NUMERO_GENERACIONES           = 2000;
+    private static final Integer NUMERO_GENERACIONES           = 1000;
     private static final Integer SIZE_POBLACION_INICIAL        = 10;
-    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 5;
+    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 10;
     private static final Integer HOLGURA_DEFECTO               = 1200;
     private static final double  PENALIZACION_HOLGURA_NEGATIVA = 1e6;
 
@@ -278,8 +278,9 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                   OrigenCiudad.getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
                   ConverterAgenda.convertToListCitaGenetic(citaDataList),
                   profesionalesDataList.size(),
-                  NUMERO_GENERACIONES, SIZE_POBLACION_INICIAL, NUMERO_PADRES_EMPAREJADOS, PENALIZACION_HOLGURA_NEGATIVA
-                        );
+                  NUMERO_GENERACIONES, SIZE_POBLACION_INICIAL, NUMERO_PADRES_EMPAREJADOS, PENALIZACION_HOLGURA_NEGATIVA,
+                        mapboxService);
+
                         autoAgendador.run();
                         var mejoResultado = autoAgendador.mejorSolucion();
                         return asignarListaCitaToProfesionalAutoagendar(
@@ -287,8 +288,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                                );
                })
          )).then(
-               insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno
-         ));
+               insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno));
 
     }
 

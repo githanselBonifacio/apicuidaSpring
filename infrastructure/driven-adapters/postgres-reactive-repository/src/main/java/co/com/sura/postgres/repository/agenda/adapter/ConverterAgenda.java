@@ -66,6 +66,8 @@ public class ConverterAgenda {
                 .fechaProgramada(citaData.getFechaProgramada())
                 .duracion(citaData.getDuracion())
                 .holgura(citaData.getHolgura())
+                .latitud(citaData.getLatitud())
+                .longitud(citaData.getLongitud())
                 .idEstado(citaData.getIdEstado())
                 .build();
     }

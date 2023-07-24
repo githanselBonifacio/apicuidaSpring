@@ -1,7 +1,6 @@
 package co.com.sura.web.agenda;
 
 import co.com.sura.agenda.AgendaUseCase;
-import co.com.sura.autoagendar.DesplazamientoMap;
 import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;

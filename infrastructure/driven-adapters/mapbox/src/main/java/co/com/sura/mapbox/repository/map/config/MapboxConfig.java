@@ -1,5 +1,7 @@
 package co.com.sura.mapbox.repository.map.config;
 
+import com.mapbox.api.directions.v5.MapboxDirections;
+import com.mapbox.geojson.Point;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -25,5 +27,14 @@ public class MapboxConfig {
 
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(uriBuilder));
        return restTemplate;
+    }
+
+   @Bean
+   public MapboxDirections mapboxDirections (){
+        return  MapboxDirections.builder()
+                .accessToken(properties.getAccessToken())
+                .origin(Point.fromLngLat(0.0, 0.0))
+                .destination(Point.fromLngLat(0.0, 0.0))
+                .build();
     }
 }

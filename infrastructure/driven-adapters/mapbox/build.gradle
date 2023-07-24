@@ -3,5 +3,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:${springWebVersion}"
     implementation "org.springframework:spring-context:${springFrameworkVersion}"
     implementation "org.javatuples:javatuples:${javatuplesVersion}"
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.8.0'
+    implementation 'androidx.annotation:annotation:1.0.0'
     implementation  project(':domain-model')
 }
