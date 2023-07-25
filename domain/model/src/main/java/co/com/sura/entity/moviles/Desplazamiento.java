@@ -1,5 +1,6 @@
-package co.com.sura.entity.agenda;
+package co.com.sura.entity.moviles;
 
+import co.com.sura.entity.agenda.Profesional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,11 @@ public class Desplazamiento {
     private LocalDateTime fechaProgramada;
     private Integer idHorarioTurno;
     private String tipo;
+    private Integer idEstado;
     private Integer duracion;
     private Integer holgura;
+    private String idMovil;
+
+    private Conductor conductor;
+    private Profesional profesional;
 }

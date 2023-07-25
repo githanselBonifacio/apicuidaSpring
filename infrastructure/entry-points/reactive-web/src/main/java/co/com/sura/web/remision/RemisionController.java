@@ -2,14 +2,16 @@ package co.com.sura.web.remision;
 
 
 import co.com.sura.dto.remision.CrearRemisionCitasRequest;
+import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.Paciente;
 import co.com.sura.remision.RemisionUseCase;
-import co.com.sura.services.mapbox.GeoUbicacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 
 @RestController
@@ -37,5 +39,17 @@ public class RemisionController {
     @GetMapping(value = "pacienteFromRemision/{idRemision}")
     public Mono<Paciente> consultarPacienteFromRemision(@PathVariable String idRemision){
         return remisionUseCase.consultarPacienteFromRemision(idRemision);
+    }
+
+    @GetMapping(value = "tratamientosFarmacia")
+    public Flux<PacienteTratamientoCita> consultarMedicamentosToFarmacia(){
+        return remisionUseCase.consultarAllTratamientosToFarmacia();
+    }
+
+    @PostMapping(value = "notificarFarmacia")
+    public Mono<Void>notificarMedicamentosToFarmacia(
+            @RequestBody List<PacienteTratamientoCita> tratamientoCitasList
+            ){
+        return remisionUseCase.notificarMedicamentosToFarmacia(tratamientoCitasList);
     }
 }

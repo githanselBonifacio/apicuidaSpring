@@ -3,7 +3,7 @@ package co.com.sura.postgres.repository.agenda.adapter;
 
 import co.com.sura.autoagendador.CitaGenetic;
 import co.com.sura.entity.agenda.Actividad;
-import co.com.sura.entity.agenda.Desplazamiento;
+import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.remision.Tratamiento;
@@ -17,7 +17,7 @@ import co.com.sura.entity.remision.SoporteNutricional;
 import co.com.sura.entity.remision.Secrecion;
 import co.com.sura.entity.remision.Medicamento;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.agenda.data.DesplazamientoData;
+import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
 import co.com.sura.postgres.repository.remision.data.TratamientoData;
 import co.com.sura.postgres.repository.remision.data.CanalizacionData;
@@ -141,6 +141,9 @@ public class ConverterAgenda {
                     .holgura(desplazamientoData.getHolgura())
                     .fechaProgramada(desplazamientoData.getFechaProgramada())
                     .idHorarioTurno(desplazamientoData.getIdHorarioTurno())
+                    .idEstado(desplazamientoData.getIdEstado())
+                    .idMovil(desplazamientoData.getIdMovil())
+
                     .build();
     }
     public static Tratamiento convertToTratamiento(TratamientoData tratamientoData){

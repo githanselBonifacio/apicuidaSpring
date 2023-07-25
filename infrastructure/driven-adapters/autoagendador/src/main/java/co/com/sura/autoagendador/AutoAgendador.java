@@ -106,7 +106,7 @@ public class AutoAgendador {
                 .longitud(lon2)
                 .build();
 
-        var tiempoViajeMono =mapboxService.calcularTiempoViaje(pos1,pos2);
+        var tiempoViajeMono =mapboxService.calcularTiempoViajeMapboxSDK(pos1,pos2);
         if (tiempoViajeMono != null) {
             return tiempoViajeMono.block();
         } else {
@@ -129,14 +129,21 @@ public class AutoAgendador {
                         citasIndividuo.get(c).getIdCita(),
                         citasIndividuo.get(c+1).getIdCita()
                 );
-
                 if (consultaTiempoDesplazamiento == null){
-                     tiempoDesplazamiento = 1200;/*calcularTiempoDesplazamiento(
+                     tiempoDesplazamiento = calcularTiempoDesplazamiento(
                             citasIndividuo.get(c).getLatitud(),
                             citasIndividuo.get(c).getLongitud(),
                             citasIndividuo.get(c+1).getLatitud(),
                             citasIndividuo.get(c+1).getLongitud()
-                    );*/
+
+                    );
+                     this.desplazamientos.add(
+                             new DesplazamientoMap()
+                                     .toBuilder()
+                                     .pos1(citasIndividuo.get(c).getIdCita())
+                                     .pos2(citasIndividuo.get(c+1).getIdCita())
+                                     .tiempo(tiempoDesplazamiento)
+                                     .build());
                 }else{
                     tiempoDesplazamiento = consultaTiempoDesplazamiento;
 

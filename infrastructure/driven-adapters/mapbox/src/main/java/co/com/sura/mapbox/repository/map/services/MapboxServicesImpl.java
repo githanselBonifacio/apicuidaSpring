@@ -57,8 +57,8 @@ public class MapboxServicesImpl implements MapboxService {
             var response = directions.executeCall();
 
             assert response != null : "respuesta mapbox duracion viaje";
-
-            var duracion = (int) Math.round(response.body().routes().get(0).durationTypical());
+            assert response.body() != null;
+            var duracion = (int) Math.round(response.body().routes().get(0).duration());
             if (duracion < DURACION_MINIMA) {
                 return Mono.just(DURACION_MINIMA);
             } else {

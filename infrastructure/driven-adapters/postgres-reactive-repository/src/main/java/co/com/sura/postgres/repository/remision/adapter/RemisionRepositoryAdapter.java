@@ -2,6 +2,7 @@ package co.com.sura.postgres.repository.remision.adapter;
 
 import co.com.sura.dto.remision.CitaRequest;
 import co.com.sura.dto.remision.RemisionRequest;
+import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
@@ -12,20 +13,16 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Comparator;
 import java.util.List;
 
+import static co.com.sura.entity.remision.TipoNotificacionFarmacia.APLICACION_MEDICAMENTO;
+import static co.com.sura.entity.remision.TipoNotificacionFarmacia.SOPORTE_NUTRICIONAL;
 
 
 @Repository
 public class RemisionRepositoryAdapter implements RemisionCrudRepository {
-
-    private final ConnectionFactory connectionFactory;
-    private final DatabaseClient databaseClient;
-
-    public RemisionRepositoryAdapter(ConnectionFactory connectionFactory, DatabaseClient databaseClient) {
-        this.connectionFactory = connectionFactory;
-        this.databaseClient = databaseClient;
-    }
 
     @Autowired
     private RemisionRepository remisionRepository;
@@ -69,15 +66,22 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     @Autowired
     private SoporteNutricionalRepository soporteNutricionalRepository;
 
+    private final ConnectionFactory connectionFactory;
+    private final DatabaseClient databaseClient;
+
+    public RemisionRepositoryAdapter(ConnectionFactory connectionFactory, DatabaseClient databaseClient) {
+        this.connectionFactory = connectionFactory;
+        this.databaseClient = databaseClient;
+    }
+
     public Mono<Void> crearRemisionCita(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
         //Remision
         String idRemision = remisionRequest.getIdRemision();
-        String idCiudad = remisionRequest.getCiudad().getIdCiudad();
-        UbicacionData ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
-        PacienteData pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
-        RemisionData remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
+        var ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
+        var pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
+        var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
 
-        DatosAtencionPacienteData datosAtencionPacienteData = ConverterRemision
+        var datosAtencionPacienteData = ConverterRemision
                 .convertirDatosAtencionPacienteData(remisionRequest.getDatosAtencionPaciente(), idRemision);
 
         List<RemisionDiagnosticoData> diagnosticosData = ConverterRemision
@@ -161,10 +165,41 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         return pacienteRepository.findPacienteByNumeroIdRemision(idRemision)
                 .flatMap(pacienteData -> ubicacionRepository.findById(pacienteData.getIdUbicacion())
                         .map(ubicacionData -> {
-                            Paciente paciente = ConverterRemision.convertToPaciente(pacienteData);
+                            var paciente = ConverterRemision.convertToPaciente(pacienteData);
                             paciente.setUbicacion(ConverterRemision.convertToUbicacion(ubicacionData));
                             return paciente;
                         }));
+    }
+
+    @Override
+    public Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmacia() {
+        return pacienteRepository.findAllTratamientosPacientes()
+                .map(pacienteTratamientoCita -> {
+                            pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
+                            return pacienteTratamientoCita;
+                        }
+                ).mergeWith(pacienteRepository.findAllSoporteNutricionalPacientes()
+                        .map(pacienteTratamientoCita -> {
+                            pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
+                            return pacienteTratamientoCita;
+                })
+                ).sort(Comparator.comparing(PacienteTratamientoCita::getNotificado).reversed()
+                        .thenComparing(PacienteTratamientoCita::getFechaProgramada).reversed());
+    }
+
+    @Override
+    public Mono<Void> notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList) {
+        return Flux.fromIterable(tratamientoCitasList)
+          .flatMap(pacienteTratamientoCita -> {
+              Mono<Void> tratamientoUpdate = pacienteTratamientoCita.getIdTratamiento() != null ?
+                 tratamientoRepository.updateNotificar(pacienteTratamientoCita.getIdTratamiento()) : Mono.empty();
+
+                Mono<Void> soporteNutricionalUpdate = pacienteTratamientoCita.getIdSoporteNutricional() != null ?
+                  soporteNutricionalRepository.updateNotificar(pacienteTratamientoCita.getIdSoporteNutricional()) :
+                        Mono.empty();
+                    return Mono.when(tratamientoUpdate, soporteNutricionalUpdate);
+                })
+                .then();
     }
 
 

@@ -1,6 +1,7 @@
 package co.com.sura.agenda;
 
 import co.com.sura.entity.agenda.*;
+import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.remision.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

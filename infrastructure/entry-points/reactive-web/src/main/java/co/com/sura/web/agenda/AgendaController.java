@@ -2,7 +2,7 @@ package co.com.sura.web.agenda;
 
 import co.com.sura.agenda.AgendaUseCase;
 import co.com.sura.entity.agenda.Actividad;
-import co.com.sura.entity.agenda.Desplazamiento;
+import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.remision.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,9 +21,9 @@ import java.time.format.DateTimeFormatter;
 @CrossOrigin(origins = "*")
 @RequestMapping("/agenda")
 public class AgendaController {
-
+    private static final Integer TIMEOUT = 30;
     @Autowired
-    AgendaUseCase agendaUseCase;
+    private AgendaUseCase agendaUseCase;
 
     //profesionales
     @GetMapping(value = "/profesionales")
@@ -74,7 +75,8 @@ public class AgendaController {
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idCiudad
     ){
-        return agendaUseCase.autoagendarTurnoCompleto(fechaTurno, idHorarioTurno, idCiudad);
+        return agendaUseCase.autoagendarTurnoCompleto(fechaTurno, idHorarioTurno, idCiudad)
+                .timeout(Duration.ofSeconds(TIMEOUT));
     }
 
     @GetMapping(value = "/actividadesByprofesionalesCiudadHorario")
@@ -134,8 +136,8 @@ public class AgendaController {
 
         var hora = nuevaHora.split(":");
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime localDateTime = LocalDateTime.parse(fechaProgramada, formatter)
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        var localDateTime = LocalDateTime.parse(fechaProgramada, formatter)
                 .withHour(Integer.parseInt(hora[0])).withMinute(Integer.parseInt(hora[1]));
 
         return agendaUseCase.reprogramarCitaById(localDateTime,idCita);

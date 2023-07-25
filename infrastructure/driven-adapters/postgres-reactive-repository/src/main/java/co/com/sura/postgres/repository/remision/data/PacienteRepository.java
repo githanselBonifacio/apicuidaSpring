@@ -1,10 +1,12 @@
 package co.com.sura.postgres.repository.remision.data;
 
 
+import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.entity.remision.Paciente;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -65,4 +67,22 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
                 pacienteData.getIdUbicacion()
         );
     }
+    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombre,paciente.apellido,  " +
+            "tratamiento.* , " +
+            "cita.fecha_programada " +
+            "FROM paciente " +
+            "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
+            "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
+            "INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita;")
+    Flux<PacienteTratamientoCita> findAllTratamientosPacientes();
+
+
+    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombre,paciente.apellido, " +
+            "soporte_nutricional.* , " +
+            "cita.fecha_programada " +
+            "FROM paciente " +
+            "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
+            "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
+            "INNER JOIN soporte_nutricional ON soporte_nutricional.id_cita = cita.id_cita;")
+    Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientes();
 }

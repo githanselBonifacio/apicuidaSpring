@@ -1,5 +1,6 @@
-package co.com.sura.postgres.repository.agenda.data;
+package co.com.sura.postgres.repository.moviles.data;
 
+import co.com.sura.postgres.repository.agenda.data.CitaData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,11 +34,20 @@ public class DesplazamientoData {
     @Column("id_horario_turno")
     private Integer idHorarioTurno;
 
+    @Column("id_estado")
+    private Integer idEstado;
+
     private String tipo;
     private Integer duracion;
     private Integer holgura;
 
-    public static DesplazamientoData crearDesplazamientoData (CitaData citaPartida ,CitaData citaDestino){
+    @Column("id_movil")
+    private String idMovil;
+
+    @Column("id_profesional")
+    private String idProfesional;
+
+    public static DesplazamientoData crearDesplazamientoData (CitaData citaPartida , CitaData citaDestino){
         return DesplazamientoData
                 .builder()
                 .idCitaPartida(citaPartida.getIdCita())

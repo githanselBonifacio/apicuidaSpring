@@ -1,5 +1,6 @@
-package co.com.sura.postgres.repository.agenda.data;
+package co.com.sura.postgres.repository.moviles.data;
 
+import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;

@@ -8,7 +8,7 @@ import co.com.sura.autoagendador.OrigenCiudad;
 import co.com.sura.autoagendador.Resultado;
 import co.com.sura.entity.agenda.AgendaRepository;
 import co.com.sura.entity.agenda.Profesional;
-import co.com.sura.entity.agenda.Desplazamiento;
+import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.remision.Cita;
@@ -21,13 +21,13 @@ import co.com.sura.entity.remision.Tratamiento;
 import co.com.sura.entity.remision.Fototerapia;
 import co.com.sura.entity.remision.TomaMuestra;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.agenda.data.DesplazamientoData;
+import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
 import co.com.sura.postgres.repository.agenda.data.TurnoProfesionalesData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalRepository;
 import co.com.sura.postgres.repository.agenda.data.TurnoProfesionalesRepository;
-import co.com.sura.postgres.repository.agenda.data.DesplazamientoRepository;
+import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.repository.remision.data.TomaMuestraRepository;
 import co.com.sura.postgres.repository.remision.data.CanalizacionRepository;
 import co.com.sura.postgres.repository.remision.data.SoporteNutricionalRepository;
@@ -48,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static co.com.sura.autoagendador.IdCiudad.getByIdCiudad;
-import static co.com.sura.postgres.repository.agenda.data.DesplazamientoData.crearDesplazamientoData;
+import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.crearDesplazamientoData;
 
 @Repository
 public class AgendaRepositoryAdapter implements AgendaRepository {
@@ -56,7 +56,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private static final Integer MAXSIZE                       = 2;
     private static final Integer NUMERO_GENERACIONES           = 1000;
     private static final Integer SIZE_POBLACION_INICIAL        = 10;
-    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 10;
+    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 5;
     private static final Integer HOLGURA_DEFECTO               = 1200;
     private static final double  PENALIZACION_HOLGURA_NEGATIVA = 1e6;
 
@@ -315,7 +315,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                       CitaData citaPartida = citas.get(0);
                       CitaData citaDestino = citas.get(1);
 
-                      var duracionViaje = mapboxService.calcularTiempoViaje(
+                      var duracionViaje = mapboxService.calcularTiempoViajeMapboxSDK(
                               new GeoUbicacion(citaPartida.getLatitud(),citaPartida.getLongitud()),
                               new GeoUbicacion(citaDestino.getLatitud(),citaDestino.getLongitud())).block();
 
