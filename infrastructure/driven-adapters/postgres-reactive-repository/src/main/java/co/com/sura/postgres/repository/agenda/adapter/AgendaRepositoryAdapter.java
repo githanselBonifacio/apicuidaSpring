@@ -315,7 +315,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                       CitaData citaPartida = citas.get(0);
                       CitaData citaDestino = citas.get(1);
 
-                      var duracionViaje = mapboxService.calcularTiempoViajeMapboxSDK(
+                      var duracionViaje = mapboxService.calcularTiempoViaje(
                               new GeoUbicacion(citaPartida.getLatitud(),citaPartida.getLongitud()),
                               new GeoUbicacion(citaDestino.getLatitud(),citaDestino.getLongitud())).block();
 

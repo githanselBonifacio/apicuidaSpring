@@ -106,7 +106,7 @@ public class AutoAgendador {
                 .longitud(lon2)
                 .build();
 
-        var tiempoViajeMono =mapboxService.calcularTiempoViajeMapboxSDK(pos1,pos2);
+        var tiempoViajeMono =mapboxService.calcularTiempoViaje(pos1,pos2);
         if (tiempoViajeMono != null) {
             return tiempoViajeMono.block();
         } else {
