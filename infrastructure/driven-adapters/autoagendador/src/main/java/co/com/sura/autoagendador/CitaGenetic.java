@@ -53,21 +53,32 @@ public class CitaGenetic implements Comparable<CitaGenetic>, Cloneable{
     }
 
     @Override
-    public String toString() {
-        return "("+ idCita + ")";
-    }
-
-    @Override
     public int compareTo(CitaGenetic citaGenetic) {
         return Long.compare(this.fechaInicioIso, citaGenetic.fechaInicioIso);
     }
 
     @Override
-    protected CitaGenetic clone() throws CloneNotSupportedException {
+    protected CitaGenetic clone()  {
         try {
             return (CitaGenetic) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+    public static Integer calcularHolguraAcomulada(CitaGenetic citaPartida, CitaGenetic citaDestino, Integer duracion){
+        return  (int) (citaDestino.getFechaInicioIso() -
+                (citaPartida.getFechaInicioIso() + duracion));
+    }
+
+    @Override
+    public String toString() {
+        return "CitaGenetic{" +
+                "idCita='" + idCita + '\'' +
+                ", latitud=" + latitud +
+                ", longitud=" + longitud +
+                ", duracion=" + duracion +
+                ", holgura=" + holgura +
+                ", fechaInicioIso=" + fechaInicioIso +
+                '}';
     }
 }

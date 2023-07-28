@@ -5,20 +5,22 @@ import co.com.sura.services.mapbox.MapboxService;
 import lombok.Data;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static co.com.sura.autoagendador.Helper.*;
 
 @Data
 public class AutoAgendador {
-
-    private MapboxService mapboxService;
     private static final Integer DOS = 2;
     private static final Double UMBRAL = 0.5;
+
+    private MapboxService mapboxService;
     private Helper helper;
     private CitaGenetic origen;
     private List<CitaGenetic> citas;
@@ -30,7 +32,7 @@ public class AutoAgendador {
     private Runnable calcularDesplazamiento;
 
     private Map<String,Resultado> resultadoActual;
-    private List<DesplazamientoMap> desplazamientos;
+    private Flux<Desplazamiento> desplazamientos;
     private Poblacion poblacionActual;
     private Double aptitudGlobalActual;
 
@@ -55,7 +57,7 @@ public class AutoAgendador {
         this.numeroPadresEnparejados = numeroPadresEnparejados;
         this.penalizacionHolgura = penalizacionHolgura;
 
-        this.desplazamientos = new ArrayList<>();
+        this.desplazamientos = Flux.empty();
         this.resultadoActual = new HashMap<>();
 
         this.random = new Random();
@@ -65,235 +67,230 @@ public class AutoAgendador {
 
     public void crearPoblacionInicial(){
        var poblacionInicial = new Poblacion();
-       List<Individuo> individuos = new ArrayList<>();
-       for (var i=0;i<this.sizePoblacionInicial;i++){
-          var individuo =  Individuo
-                   .builder()
-                   .citaGen(
-                       new ArrayList<>(
-                       CitaGenetic.dividirListaCitas(
-                           this.citas,
-                            this.numeroMoviles,
-                            this.origen)
-                           )
-                   )
-                   .build();
-           individuos.add(individuo);
-       }
-       poblacionInicial.setIndividuos(individuos);
-       this.poblacionActual = poblacionInicial;
+        var individuos = Flux.range(0, this.sizePoblacionInicial)
+                .map(i -> Individuo.builder()
+                        .citaGen(Flux.fromIterable(
+                                CitaGenetic.dividirListaCitas(this.citas,this.numeroMoviles,this.origen)))
+                        .build());
+
+        poblacionInicial.setIndividuos(individuos);
+        this.poblacionActual = poblacionInicial;
     }
     private Integer validarDuracionViajeAlmacenado(String idCita1, String idCita2){
-        for (DesplazamientoMap desplazamiento : this.desplazamientos) {
-            if (desplazamiento.getPos1().equals(idCita1)
-                    && desplazamiento.getPos2().equals(idCita2)) {
-                return desplazamiento.getTiempo();
-            }
-        }
-        return null;
+        AtomicReference<Integer> duracion = new AtomicReference<>(0);
+         this.desplazamientos
+                .filter(desplazamiento -> desplazamiento.getPos1().equals(idCita1)
+                        && desplazamiento.getPos2().equals(idCita2))
+                .map(Desplazamiento::getTiempo)
+                .next()
+                 .subscribe(duracion::set);
+        return duracion.get();
     }
-    public  Integer calcularTiempoDesplazamiento(Double lat1,Double lon1,Double lat2, Double lon2 ){
+    private Integer getDuracionDesplazamiento(CitaGenetic citaPartida, CitaGenetic citaDestino){
+        Integer tiempoDesplazamiento;
+        Integer consultaTiempoDesplazamiento = validarDuracionViajeAlmacenado(
+                citaPartida.getIdCita(),
+                citaDestino.getIdCita()
+        );
+        if (consultaTiempoDesplazamiento == null) {
+            tiempoDesplazamiento = calcularTiempoDesplazamiento(
+                    citaPartida, citaDestino);
 
+            this.desplazamientos.concatWith(
+                    Flux.just(Desplazamiento.crearDesplazamiento(
+                            citaPartida, citaDestino, tiempoDesplazamiento)
+                    )
+            );
+        } else {
+            tiempoDesplazamiento = consultaTiempoDesplazamiento;
+        }
+        return tiempoDesplazamiento;
+    }
+
+    private   Integer calcularTiempoDesplazamiento(CitaGenetic citaPartida,CitaGenetic citaDestino){
+        AtomicReference<Integer> tiempo = new AtomicReference<>();
         var pos1 = GeoUbicacion
                 .builder()
-                .latitud(lat1)
-                .longitud(lon1)
+                .latitud(citaPartida.getLatitud())
+                .longitud(citaPartida.getLongitud())
                 .build();
 
         var pos2 =GeoUbicacion
                 .builder()
-                .latitud(lat2)
-                .longitud(lon2)
+                .latitud(citaDestino.getLatitud())
+                .longitud(citaDestino.getLongitud())
                 .build();
 
-        var tiempoViajeMono =mapboxService.calcularTiempoViaje(pos1,pos2);
-        if (tiempoViajeMono != null) {
-            return tiempoViajeMono.block();
-        } else {
-            return 0;
-        }
+        mapboxService.calcularTiempoViaje(pos1,pos2)
+                .subscribe(tiempo::set);
+        return tiempo.get();
     }
-    private List<List<Integer>> calcularAptitudIndividuo(Individuo individuo){
-
-        List <List<Integer>> puntajeAptitud= new ArrayList<>();
-
-
-        for (List<CitaGenetic> citasIndividuo: individuo.getCitaGen()){
-            List<Integer> holgurasAcumuladas = new ArrayList<>();
-            for (var c = 0;c<citasIndividuo.size();c++){
-                if (c == citasIndividuo.size()-1){
-                    break;
-                }
-                Integer tiempoDesplazamiento;
-                Integer consultaTiempoDesplazamiento = validarDuracionViajeAlmacenado(
-                        citasIndividuo.get(c).getIdCita(),
-                        citasIndividuo.get(c+1).getIdCita()
-                );
-                if (consultaTiempoDesplazamiento == null){
-                     tiempoDesplazamiento = calcularTiempoDesplazamiento(
-                            citasIndividuo.get(c).getLatitud(),
-                            citasIndividuo.get(c).getLongitud(),
-                            citasIndividuo.get(c+1).getLatitud(),
-                            citasIndividuo.get(c+1).getLongitud()
-
-                    );
-                     this.desplazamientos.add(
-                             new DesplazamientoMap()
-                                     .toBuilder()
-                                     .pos1(citasIndividuo.get(c).getIdCita())
-                                     .pos2(citasIndividuo.get(c+1).getIdCita())
-                                     .tiempo(tiempoDesplazamiento)
-                                     .build());
-                }else{
-                    tiempoDesplazamiento = consultaTiempoDesplazamiento;
-
-                }
-                int tiempoTotalDesplazamiento = tiempoDesplazamiento +  citasIndividuo.get(c).getDuracion();
-
-                int holguraAcumulada = (int) (citasIndividuo.get(c+1).getFechaInicioIso() -
-                                        (citasIndividuo.get(c).getFechaInicioIso()+tiempoTotalDesplazamiento));
-
-
-                if (holguraAcumulada<0){
-                    holgurasAcumuladas.add((int) ( -1*Math.abs(holguraAcumulada*(this.penalizacionHolgura))));
-                }else{
-                    holgurasAcumuladas.add(holguraAcumulada);
-                }
+    private Flux<List<Integer>> calcularAptitudIndividuo(Individuo individuo){
+      return individuo.getCitaGen()
+        .flatMap(c -> {
+          List<Integer> holgurasAcumuladas = new ArrayList<>();
+          for (var i = 0; i < c.size() - 1; i++) {
+            Integer tiempoViaje = getDuracionDesplazamiento(c.get(i),c.get(i + 1)) + c.get(i).getDuracion();
+            int holguraAcumulada = CitaGenetic.calcularHolguraAcomulada (c.get(i),c.get(i + 1),tiempoViaje);
+            if(holguraAcumulada < 0 ){
+                holguraAcumulada = (int)(-1 * Math.abs(holguraAcumulada * (this.penalizacionHolgura)));
             }
-            puntajeAptitud.add(holgurasAcumuladas);
-
-        }
-        return puntajeAptitud;
+            holgurasAcumuladas.add(holguraAcumulada);
+          }
+            return Flux.just(holgurasAcumuladas);
+        });
     }
-    private static double calcularAptitudGlobalIndividuo(List<List<Integer>> aptitudIndiviuo){
-        return aptitudIndiviuo.stream()
-                .flatMap(List::stream)
-                .mapToDouble(Integer::intValue)
-                .sum();
+    private static Double calcularAptitudGlobalIndividuo(Flux<List<Integer>> aptitudIndiviuo){
+        AtomicReference<Double> puntaje = new AtomicReference<>();
+        aptitudIndiviuo
+                .flatMapIterable(list -> list)
+                .reduce(0, Integer::sum)
+                .map(Double::valueOf)
+                .subscribe(puntaje::set);
+        return puntaje.get();
     }
     private  Poblacion seleccionarMejoresPadres(){
        return new Poblacion(
-               this.resultadoActual
-                   .entrySet()
-                   .stream()
-                   .limit(this.numeroPadresEnparejados)
-                   .map(Map.Entry::getValue)
-                   .map(Resultado::getIndividuo)
-                   .collect(Collectors.toList())
+               Flux.fromIterable(this.resultadoActual.values())
+                       .take(this.numeroPadresEnparejados)
+                       .map(Resultado::getIndividuo)
        );
     }
     private void calcularAptitudPoblacion(){
-        for (var i=0;i<this.poblacionActual.getIndividuos().size();i++){
-            var puntajeAptitudIndividuo = this.calcularAptitudIndividuo(poblacionActual.getIndividuos().get(i));
-            var puntajeGlobalAptitudIndividuo = calcularAptitudGlobalIndividuo(puntajeAptitudIndividuo);
-            this.resultadoActual.put(
-                    UUID.randomUUID().toString(),
-                    new Resultado()
-                            .toBuilder()
-                            .puntajeAptitudIndividuo(puntajeAptitudIndividuo)
-                            .individuo(poblacionActual.getIndividuos().get(i))
-                            .puntajeAptitudGlobalIndividuo(puntajeGlobalAptitudIndividuo)
-                            .build());
+      this.poblacionActual.getIndividuos().subscribe(
+        resp ->{
+            this.poblacionActual.getIndividuos()
+                    .flatMap(individuo -> {
+                        var puntajeAptitudIndividuo = this.calcularAptitudIndividuo(individuo);
+                        var puntajeGlobalAptitudIndividuo = calcularAptitudGlobalIndividuo(puntajeAptitudIndividuo);
+                        return Mono.just(new Resultado()
+                                .toBuilder()
+                                .puntajeAptitudIndividuo(puntajeAptitudIndividuo)
+                                .individuo(individuo)
+                                .puntajeAptitudGlobalIndividuo(puntajeGlobalAptitudIndividuo)
+                                .build());
+                    })
+                    .collectList()
+                    .map(resultados -> resultados.stream()
+                            .sorted(Comparator.comparingDouble(Resultado::getPuntajeAptitudGlobalIndividuo).reversed())
+                            .limit(this.numeroPadresEnparejados)
+                            .collect(Collectors.toMap(
+                                    resultado -> UUID.randomUUID().toString(),
+                                    resultado -> resultado,
+                                    (oldValue, newValue) -> oldValue,
+                                    LinkedHashMap::new
+                            ))
+                    ).subscribe(result -> this.resultadoActual = result);
         }
-        this.resultadoActual = this.resultadoActual
-                .entrySet()
-                .stream()
-                .sorted(
-                        Map.Entry
-                                .comparingByValue(
-                                        Comparator.comparingDouble(Resultado::getPuntajeAptitudGlobalIndividuo
-                                                )
-                                .reversed())
-                )
-                .limit(this.numeroPadresEnparejados)
-                .collect(
-                        Collectors.toMap(
-                                Map.Entry::getKey,Map.Entry::getValue,(oldValue,newValue)->oldValue, LinkedHashMap::new)
-                );
+      );
+
 
     }
 
-    private static  List<Pair<Integer,Integer>> encontrarHorguraNegativa(List<List<Integer>> puntajeIndividuo, int ic){
-        var coordenadas = new ArrayList<Pair<Integer,Integer>>();
-        for (var i=0;i<puntajeIndividuo.size();i++){
-            for (var j=0;j<puntajeIndividuo.get(i).size();j++){
-                if(puntajeIndividuo.get(i).get(j)<0){
-                    var c = (j+ic<puntajeIndividuo.get(i).size()) ? (j+ic) : j;
-                    coordenadas.add(new Pair<>(i,c));
-                }
-            }
-        }
-        return coordenadas
-                .stream()
-                .filter(tupla -> tupla.getValue1() !=0 )
-                .collect(Collectors.toList());
+    private static  Flux<Pair<Integer,Integer>> encontrarHorguraNegativa(Flux<List<Integer>> puntajeIndividuo, int ic){
+        return puntajeIndividuo
+                .flatMapSequential(list -> Flux.fromIterable(list)
+                        .index()
+                        .filter(tuple -> tuple.getT2() < 0)
+                        .map(tuple -> {
+                            var i = puntajeIndividuo.index().getPrefetch();
+                            var j = tuple.getT1().intValue();
+                            int c = (j + ic < list.size()) ? (j + ic) : j;
+                            return new Pair<>(i, c);
+                        })
+                )
+                .filter(pair -> pair.getValue1() != 0);
     }
 
     private Poblacion mutarIndividuosPoblacion() {
 
-        var nuevosIndividuos = new ArrayList<Individuo>();
+        List<Individuo> nuevosIndividuos = new ArrayList<>();
 
         for (Resultado resultado: this.resultadoActual.values()) {
 
             var coor =
-                    encontrarHorguraNegativa(resultado.getPuntajeAptitudIndividuo(), random.nextInt(DOS));
+                    encontrarHorguraNegativa(
+                            resultado.getPuntajeAptitudIndividuo(), random.nextInt(DOS));
 
-            if (coor.isEmpty()){
+            AtomicReference<List<Pair<Integer,Integer>>>coorListAtomic = new AtomicReference<>();
+
+           coor.collectList().subscribe(coorListAtomic::set);
+            var coorList = coorListAtomic.get();
+            if (coorList.isEmpty()){
                 return new Poblacion();
             }
-            var pos1 = coor.get(random.nextInt(coor.size()));
+
+            var pos1 = coorList.get(random.nextInt(coorList.size()));
             var pos2 = new Pair<>(maxSumaLista(resultado.getPuntajeAptitudIndividuo()),1);
             Individuo nuevoIndividuo;
 
-            var individuoMutar = resultado.getIndividuo().clone();
+            AtomicReference<List<List<CitaGenetic>>> citasGenetic = new AtomicReference<>();
+            resultado.getIndividuo().clone()
+                    .getCitaGen()
+                    .collectList()
+                    .subscribe(citasGenetic::set);
             if (random.nextDouble() > UMBRAL) {
-                nuevoIndividuo = intercambiarElementos(individuoMutar.getCitaGen(), pos1, pos2);
+                nuevoIndividuo = intercambiarElementos(citasGenetic.get(), pos1, pos2);
             } else {
-                nuevoIndividuo = cambiarElementos(individuoMutar.getCitaGen(), pos1, pos2);
+                nuevoIndividuo = cambiarElementos(citasGenetic.get(), pos1, pos2);
             }
 
             nuevosIndividuos.add(nuevoIndividuo);
         }
-        return new Poblacion(
-                nuevosIndividuos
-                        .stream()
-                        .peek(Individuo::sortCitaGen)
-                        .collect(Collectors.toList())
-        );
+        nuevosIndividuos = nuevosIndividuos
+                .stream()
+                .peek(Individuo::sortCitaGen)
+                .collect(Collectors.toList());
+
+        return new Poblacion(Flux.fromIterable(nuevosIndividuos));
     }
 
     public Resultado mejorSolucion() {
+
         var mejorResultado = Collections.max(
                 this.resultadoActual
                         .values(),Comparator.comparing(Resultado::getPuntajeAptitudGlobalIndividuo)
         );
         List<Pair<Integer,Integer>> coordenadasHolguraNegativa = encontrarHorguraNegativa(
                 mejorResultado.getPuntajeAptitudIndividuo(),1
-        );
+        ).collectList().blockOptional().orElse(new ArrayList<>());
         var individuo = mejorResultado.getIndividuo();
-        List<List<CitaGenetic>> nuevalistaCitasGen = new ArrayList<>();
 
-        for(var i = 0;i<individuo.getCitaGen().size();i++){
+        List<List<CitaGenetic>> nuevalistaCitasGen = new ArrayList<>();
+        var listaCitas = individuo.getCitaGen().collectList().blockOptional()
+                .orElse(new ArrayList<>());
+        for(var i = 0;i<listaCitas.size();i++){
             List<CitaGenetic> itemIndividuo = new ArrayList<>();
-            for(var  j = 0; j<individuo.getCitaGen().get(i).size();j++){
+            for(var  j = 0; j<listaCitas.get(i).size();j++){
                 if(!coordenadasHolguraNegativa.contains(new Pair<>(i,j))){
-                    itemIndividuo.add(individuo.getCitaGen().get(i).get(j));
+                    itemIndividuo.add(listaCitas.get(i).get(j));
                 }
 
             }
             nuevalistaCitasGen.add(itemIndividuo);
         }
 
-        mejorResultado.setIndividuo( new Individuo(nuevalistaCitasGen));
+        mejorResultado.setIndividuo( new Individuo(Flux.fromIterable(nuevalistaCitasGen)));
         return mejorResultado;
     }
     public void run (){
         this.crearPoblacionInicial();
+        System.out.println(this.resultadoActual);
+       /* this.poblacionActual.getIndividuos().subscribe(
+                v -> v.getCitaGen().subscribe(r -> System.out.println(r))
+        );*/
         for(var g = 0;g<this.numeroGeneraciones;g++){
             this.calcularAptitudPoblacion();
             this.poblacionActual = this.seleccionarMejoresPadres();
             var siguienteGeneracion = this.mutarIndividuosPoblacion();
-            if(siguienteGeneracion.getIndividuos().isEmpty()){
+            final var sizeSiguienteGeneracion = new AtomicInteger();
+            siguienteGeneracion
+                    .getIndividuos()
+                    .collectList()
+                    .subscribe(result ->{
+                        sizeSiguienteGeneracion.set(result.size());
+                    });
+            if(sizeSiguienteGeneracion.get() == 0){
                 break;
             }else{
                 this.poblacionActual = siguienteGeneracion.clone();

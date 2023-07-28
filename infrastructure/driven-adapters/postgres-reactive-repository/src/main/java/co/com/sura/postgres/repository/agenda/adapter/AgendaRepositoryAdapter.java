@@ -243,8 +243,11 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         return Flux.fromIterable(profesionalesDataList)
            .flatMap(profesionalData -> {
               int index = profesionalesDataList.indexOf(profesionalData);
-              int sizeCitasGen = mejoResultado.getIndividuo().getCitaGen().get(index).size();
-              return Flux.fromIterable(mejoResultado.getIndividuo().getCitaGen().get(index).subList(1, sizeCitasGen))
+              int sizeCitasGen = mejoResultado.getIndividuo().getCitaGen().collectList().blockOptional()
+                      .orElse(new ArrayList<>()).get(index).size();
+              return Flux.fromIterable(mejoResultado.getIndividuo().getCitaGen().collectList().blockOptional()
+                              .orElse(new ArrayList<>()).get(index).subList(1, sizeCitasGen))
+
                             .flatMap(citaGenetic -> {
                                 String idCita = citaGenetic.getIdCita();
                                 String idProfesional = profesionalData.getNumeroIdentificacion();

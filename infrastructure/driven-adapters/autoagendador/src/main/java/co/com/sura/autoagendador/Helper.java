@@ -1,17 +1,12 @@
 package co.com.sura.autoagendador;
 
-import co.com.sura.mapbox.repository.map.services.MapboxServicesImpl;
-import co.com.sura.services.mapbox.GeoUbicacion;
-import co.com.sura.services.mapbox.MapboxService;
 import org.javatuples.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Helper {
 
@@ -28,7 +23,7 @@ public class Helper {
             nuevaListaIndividuoCopy.get(pos1.getValue0()).set(pos1.getValue1(), val2);
             nuevaListaIndividuoCopy.get(pos2.getValue0()).remove((int)pos2.getValue1());
             nuevaListaIndividuoCopy.get(pos2.getValue0()).add(val1);
-            return new Individuo(nuevaListaIndividuoCopy);
+            return new Individuo(Flux.fromIterable(nuevaListaIndividuoCopy));
 
     }
 
@@ -41,15 +36,16 @@ public class Helper {
         List<List<CitaGenetic>> nuevaListaIndividuoCopy = new ArrayList<>(nuevaListaIndividuo);
         nuevaListaIndividuoCopy.get(pos1.getValue0()).remove((int) pos1.getValue1());
         nuevaListaIndividuoCopy.get(pos2.getValue0()).add(val1);
-        return new Individuo(nuevaListaIndividuoCopy);
+        return new Individuo(Flux.fromIterable(nuevaListaIndividuoCopy));
 
     }
-    public static int maxSumaLista(List<List<Integer>> lista) {
+    public static int maxSumaLista(Flux<List<Integer>> listaFlux) {
+        AtomicInteger max = new AtomicInteger();
+        listaFlux.flatMap(lista -> Flux.just(lista.stream().mapToInt(Integer::intValue).sum()))
+                .reduce(Integer::max)
+                .subscribe(max::set);
 
-        return  IntStream.range(0, lista.size())
-                .boxed()
-                .max(Comparator.comparingInt(i -> lista.get(i).stream().mapToInt(Integer::intValue).sum()))
-                .orElse(-1);
+        return max.get();
     }
 
 

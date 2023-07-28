@@ -2,6 +2,7 @@ package co.com.sura.autoagendador;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class Poblacion implements Cloneable{
-    private List<Individuo> individuos;
+    private Flux<Individuo> individuos;
 
     public Poblacion() {
-        this.individuos = new ArrayList<>();
+        this.individuos = Flux.empty();
     }
 
     @Override
@@ -23,7 +24,14 @@ public class Poblacion implements Cloneable{
         } catch (CloneNotSupportedException e) {
             throw  new AssertionError();
         }
-        cloned.individuos = new ArrayList<>(this.individuos);
+        cloned.individuos = Flux.fromIterable(this.individuos.toIterable());
         return cloned;
+    }
+
+    @Override
+    public String toString() {
+        return "Poblacion{" +
+                "individuos=" + individuos +
+                '}';
     }
 }
