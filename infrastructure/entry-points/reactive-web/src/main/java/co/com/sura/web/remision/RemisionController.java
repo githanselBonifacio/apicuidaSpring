@@ -47,9 +47,7 @@ public class RemisionController {
     }
 
     @PostMapping(value = "notificarFarmacia")
-    public Mono<Void>notificarMedicamentosToFarmacia(
-            @RequestBody List<PacienteTratamientoCita> tratamientoCitasList
-            ){
+    public Mono<Void>notificarMedicamentosToFarmacia(@RequestBody List<PacienteTratamientoCita> tratamientoCitasList){
         return remisionUseCase.notificarMedicamentosToFarmacia(tratamientoCitasList);
     }
 }

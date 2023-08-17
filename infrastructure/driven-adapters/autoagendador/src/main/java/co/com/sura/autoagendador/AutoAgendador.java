@@ -5,7 +5,8 @@ import co.com.sura.services.mapbox.MapboxService;
 import lombok.Data;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 import java.util.*;
@@ -106,7 +107,8 @@ public class AutoAgendador {
                 .longitud(lon2)
                 .build();
 
-        var tiempoViajeMono =mapboxService.calcularTiempoViajeMapboxSDK(pos1,pos2);
+        var tiempoViajeMono =mapboxService.calcularTiempoViaje(pos1,pos2);
+
         if (tiempoViajeMono != null) {
             return tiempoViajeMono.block();
         } else {
@@ -116,7 +118,6 @@ public class AutoAgendador {
     private List<List<Integer>> calcularAptitudIndividuo(Individuo individuo){
 
         List <List<Integer>> puntajeAptitud= new ArrayList<>();
-
 
         for (List<CitaGenetic> citasIndividuo: individuo.getCitaGen()){
             List<Integer> holgurasAcumuladas = new ArrayList<>();
@@ -203,7 +204,7 @@ public class AutoAgendador {
                                 .comparingByValue(
                                         Comparator.comparingDouble(Resultado::getPuntajeAptitudGlobalIndividuo
                                                 )
-                                .reversed())
+                                                .reversed())
                 )
                 .limit(this.numeroPadresEnparejados)
                 .collect(
@@ -232,12 +233,9 @@ public class AutoAgendador {
     private Poblacion mutarIndividuosPoblacion() {
 
         var nuevosIndividuos = new ArrayList<Individuo>();
-
         for (Resultado resultado: this.resultadoActual.values()) {
 
-            var coor =
-                    encontrarHorguraNegativa(resultado.getPuntajeAptitudIndividuo(), random.nextInt(DOS));
-
+            var coor = encontrarHorguraNegativa(resultado.getPuntajeAptitudIndividuo(), random.nextInt(DOS));
             if (coor.isEmpty()){
                 return new Poblacion();
             }

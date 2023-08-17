@@ -54,9 +54,9 @@ import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.cr
 public class AgendaRepositoryAdapter implements AgendaRepository {
 
     private static final Integer MAXSIZE                       = 2;
-    private static final Integer NUMERO_GENERACIONES           = 1000;
+    private static final Integer NUMERO_GENERACIONES           = 200;
     private static final Integer SIZE_POBLACION_INICIAL        = 10;
-    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 5;
+    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 4;
     private static final Integer HOLGURA_DEFECTO               = 1200;
     private static final double  PENALIZACION_HOLGURA_NEGATIVA = 1e6;
 
@@ -287,9 +287,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                                        profesionalesDataList,mejoResultado
                                );
                })
-         )).then(
-               insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno));
-
+         )).then(insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno));
     }
 
     @Override
@@ -315,7 +313,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                       CitaData citaPartida = citas.get(0);
                       CitaData citaDestino = citas.get(1);
 
-                      var duracionViaje = mapboxService.calcularTiempoViajeMapboxSDK(
+                      var duracionViaje = mapboxService.calcularTiempoViaje(
                               new GeoUbicacion(citaPartida.getLatitud(),citaPartida.getLongitud()),
                               new GeoUbicacion(citaDestino.getLatitud(),citaDestino.getLongitud())).block();
 
