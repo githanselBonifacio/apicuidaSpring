@@ -56,7 +56,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private static final Integer MAXSIZE                       = 2;
     private static final Integer NUMERO_GENERACIONES           = 1000;
     private static final Integer SIZE_POBLACION_INICIAL        = 10;
-    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 4;
+    private static final Integer NUMERO_PADRES_EMPAREJADOS     = 5;
     private static final Integer HOLGURA_DEFECTO               = 1200;
     private static final double  PENALIZACION_HOLGURA_NEGATIVA = 1e6;
 
@@ -135,8 +135,9 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Mono<Void> desasignarProfesionalTurno(LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional) {
-        return turnoProfesionalesRepository.deleteByFechaTurnoIdHorarioProfesional(
-                fechaTurno,idHorarioTurno,idProfesional);
+        return  citaRepository.desagendarAllFromIdProfesional( fechaTurno,  idHorarioTurno, idProfesional)
+                .then(Mono.from(turnoProfesionalesRepository.deleteByFechaTurnoIdHorarioProfesional(
+                        fechaTurno,idHorarioTurno,idProfesional)));
     }
 
     @Override

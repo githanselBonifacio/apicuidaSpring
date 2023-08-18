@@ -5,10 +5,6 @@ import co.com.sura.services.mapbox.MapboxService;
 import lombok.Data;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,10 +12,9 @@ import static co.com.sura.autoagendador.Helper.*;
 
 @Data
 public class AutoAgendador {
-
-    private MapboxService mapboxService;
     private static final Integer DOS = 2;
     private static final Double UMBRAL = 0.5;
+    private MapboxService mapboxService;
     private Helper helper;
     private CitaGenetic origen;
     private List<CitaGenetic> citas;

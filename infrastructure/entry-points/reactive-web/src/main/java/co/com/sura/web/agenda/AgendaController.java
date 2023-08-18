@@ -54,7 +54,7 @@ public class AgendaController {
         return agendaUseCase.asignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional);
     }
 
-    @GetMapping(value = "/deasignarProfesionalTurno")
+    @GetMapping(value = "/desasignarProfesionalTurno")
     public Mono<Void> desasignarProfesionalTurno(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,

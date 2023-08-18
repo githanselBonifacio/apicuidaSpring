@@ -33,7 +33,7 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "AND cita.id_ciudad = $3 " +
             "AND cita.id_estado != 5 " +
             "AND cita.id_profesional = $4 " +
-            "ORDER BY public.cita.fecha_inicio ASC;")
+            "ORDER BY public.cita.fecha_programada ASC;")
     Flux<CitaData> findCitasByTurnoCiudadProfesional(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
@@ -70,6 +70,14 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "AND cita.id_ciudad = $3;")
     Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad);
 
+    @Query("UPDATE cita " +
+            "SET id_estado = 1 , id_profesional=NULL " +
+            "FROM turno_cita " +
+            "WHERE cita.id_profesional = $3 " +
+            "AND turno_cita.fecha_turno = $1 " +
+            "AND turno_cita.id_horario_turno = $2; ")
+    Mono<Void> desagendarAllFromIdProfesional(
+            LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional);
 
     @Query("INSERT INTO cita " +
             "(id_cita, id_remision, duracion, holgura, fecha_inicio, especialidad, id_ciudad,fecha_programada" +
