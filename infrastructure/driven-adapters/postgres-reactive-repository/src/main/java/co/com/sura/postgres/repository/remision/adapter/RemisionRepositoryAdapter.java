@@ -77,10 +77,15 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     public Mono<Void> crearRemisionCita(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
         //Remision
         String idRemision = remisionRequest.getIdRemision();
+        Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
+        validarRemision.subscribe();
+
+        if(validarRemision.blockOptional().orElse(false)){
+            return Mono.error(new Throwable("Ya existe una remision con el id "+idRemision));
+        }
         var ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
         var pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
         var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
-
         var datosAtencionPacienteData = ConverterRemision
                 .convertirDatosAtencionPacienteData(remisionRequest.getDatosAtencionPaciente(), idRemision);
 
@@ -107,21 +112,21 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
         List<CuracionData> curacionesData = ConverterRemision.extraerCuracionData(citasRequest);
 
-        try {
-            Flux<TratamientoData> tratamientosFlux = tratamientoRepository.saveAll(tratamientosData);
-            Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
-            Flux<CanalizacionData> canalizacionDataFlux = canalizacionRepository.saveAll(canalizacionesData);
-            Flux<FototerapiaData> fototerapiaDataFlux = fototerapiaRepository.saveAll(fototerapiaData);
-            Flux<SecrecionData> secrecionDataFlux = secrecionRepository.saveAll(secrecionData);
-            Flux<SondajeData> sondajeDataFlux = sondajeRepository.saveAll(sondajeData);
 
-            Flux<SoporteNutricionalData> soporteNutricionalDataFlux = soporteNutricionalRepository
+        Flux<TratamientoData> tratamientosFlux         = tratamientoRepository.saveAll(tratamientosData);
+        Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
+        Flux<CanalizacionData> canalizacionDataFlux    = canalizacionRepository.saveAll(canalizacionesData);
+        Flux<FototerapiaData> fototerapiaDataFlux      = fototerapiaRepository.saveAll(fototerapiaData);
+        Flux<SecrecionData> secrecionDataFlux          = secrecionRepository.saveAll(secrecionData);
+        Flux<SondajeData> sondajeDataFlux              = sondajeRepository.saveAll(sondajeData);
+
+        Flux<SoporteNutricionalData> soporteNutricionalDataFlux = soporteNutricionalRepository
                     .saveAll(soporteNutricionalData);
 
-            Flux<TomaMuestraData> tomaMuestraDataFlux = tomaMuestraRepository.saveAll(tomaMuestraData);
-            Flux<CuracionData> curacionDataFlux = curacionRepository.saveAll(curacionesData);
+        Flux<TomaMuestraData> tomaMuestraDataFlux = tomaMuestraRepository.saveAll(tomaMuestraData);
+        Flux<CuracionData> curacionDataFlux = curacionRepository.saveAll(curacionesData);
 
-            return Mono.from(ubicacionRepository.insertUbicacion(ubicacionData))
+        return Mono.from(ubicacionRepository.insertUbicacion(ubicacionData))
                     .then(Mono.from(pacienteRepository.insertpaciente(pacienteData)))
 
                     .then(Mono.from(remisionRepository.insertRemision(remisionData)))
@@ -140,18 +145,13 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                     .then(soporteNutricionalDataFlux.collectList())
                     .then(tomaMuestraDataFlux.collectList())
                     .then(curacionDataFlux.collectList())
-                    .then();
-
-        } catch (Exception e) {
-            Mono<Void> deleteData = Mono.from(ubicacionRepository.delete(ubicacionData))
-                    .then(Mono.from(pacienteRepository.delete(pacienteData)))
-                    .then(Mono.from(remisionRepository.delete(remisionData)))
-                    .then(Mono.from(citaRepository.deleteAll(citasData)))
-                    .then(Mono.from(remisionDiagnosticoRepository.deleteAll(diagnosticosData)))
-                    .then(Mono.from(datosAtencionPacienteRepository.delete(datosAtencionPacienteData)));
-
-            return deleteData.then(Mono.error(e));
-        }
+                    .then()
+                    .onErrorMap(throwable -> {
+                       Mono<Void>  error = Mono.from(
+                           remisionRepository.deleteAllDataRemision(idRemision,pacienteData.getNumeroIdentificacion()));
+                       error.subscribe();
+                       return new Exception("Error al crear remision");
+                    });
     }
 
     @Override

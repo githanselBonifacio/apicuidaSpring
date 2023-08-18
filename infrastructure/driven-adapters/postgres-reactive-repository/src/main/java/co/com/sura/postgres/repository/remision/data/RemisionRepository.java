@@ -9,6 +9,8 @@ import java.time.LocalDate;
 
 public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,String> {
 
+    @Query("CALL public.delete_remision_data(:idRemision,:numeroIdentificacionPaciente)")
+    Mono<Void> deleteAllDataRemision(@Param("idRemision") String idRemision,@Param("numeroIdentificacionPaciente") String numeroIdentificacionPaciente);
 
     @Override
     Mono<Boolean> existsById(String idRemision);
