@@ -5,6 +5,10 @@ import co.com.sura.dto.remision.*;
 import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.remision.data.*;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -17,7 +21,13 @@ import java.util.stream.Collectors;
 
 @Component
 public class ConverterRemision {
+    protected static Object convertToJsonObject (Json jsonByteArrayInput ){
+        Gson gson = new Gson();
+        byte[] byteArray = jsonByteArrayInput.asArray();
+        String jsonString = new String(byteArray);
 
+        return   gson.fromJson(jsonString, Object.class);
+    }
     public static RemisionData convertToRemisionRequest(RemisionRequest remisionRequest){
 
         return new RemisionData()
@@ -119,6 +129,7 @@ public class ConverterRemision {
                 .holgura(citaRequest.getHolgura())
                 .fechaInicio(citaRequest.getFechaInicio())
                 .especialidad(citaRequest.getEspecialidad())
+                .idCita(citaRequest.getIdCita())
                 .build();
     }
 
@@ -346,6 +357,24 @@ public class ConverterRemision {
                 .telefonoPaciente(datosAtencionPacienteData.getTelefonoPaciente())
                 .celularPaciente2(datosAtencionPacienteData.getCelularPaciente2())
                 .celularPaciente(datosAtencionPacienteData.getCelularPaciente())
+                .build();
+    }
+
+    public static  RegistroHistorialRemision convertToRegistroHistoriaRemision(
+            RegistroHistorialRemisionData registroHistorialRemisionData){
+        return new RegistroHistorialRemision()
+                .toBuilder()
+                .idRemision(registroHistorialRemisionData.getIdRemision())
+                .estado(registroHistorialRemisionData.getEstado())
+                .fechaAdmision(registroHistorialRemisionData.getFechaAdmision())
+                .programa(registroHistorialRemisionData.getPrograma())
+                .tipoAdmision(registroHistorialRemisionData.getTipoAdmision())
+                .institucionRemite(registroHistorialRemisionData.getInstitucionRemite())
+                .paciente(convertToJsonObject(registroHistorialRemisionData.getPaciente()))
+                .datosAtencion(convertToJsonObject(registroHistorialRemisionData.getDatosAtencion()))
+                .ubicacionPaciente(convertToJsonObject(registroHistorialRemisionData.getUbicacionPaciente()))
+                .diagnosticos(convertToJsonObject(registroHistorialRemisionData.getDiagnosticos()))
+                .citas(convertToJsonObject(registroHistorialRemisionData.getCitas()))
                 .build();
     }
 }

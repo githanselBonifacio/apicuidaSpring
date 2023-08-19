@@ -27,10 +27,14 @@ subprojects {
         implementation "io.projectreactor:reactor-core:${reactorVersion}"
         implementation "io.projectreactor.addons:reactor-extra:${reactorExtraVersion}"
 
+        implementation 'com.google.code.gson:gson:2.8.9'
+
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+
+
     }
 
     jacoco {

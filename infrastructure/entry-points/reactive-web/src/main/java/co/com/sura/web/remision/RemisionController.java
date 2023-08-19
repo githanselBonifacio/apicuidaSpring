@@ -5,6 +5,7 @@ import co.com.sura.dto.remision.CrearRemisionCitasRequest;
 import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.Paciente;
+import co.com.sura.entity.remision.RegistroHistorialRemision;
 import co.com.sura.remision.RemisionUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,5 +50,17 @@ public class RemisionController {
     @PostMapping(value = "notificarFarmacia")
     public Mono<Void>notificarMedicamentosToFarmacia(@RequestBody List<PacienteTratamientoCita> tratamientoCitasList){
         return remisionUseCase.notificarMedicamentosToFarmacia(tratamientoCitasList);
+    }
+
+    @GetMapping(value = "historial/{idRemision}")
+    public Flux<RegistroHistorialRemision> consultarHistorialRemisionById(@PathVariable String idRemision){
+        return remisionUseCase.consultarHistorialRemisionById(idRemision);
+    }
+    @PostMapping("/actualizarRemisionPorNovedad")
+    public Mono<Void> actualizarRemisionPorNovedad(@RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
+        return remisionUseCase.ActualizarRemisionPorNovedad(
+                crearRemisionCitasRequest.getRemision(),
+                crearRemisionCitasRequest.getCitas()
+        );
     }
 }

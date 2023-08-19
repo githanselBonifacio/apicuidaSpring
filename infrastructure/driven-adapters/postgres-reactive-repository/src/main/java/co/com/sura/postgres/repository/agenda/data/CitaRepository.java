@@ -119,4 +119,10 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
                 .flatMap(this::insertCita)
                 .then();
     }
+    @Query("SELECT get_last_consecutive_number_cita($1);")
+    Mono<Integer> findLastNumberCitaRemision(String idRemision);
+
+
+    @Query("CALL public.delete_cita_data(:idRemision)")
+    Mono<Void> deleteCitaDataByIdRemision(@Param("idRemision") String idRemision);
 }

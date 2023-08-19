@@ -3,10 +3,7 @@ package co.com.sura.remision;
 import co.com.sura.dto.remision.CitaRequest;
 import co.com.sura.dto.remision.RemisionRequest;
 import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.remision.DatosAtencionPaciente;
-import co.com.sura.entity.remision.Paciente;
-import co.com.sura.entity.remision.RemisionFactory;
-import co.com.sura.entity.remision.RemisionCrudRepository;
+import co.com.sura.entity.remision.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -41,5 +38,11 @@ public class RemisionUseCase implements RemisionFactory {
     public Mono<Void> notificarMedicamentosToFarmacia (List<PacienteTratamientoCita> tratamientoCitasList){
         return remisionCrudRepository.notificarMedicamentosToFarmacia(tratamientoCitasList);
     }
+    public Flux<RegistroHistorialRemision> consultarHistorialRemisionById (String idRemision){
+        return remisionCrudRepository.consultarHistoricoRemision(idRemision);
+    }
 
+    public Mono<Void> ActualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citas){
+        return remisionCrudRepository.actualizarRemisionPorNovedad(remisionRequest,citas);
+    }
 }

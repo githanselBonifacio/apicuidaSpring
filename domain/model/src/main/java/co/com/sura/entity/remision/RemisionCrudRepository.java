@@ -14,4 +14,8 @@ public interface RemisionCrudRepository {
 
     Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmacia();
     Mono<Void>                    notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList);
+
+    Flux<RegistroHistorialRemision>consultarHistoricoRemision(String idRemision);
+
+    Mono<Void>                   actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citas);
 }
