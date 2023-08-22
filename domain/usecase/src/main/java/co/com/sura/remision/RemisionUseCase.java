@@ -1,12 +1,14 @@
 package co.com.sura.remision;
 
 import co.com.sura.dto.remision.CitaRequest;
+import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
 import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.entity.remision.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RemisionUseCase implements RemisionFactory {
@@ -42,7 +44,8 @@ public class RemisionUseCase implements RemisionFactory {
         return remisionCrudRepository.consultarHistoricoRemision(idRemision);
     }
 
-    public Mono<Void> ActualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citas){
-        return remisionCrudRepository.actualizarRemisionPorNovedad(remisionRequest,citas);
+    public Mono<Void> ActualizarRemisionPorNovedad(
+            RemisionRequest remisionRequest, List<CitaRequest> citas, NovedadRequest novedadRequest){
+        return remisionCrudRepository.actualizarRemisionPorNovedad(remisionRequest,citas,novedadRequest);
     }
 }

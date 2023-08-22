@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.persistence.Entity;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder(toBuilder = true)
 @Data
@@ -23,6 +24,12 @@ public class RegistroHistorialRemisionData {
     @Id
     @Column("id_historial")
     private Integer id;
+
+    @Column("fecha_aplicacion_novedad")
+    private LocalDateTime fechaAplicacionNovedad;
+
+    @Column("motivo_novedad")
+    private String motivoNovedad;
 
     @Column("id_remision")
     private String idRemision;

@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 @Component
 public class ConverterRemision {
     protected static Object convertToJsonObject (Json jsonByteArrayInput ){
-        Gson gson = new Gson();
+        var gson = new Gson();
         byte[] byteArray = jsonByteArrayInput.asArray();
-        String jsonString = new String(byteArray);
+        var jsonString = new String(byteArray);
 
         return   gson.fromJson(jsonString, Object.class);
     }
@@ -362,9 +362,10 @@ public class ConverterRemision {
 
     public static  RegistroHistorialRemision convertToRegistroHistoriaRemision(
             RegistroHistorialRemisionData registroHistorialRemisionData){
-        return new RegistroHistorialRemision()
-                .toBuilder()
+        var builder = new RegistroHistorialRemision().toBuilder()
                 .idRemision(registroHistorialRemisionData.getIdRemision())
+                .fechaAplicacionNovedad(registroHistorialRemisionData.getFechaAplicacionNovedad())
+                .motivoNovedad(registroHistorialRemisionData.getMotivoNovedad())
                 .estado(registroHistorialRemisionData.getEstado())
                 .fechaAdmision(registroHistorialRemisionData.getFechaAdmision())
                 .programa(registroHistorialRemisionData.getPrograma())
@@ -373,8 +374,11 @@ public class ConverterRemision {
                 .paciente(convertToJsonObject(registroHistorialRemisionData.getPaciente()))
                 .datosAtencion(convertToJsonObject(registroHistorialRemisionData.getDatosAtencion()))
                 .ubicacionPaciente(convertToJsonObject(registroHistorialRemisionData.getUbicacionPaciente()))
-                .diagnosticos(convertToJsonObject(registroHistorialRemisionData.getDiagnosticos()))
-                .citas(convertToJsonObject(registroHistorialRemisionData.getCitas()))
-                .build();
+                .diagnosticos(convertToJsonObject(registroHistorialRemisionData.getDiagnosticos()));
+
+        if (registroHistorialRemisionData.getCitas() != null) {
+            builder.citas(convertToJsonObject(registroHistorialRemisionData.getCitas()));
+        }
+        return builder.build();
     }
 }

@@ -123,6 +123,8 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
     Mono<Integer> findLastNumberCitaRemision(String idRemision);
 
 
-    @Query("CALL public.delete_cita_data(:idRemision)")
-    Mono<Void> deleteCitaDataByIdRemision(@Param("idRemision") String idRemision);
+    @Query("CALL public.delete_cita_data(:idRemision,:fechaAplicacionNovedad)")
+    Mono<Void> deleteCitaDataByIdRemision(
+            @Param("idRemision") String idRemision,
+            @Param("fechaAplicacionNovedad") LocalDateTime fechaAplicacionNovedad);
 }

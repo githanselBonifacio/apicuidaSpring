@@ -60,7 +60,8 @@ public class RemisionController {
     public Mono<Void> actualizarRemisionPorNovedad(@RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
         return remisionUseCase.ActualizarRemisionPorNovedad(
                 crearRemisionCitasRequest.getRemision(),
-                crearRemisionCitasRequest.getCitas()
+                crearRemisionCitasRequest.getCitas(),
+                crearRemisionCitasRequest.getNovedad()
         );
     }
 }

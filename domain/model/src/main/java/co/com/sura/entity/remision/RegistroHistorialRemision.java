@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,6 +15,8 @@ public class RegistroHistorialRemision {
 
     private String idRemision;
     private String estado;
+    private LocalDateTime fechaAplicacionNovedad;
+    private String motivoNovedad;
     private LocalDate fechaAdmision;
     private String programa;
     private String tipoAdmision;

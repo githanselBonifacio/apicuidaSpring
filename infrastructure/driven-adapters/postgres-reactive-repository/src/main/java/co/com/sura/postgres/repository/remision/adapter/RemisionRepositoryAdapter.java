@@ -1,6 +1,7 @@
 package co.com.sura.postgres.repository.remision.adapter;
 
 import co.com.sura.dto.remision.CitaRequest;
+import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
 import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.entity.remision.*;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -224,12 +226,16 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     }
 
     @Override
-    public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
+    public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
+                                                   NovedadRequest novedadRequest) {
 
         Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
-                registroHistorialRemisionRepository.buildByIdRemision(remisionRequest.getIdRemision()));
+                registroHistorialRemisionRepository
+                        .buildByIdRemision(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
         registroRemision.subscribe();
-
+        var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
+        registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
+        registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
         ///envio de remision
         //Remision
         String idRemision = remisionRequest.getIdRemision();
@@ -294,8 +300,9 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
 
         return Mono.from(registroHistorialRemisionRepository
-                .save(registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData())))
-                .then(Mono.from(citaRepository.deleteCitaDataByIdRemision(idRemision)))
+                .save(registroRemisionData))
+                .then(Mono.from(citaRepository
+                        .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
                 .then(ubicacionRepository.save(ubicacionData))
 
                 .then(Mono.from(pacienteRepository.save(pacienteData)))

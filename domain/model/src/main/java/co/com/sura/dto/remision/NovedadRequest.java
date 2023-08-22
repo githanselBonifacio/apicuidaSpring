@@ -6,17 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class CrearRemisionCitasRequest {
-    private RemisionRequest remision;
-    private List<CitaRequest> citas;
+public class NovedadRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-    private NovedadRequest novedad;
+    private LocalDateTime fechaAplicarNovedad;
+    private String motivoNovedad;
 }
