@@ -8,7 +8,6 @@ import co.com.sura.entity.remision.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class RemisionUseCase implements RemisionFactory {
@@ -19,6 +18,9 @@ public class RemisionUseCase implements RemisionFactory {
         this.remisionCrudRepository = remisionRepository;
     }
 
+    public Flux<Remision> consultarRemisiones(){
+        return remisionCrudRepository.consultarRemisiones();
+    }
     public Mono<Void> crearRemisionCitas (RemisionRequest remisionRequest, List<CitaRequest> citas){
         return remisionCrudRepository
                 .crearRemisionCita(
@@ -44,8 +46,11 @@ public class RemisionUseCase implements RemisionFactory {
         return remisionCrudRepository.consultarHistoricoRemision(idRemision);
     }
 
-    public Mono<Void> ActualizarRemisionPorNovedad(
+    public Mono<Void> actualizarRemisionPorNovedad(
             RemisionRequest remisionRequest, List<CitaRequest> citas, NovedadRequest novedadRequest){
         return remisionCrudRepository.actualizarRemisionPorNovedad(remisionRequest,citas,novedadRequest);
+    }
+    public Mono<RegistroHistorialRemision> consultarDataActualRemision(String idRemision){
+        return remisionCrudRepository.consultarDatosRemision(idRemision);
     }
 }

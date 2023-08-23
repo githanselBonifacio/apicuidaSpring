@@ -6,6 +6,7 @@ import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.Paciente;
 import co.com.sura.entity.remision.RegistroHistorialRemision;
+import co.com.sura.entity.remision.Remision;
 import co.com.sura.remision.RemisionUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,11 @@ public class RemisionController {
         );
     }
 
+    @GetMapping(value = "")
+    public Flux<Remision> consultarRemisiones(){
+        return remisionUseCase.consultarRemisiones();
+    }
+
     @GetMapping(value = "datosAtencionPaciente/{idRemision}")
     public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByRemision(@PathVariable String idRemision){
         return remisionUseCase.consultarDatosAtencionPacienteByRemision(idRemision);
@@ -56,9 +62,15 @@ public class RemisionController {
     public Flux<RegistroHistorialRemision> consultarHistorialRemisionById(@PathVariable String idRemision){
         return remisionUseCase.consultarHistorialRemisionById(idRemision);
     }
+
+    @GetMapping(value = "/{idRemision}")
+    public Mono<RegistroHistorialRemision> consultarAllDataRemisionById(@PathVariable String idRemision){
+        return remisionUseCase.consultarDataActualRemision(idRemision);
+    }
+
     @PostMapping("/actualizarRemisionPorNovedad")
     public Mono<Void> actualizarRemisionPorNovedad(@RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
-        return remisionUseCase.ActualizarRemisionPorNovedad(
+        return remisionUseCase.actualizarRemisionPorNovedad(
                 crearRemisionCitasRequest.getRemision(),
                 crearRemisionCitasRequest.getCitas(),
                 crearRemisionCitasRequest.getNovedad()

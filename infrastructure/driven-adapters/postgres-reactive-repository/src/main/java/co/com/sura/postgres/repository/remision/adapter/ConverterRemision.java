@@ -2,6 +2,7 @@ package co.com.sura.postgres.repository.remision.adapter;
 
 
 import co.com.sura.dto.remision.*;
+import co.com.sura.entity.maestro.Ciudad;
 import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.remision.data.*;
@@ -39,6 +40,19 @@ public class ConverterRemision {
                 .tipoAdmision(remisionRequest.getTipoAdmision())
                 .numeroIdentificacionPaciente(remisionRequest.getNumeroIdentificacion())
                 .estado(remisionRequest.getEstado())
+                .build();
+    }
+    public static Remision convertToRemision(RemisionData remisionData){
+
+        return new Remision()
+                .toBuilder()
+                .idRemision(remisionData.getIdRemision())
+                .institucionRemite(remisionData.getInstitucionRemite())
+                .programa(remisionData.getPrograma())
+                .fechaAdmision(remisionData.getFechaAdmision())
+                .tipoAdmision(remisionData.getTipoAdmision())
+                .programa(remisionData.getPrograma())
+                .estado(remisionData.getEstado())
                 .build();
     }
     public static  Paciente convertToPaciente (PacienteData pacienteData){
@@ -100,7 +114,7 @@ public class ConverterRemision {
                 .edad(remisionRequest.getEdad())
                 .sexo(remisionRequest.getSexo())
                 .peso(remisionRequest.getPeso())
-                .tipoAfiliacion(remisionRequest.getTipoIdentificacion().getNombre())
+                .tipoAfiliacion(remisionRequest.getTipoAfiliacion().getNombre())
                 .nombreAseguradora(remisionRequest.getTipoAfiliacion().getNombreAseguradora())
                 .fechaNacimiento(remisionRequest.getFechaNacimiento())
                 .idUbicacion(remisionRequest.getIdRemision()+"_ubicacion")

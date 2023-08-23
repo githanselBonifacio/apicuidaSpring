@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -80,6 +79,11 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         this.databaseClient = databaseClient;
     }
 
+
+    @Override
+    public Flux<Remision> consultarRemisiones() {
+        return remisionRepository.findAllRemision();
+    }
 
     public Mono<Void> crearRemisionCita(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
         //Remision
@@ -173,7 +177,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
     @Override
     public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByIdRemision(String idRemision) {
-        return datosAtencionPacienteRepository.findAllByIdRemision(idRemision)
+        return datosAtencionPacienteRepository.findByIdRemision(idRemision)
                 .map(ConverterRemision :: convertToDatosAtencionPaciente);
     }
 
@@ -226,12 +230,18 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     }
 
     @Override
+    public Mono<RegistroHistorialRemision> consultarDatosRemision(String idRemision) {
+        return registroHistorialRemisionRepository.buildByIdRemisionActual(idRemision)
+                .map(ConverterRemision::convertToRegistroHistoriaRemision);
+    }
+
+    @Override
     public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
                                                    NovedadRequest novedadRequest) {
 
         Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
-                registroHistorialRemisionRepository
-                        .buildByIdRemision(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
+             registroHistorialRemisionRepository
+                .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
         registroRemision.subscribe();
         var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
         registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());

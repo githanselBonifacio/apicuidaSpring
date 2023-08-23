@@ -31,5 +31,7 @@ public class RemisionData {
     private String institucionRemite;
     @Column("numero_identificacion_paciente")
     private String numeroIdentificacionPaciente;
+    @Column("id_ciudad")
+    private String idCiudad;
 
 }

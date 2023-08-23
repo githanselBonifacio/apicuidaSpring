@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RemisionCrudRepository {
+    Flux<Remision>                consultarRemisiones();
     Mono<Void>                    crearRemisionCita (RemisionRequest remisionRequest, List<CitaRequest> citas);
     Mono<DatosAtencionPaciente>   consultarDatosAtencionPacienteByIdRemision (String idRemision);
     Mono<Paciente>                consultarPacienteFromRemision (String idRemision);
@@ -19,9 +20,8 @@ public interface RemisionCrudRepository {
     Mono<Void>                    notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList);
 
     Flux<RegistroHistorialRemision>consultarHistoricoRemision(String idRemision);
+    Mono<RegistroHistorialRemision>consultarDatosRemision(String idRemision);
 
-    Mono<Void>                     actualizarRemisionPorNovedad(
-                                                                RemisionRequest remisionRequest,
-                                                                List<CitaRequest> citas,
-                                                                NovedadRequest novedadRequest);
+    Mono<Void>    actualizarRemisionPorNovedad(
+                           RemisionRequest remisionRequest, List<CitaRequest> citas, NovedadRequest novedadRequest);
 }

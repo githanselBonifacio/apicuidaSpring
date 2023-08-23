@@ -1,13 +1,25 @@
 package co.com.sura.postgres.repository.remision.data;
 
+import co.com.sura.entity.remision.Remision;
+import com.google.gson.JsonObject;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.LocalDate;
 
+
 public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,String> {
+
+    @Query("SELECT remision.*, " +
+            "CONCAT(paciente.nombre, ' ', paciente.apellido) as paciente, "+
+            "ciudad.nombre as ciudad "+
+            "FROM public.remision " +
+            "INNER JOIN ciudad ON remision.id_ciudad = ciudad.id_ciudad " +
+            "INNER JOIN paciente ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
+            "ORDER BY remision.fecha_admision; " )
+    Flux<Remision> findAllRemision();
 
     @Query("CALL public.delete_remision_data(:idRemision,:numeroIdentificacionPaciente)")
     Mono<Void> deleteAllDataRemision(
@@ -47,5 +59,6 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
                 remisionData.getNumeroIdentificacionPaciente()
         );
     }
+
 
 }

@@ -6,5 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface DatosAtencionPacienteRepository extends ReactiveCrudRepository <DatosAtencionPacienteData,Integer> {
 
-    Mono<DatosAtencionPacienteData> findAllByIdRemision(String idRemision);
+    Mono<DatosAtencionPacienteData> findByIdRemision(String idRemision);
 }
