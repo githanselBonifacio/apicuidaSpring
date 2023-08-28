@@ -17,9 +17,10 @@ import javax.persistence.Entity;
 @Entity
 @Table(name = "remision_diagnostico")
 public class RemisionDiagnosticoData {
-    @Id
-    @Column("id_diagnostico")
-    private Integer idDiagnostico;
+
+    @Column("codigo")
+    private String codigo;
+
     @Column("id_remision")
     private String idRemision;
     @Column("nombre_diagnostico")

@@ -1,10 +1,7 @@
 package co.com.sura.postgres.repository.maestros.adapter;
 
 import co.com.sura.entity.maestro.*;
-import co.com.sura.postgres.repository.maestros.data.CiudadRepository;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
-import co.com.sura.postgres.repository.maestros.data.PlanSaludRepository;
-import co.com.sura.postgres.repository.maestros.data.TipoIdentificacionRepository;
+import co.com.sura.postgres.repository.maestros.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -24,6 +21,9 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
 
     @Autowired
     private PlanSaludRepository planSaludRepository;
+
+    @Autowired
+    private EstadoCitaRepository estadoCitaRepository;
 
     @Override
     public Flux<Ciudad> consultarCiudad() {
@@ -71,5 +71,11 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     public Mono<PlanSalud> consultarPlanSaludById(Integer idPlanSalud) {
         return planSaludRepository.findById(idPlanSalud)
                 .map(ConverterMaestros :: convertToTipoIdentificacion);
+    }
+
+    @Override
+    public Flux<EstadoCita> consultarEstadosCita() {
+        return estadoCitaRepository.findAll()
+                .map(ConverterMaestros ::convertToEstadoCita);
     }
 }

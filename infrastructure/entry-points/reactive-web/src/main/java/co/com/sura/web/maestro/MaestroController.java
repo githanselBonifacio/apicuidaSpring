@@ -1,9 +1,6 @@
 package co.com.sura.web.maestro;
 
-import co.com.sura.entity.maestro.Ciudad;
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.maestro.PlanSalud;
-import co.com.sura.entity.maestro.TipoIdentificacion;
+import co.com.sura.entity.maestro.*;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -47,13 +44,8 @@ public class MaestroController {
     }
 
     // plan salud
-    @GetMapping("planSalud")
-    public Flux<PlanSalud> consultarPlanSalud(){
-        return crudMaestroUseCase.consultarPlanSalud();
-    }
-
-    @GetMapping("planSalud/{idPlanSalud}")
-    public Mono<PlanSalud> consultarPlanSaludById(@PathVariable Integer idPlanSalud){
-        return crudMaestroUseCase.consultarPlanSaludById(idPlanSalud);
+    @GetMapping("estadosCita")
+    public Flux<EstadoCita> consultarPlanSalud(){
+        return crudMaestroUseCase.consultarEstadosCita();
     }
 }

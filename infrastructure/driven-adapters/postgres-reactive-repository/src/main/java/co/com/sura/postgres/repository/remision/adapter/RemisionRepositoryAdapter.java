@@ -135,7 +135,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
 
         Flux<TratamientoData> tratamientosFlux         = tratamientoRepository.saveAll(tratamientosData);
-        Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
+        //Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
         Flux<CanalizacionData> canalizacionDataFlux    = canalizacionRepository.saveAll(canalizacionesData);
         Flux<FototerapiaData> fototerapiaDataFlux      = fototerapiaRepository.saveAll(fototerapiaData);
         Flux<SecrecionData> secrecionDataFlux          = secrecionRepository.saveAll(secrecionData);
@@ -147,9 +147,16 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         Flux<TomaMuestraData> tomaMuestraDataFlux = tomaMuestraRepository.saveAll(tomaMuestraData);
         Flux<CuracionData> curacionDataFlux = curacionRepository.saveAll(curacionesData);
 
-        return Mono.from(ubicacionRepository.insertUbicacion(ubicacionData))
-                    .then(Mono.from(pacienteRepository.insertpaciente(pacienteData)))
-
+        return Mono.from(pacienteRepository.existsById(pacienteData.getNumeroIdentificacion()))
+                    .flatMap(pacienteExiste ->{
+                        if (Boolean.TRUE.equals(pacienteExiste)){
+                            return pacienteRepository.save(pacienteData)
+                                    .then(Mono.from(ubicacionRepository.save(ubicacionData)));
+                        }else{
+                            return  pacienteRepository.insertpaciente(pacienteData)
+                                    .then(Mono.from(ubicacionRepository.insertUbicacion(ubicacionData)));
+                        }
+                    })
                     .then(Mono.from(remisionRepository.insertRemision(remisionData)))
 
                     .then(Mono.from(citaRepository.insertMultiplescitas(citasData)))
@@ -158,7 +165,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                             .save(datosAtencionPacienteData)))
 
                     .then(tratamientosFlux.collectList())
-                    .then(diagnosticosFlux.collectList())
+                    .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)))
                     .then(canalizacionDataFlux.collectList())
                     .then(fototerapiaDataFlux.collectList())
                     .then(secrecionDataFlux.collectList())
@@ -239,15 +246,6 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
                                                    NovedadRequest novedadRequest) {
 
-        Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
-             registroHistorialRemisionRepository
-                .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
-        registroRemision.subscribe();
-        var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
-        registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
-        registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
-        ///envio de remision
-        //Remision
         String idRemision = remisionRequest.getIdRemision();
         Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
         validarRemision.subscribe();
@@ -255,6 +253,17 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         if(!validarRemision.blockOptional().orElse(false)){
             return Mono.error(new Throwable("No existe una remision con el id "+idRemision));
         }
+
+        Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
+             registroHistorialRemisionRepository
+                .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
+        registroRemision.subscribe();
+        var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
+        registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
+        registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
+
+        ///envio de remision
+        //Remision
         var ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
         var pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
         var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
@@ -263,7 +272,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
         List<RemisionDiagnosticoData> diagnosticosData = ConverterRemision
                 .extraerRemisionDiagnosticoData(remisionRequest.getDiagnosticos(), idRemision);
-
+        diagnosticosData.forEach(System.out::println);
         //citas
         var counter = new AtomicInteger(
                 citaRepository.findLastNumberCitaRemision(remisionRequest.getIdRemision())
@@ -296,7 +305,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
 
         Flux<TratamientoData> tratamientosFlux         = tratamientoRepository.saveAll(tratamientosData);
-        Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
+        //Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
         Flux<CanalizacionData> canalizacionDataFlux    = canalizacionRepository.saveAll(canalizacionesData);
         Flux<FototerapiaData> fototerapiaDataFlux      = fototerapiaRepository.saveAll(fototerapiaData);
         Flux<SecrecionData> secrecionDataFlux          = secrecionRepository.saveAll(secrecionData);
@@ -325,7 +334,8 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                         .save(datosAtencionPacienteData)))
 
                 .then(tratamientosFlux.collectList())
-                .then(diagnosticosFlux.collectList())
+                .then(Mono.from(remisionDiagnosticoRepository.updateMultiplesDiagnosticos(diagnosticosData)))
+                //.then(diagnosticosFlux.collectList())
                 .then(canalizacionDataFlux.collectList())
                 .then(fototerapiaDataFlux.collectList())
                 .then(secrecionDataFlux.collectList())

@@ -21,4 +21,7 @@ public interface MaestroRepository {
     Flux<PlanSalud> consultarPlanSalud();
     Mono<PlanSalud> consultarPlanSaludById(Integer idPlanSalud);
 
+    //estado citas
+    Flux<EstadoCita> consultarEstadosCita();
+
 }

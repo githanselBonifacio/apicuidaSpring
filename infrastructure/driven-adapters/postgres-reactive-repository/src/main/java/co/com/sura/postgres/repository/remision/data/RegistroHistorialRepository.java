@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public interface RegistroHistorialRepository extends ReactiveCrudRepository<RegistroHistorialRemisionData,Integer> {
 
-    @Query("select * from  public.historial_remision WHERE id_remision = $1;")
+    @Query("select * from  public.historial_remision WHERE id_remision = $1 ORDER BY fecha_registro DESC;")
     Flux<RegistroHistorialRemisionData> findAllByIdRemision(String idRemision);
 
     @Query("SELECT public.remision.*, " +
@@ -27,13 +27,13 @@ public interface RegistroHistorialRepository extends ReactiveCrudRepository<Regi
             "   'fototerapias', (SELECT json_agg(fo) FROM fototerapia fo WHERE fo.id_cita = c.id_cita), " +
             "   'secreciones', (SELECT json_agg(se) FROM secrecion se WHERE se.id_cita = c.id_cita), " +
             "   'sondajes', (SELECT json_agg(son) FROM sondaje son WHERE son.id_cita = c.id_cita), " +
-            "   'soporte nutricionales', " +
+            "   'soporte_nutricionales', " +
             "               (SELECT json_agg(sopor) FROM soporte_nutricional sopor WHERE sopor.id_cita = c.id_cita), " +
-            "   'toma de muestra', (SELECT json_agg(to_mu) FROM toma_muestra to_mu WHERE to_mu.id_cita = c.id_cita) " +
+            "   'toma_muestra', (SELECT json_agg(to_mu) FROM toma_muestra to_mu WHERE to_mu.id_cita = c.id_cita) " +
             "    )))" +
             "  FROM (SELECT cita.* FROM cita " +
             "         WHERE id_remision = $1 AND (id_estado = 1 OR id_estado = 2) AND fecha_programada > $2 " +
-            "        ) c )as citas " +
+            "        ORDER BY fecha_programada ASC) c )as citas " +
             "   FROM public.remision " +
             "   INNER JOIN  public.paciente ON public.paciente.numero_identificacion " +
             "      = public.remision.numero_identificacion_paciente " +
@@ -59,13 +59,13 @@ public interface RegistroHistorialRepository extends ReactiveCrudRepository<Regi
             "   'fototerapias', (SELECT json_agg(fo) FROM fototerapia fo WHERE fo.id_cita = c.id_cita), " +
             "   'secreciones', (SELECT json_agg(se) FROM secrecion se WHERE se.id_cita = c.id_cita), " +
             "   'sondajes', (SELECT json_agg(son) FROM sondaje son WHERE son.id_cita = c.id_cita), " +
-            "   'soporte nutricionales', " +
+            "   'soporte_nutricionales', " +
             "               (SELECT json_agg(sopor) FROM soporte_nutricional sopor WHERE sopor.id_cita = c.id_cita), " +
-            "   'toma de muestra', (SELECT json_agg(to_mu) FROM toma_muestra to_mu WHERE to_mu.id_cita = c.id_cita) " +
+            "   'toma_muestra', (SELECT json_agg(to_mu) FROM toma_muestra to_mu WHERE to_mu.id_cita = c.id_cita) " +
             "    )))" +
             "  FROM (SELECT cita.* FROM cita " +
             "         WHERE id_remision = $1 " +
-            "        ) c )as citas " +
+            "        ORDER BY fecha_programada ASC) c )as citas " +
             "   FROM public.remision " +
             "   INNER JOIN  public.paciente ON public.paciente.numero_identificacion " +
             "      = public.remision.numero_identificacion_paciente " +

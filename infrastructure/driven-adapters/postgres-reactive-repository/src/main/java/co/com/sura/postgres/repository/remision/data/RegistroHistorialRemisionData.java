@@ -56,4 +56,7 @@ public class RegistroHistorialRemisionData {
 
     @Column("citas")
     private Json citas;
+
+    @Column("fecha_registro")
+    private LocalDateTime fechaRegistro;
 }

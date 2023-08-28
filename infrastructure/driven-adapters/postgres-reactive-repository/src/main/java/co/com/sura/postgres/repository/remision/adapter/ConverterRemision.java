@@ -40,6 +40,7 @@ public class ConverterRemision {
                 .tipoAdmision(remisionRequest.getTipoAdmision())
                 .numeroIdentificacionPaciente(remisionRequest.getNumeroIdentificacion())
                 .estado(remisionRequest.getEstado())
+                .idCiudad(remisionRequest.getCiudad().getIdCiudad())
                 .build();
     }
     public static Remision convertToRemision(RemisionData remisionData){
@@ -125,13 +126,12 @@ public class ConverterRemision {
 
         return diagnosticos
                 .stream()
-                .map(diagnostico -> {
-                    return new RemisionDiagnosticoData()
-                            .toBuilder()
-                            .idRemision(idRemision)
-                            .nombreDiagnostico(diagnostico.getNombre())
-                            .build();
-                })
+                .map(diagnostico -> new RemisionDiagnosticoData()
+                        .toBuilder()
+                        .idRemision(idRemision)
+                        .nombreDiagnostico(diagnostico.getNombre())
+                        .codigo(diagnostico.getCodigo())
+                        .build())
                 .collect(Collectors.toList());
     }
 

@@ -26,8 +26,6 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
             @Param("idRemision") String idRemision,
             @Param("numeroIdentificacionPaciente") String numeroIdentificacionPaciente);
 
-    @Override
-    Mono<Boolean> existsById(String idRemision);
 
     @Query("INSERT INTO remision(" +
             "id_remision, " +
@@ -36,9 +34,10 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
             "programa, " +
             "tipo_admision, " +
             "institucion_remite, " +
-            "numero_identificacion_paciente) " +
+            "numero_identificacion_paciente," +
+            "id_ciudad) " +
             " VALUES " +
-            "($1, $2, $3, $4, $5, $6, $7)")
+            "($1, $2, $3, $4, $5, $6, $7,$8)")
     Mono<Void> insertRemisionQuery(
             @Param("$1") String idRemision,
             @Param("$2") String estado,
@@ -46,7 +45,8 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
             @Param("$4") String programa,
             @Param("$5") String tipoAdmision,
             @Param("$6") String institucionRemite,
-            @Param("$7") String numeroIdentificacionPaciente
+            @Param("$7") String numeroIdentificacionPaciente,
+            @Param("$8") String idCiudad
     );
     default Mono<Void> insertRemision(RemisionData remisionData){
         return insertRemisionQuery(
@@ -56,7 +56,8 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
                 remisionData.getPrograma(),
                 remisionData.getTipoAdmision(),
                 remisionData.getInstitucionRemite(),
-                remisionData.getNumeroIdentificacionPaciente()
+                remisionData.getNumeroIdentificacionPaciente(),
+                remisionData.getIdCiudad()
         );
     }
 

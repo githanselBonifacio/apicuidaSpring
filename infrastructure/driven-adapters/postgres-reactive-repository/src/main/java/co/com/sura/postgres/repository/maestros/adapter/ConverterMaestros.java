@@ -1,14 +1,8 @@
 package co.com.sura.postgres.repository.maestros.adapter;
 
 
-import co.com.sura.entity.maestro.Ciudad;
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.maestro.PlanSalud;
-import co.com.sura.entity.maestro.TipoIdentificacion;
-import co.com.sura.postgres.repository.maestros.data.CiudadData;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.repository.maestros.data.PlanSaludData;
-import co.com.sura.postgres.repository.maestros.data.TipoIdentificacionData;
+import co.com.sura.entity.maestro.*;
+import co.com.sura.postgres.repository.maestros.data.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,6 +45,13 @@ public class ConverterMaestros  {
                 .idPlan(planSaludData.getIdPlan())
                 .nombre(planSaludData.getNombre())
                 .nombrePrestador(planSaludData.getNombrePrestador())
+                .build();
+    }
+    public static EstadoCita convertToEstadoCita(EstadoCitaData estadoCitaData){
+        return new EstadoCita()
+                .toBuilder()
+                .id(estadoCitaData.getId())
+                .nombre(estadoCitaData.getNombre())
                 .build();
     }
 }
