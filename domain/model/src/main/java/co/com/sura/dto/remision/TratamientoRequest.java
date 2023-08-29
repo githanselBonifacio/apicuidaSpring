@@ -1,6 +1,7 @@
 package co.com.sura.dto.remision;
 
 import co.com.sura.entity.remision.Medicamento;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class TratamientoRequest {
+    @JsonIgnore
     private String idTratamiento;
     private TipoTratamientoRequest tipoTratamiento;
     private Medicamento medicamento;

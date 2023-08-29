@@ -16,6 +16,7 @@ import co.com.sura.entity.remision.Curacion;
 import co.com.sura.entity.remision.SoporteNutricional;
 import co.com.sura.entity.remision.Secrecion;
 import co.com.sura.entity.remision.Medicamento;
+import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
@@ -35,25 +36,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ConverterAgenda {
+public class ConverterAgenda extends Converter {
 
 
     public static Profesional convertToProfesional(ProfesionalData profesionalData){
-        return new Profesional()
-                .toBuilder()
-                .numeroIdentificacion(profesionalData.getNumeroIdentificacion())
-                .idTipoIdentificacion(profesionalData.getIdTipoIdentificacion())
-                .nombres(profesionalData.getNombre())
-                .apellidos(profesionalData.getApellido())
-                .fechaNacimiento(profesionalData.getFechaNacimiento())
-                .idCiudad(profesionalData.getIdCiudad())
-                .activo(profesionalData.isActivo())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(profesionalData), Profesional.class
+        );
     }
     public static Actividad convertToActividad(ProfesionalData profesionalData){
         return new Actividad()
                 .toBuilder()
-                .responsable(profesionalData.getNombre()+" "+profesionalData.getApellido())
+                .responsable(profesionalData.getNombres()+" "+profesionalData.getApellidos())
                 .numeroIdentificacion(profesionalData.getNumeroIdentificacion())
                 .tareas(new ArrayList<>())
                 .build();
@@ -84,35 +78,15 @@ public class ConverterAgenda {
     }
 
     public static ProfesionalData convertToProfesionalData(Profesional profesional){
-        return new ProfesionalData()
-                .toBuilder()
-                .numeroIdentificacion(profesional.getNumeroIdentificacion())
-                .idTipoIdentificacion(profesional.getIdTipoIdentificacion())
-                .nombre(profesional.getNombres())
-                .apellido(profesional.getApellidos())
-                .fechaNacimiento(profesional.getFechaNacimiento())
-                .idCiudad(profesional.getIdCiudad())
-                .activo(profesional.isActivo())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(profesional), ProfesionalData.class
+        );
     }
 
     public static Cita convertToCita(CitaData citaData){
-        return new Cita()
-                .toBuilder()
-                .idCita(citaData.getIdCita())
-                .idRemision(citaData.getIdRemision())
-                .duracion(citaData.getDuracion())
-                .holgura(citaData.getHolgura())
-                .fechaInicio(citaData.getFechaInicio())
-                .fechaProgramada(citaData.getFechaProgramada())
-                .especialidad(citaData.getEspecialidad())
-                .idEstado(citaData.getIdEstado())
-                .idCiudad(citaData.getIdCiudad())
-                .idProfesional(citaData.getIdProfesional())
-                .idConductor(citaData.getIdConductor())
-                .latitud(citaData.getLatitud())
-                .longitud(citaData.getLongitud())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(citaData), Cita.class
+        );
     }
     public static  List<CitaGenetic> convertToListCitaGenetic(List<CitaData> citas){
         return citas
@@ -132,19 +106,9 @@ public class ConverterAgenda {
                 .build();
     }
     public static Desplazamiento converToDesplazamiento(DesplazamientoData desplazamientoData){
-            return new Desplazamiento()
-                    .toBuilder()
-                    .idCitaPartida(desplazamientoData.getIdCitaPartida())
-                    .idCitaDestino(desplazamientoData.getIdCitaDestino())
-                    .tipo(desplazamientoData.getTipo())
-                    .duracion(desplazamientoData.getDuracion())
-                    .holgura(desplazamientoData.getHolgura())
-                    .fechaProgramada(desplazamientoData.getFechaProgramada())
-                    .idHorarioTurno(desplazamientoData.getIdHorarioTurno())
-                    .idEstado(desplazamientoData.getIdEstado())
-                    .idMovil(desplazamientoData.getIdMovil())
-
-                    .build();
+        return deserializarJson(
+                convertirObjetoAJson(desplazamientoData), Desplazamiento.class
+        );
     }
     public static Tratamiento convertToTratamiento(TratamientoData tratamientoData){
         return new Tratamiento()
@@ -170,61 +134,39 @@ public class ConverterAgenda {
     }
 
     public static Curacion convertToCuracion(CuracionData curacionData){
-        return new Curacion()
-                .toBuilder()
-                .tipoCuracion(curacionData.getTipoCuracion())
-                .descripcion(curacionData.getDescripcion())
-                .sesiones(curacionData.getSesiones())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(curacionData), Curacion.class
+        );
+
     }
 
     public static Canalizacion convertToCanalizacion(CanalizacionData canalizacionData){
-        return new Canalizacion()
-                .toBuilder()
-                .tipoCanalizacion(canalizacionData.getTipoCanalizacion())
-                .tipoPrestacion(canalizacionData.getTipoPrestacion())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(canalizacionData), Canalizacion.class
+        );
     }
 
     public static Fototerapia convertToFototerapia(FototerapiaData fototerapiaData){
-        return new Fototerapia()
-                .toBuilder()
-                .diasTratamiento(fototerapiaData.getDiasTratamiento())
-                .tipoFrecuencia(fototerapiaData.getTipofrecuencia())
-                .cantidadDosis(fototerapiaData.getCantidadDosis())
-                .tipoPrestacion(fototerapiaData.getTipoPrestacion())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(fototerapiaData), Fototerapia.class
+        );
     }
 
     public static Secrecion convertToSecrecionData(SecrecionData secrecionData){
-        return new Secrecion()
-                .toBuilder()
-                .diasTratamiento(secrecionData.getDiasTratamiento())
-                .envioAspirador(secrecionData.isEnvioAspirador())
-                .visitaEnfermeria(secrecionData.isVisitaEnfermeria())
-                .tipoSonda(secrecionData.getTipoSonda())
-                .nasal(secrecionData.isNasal())
-                .traqueostomia(secrecionData.isTraqueostomia())
-                .tipoPrestacion(secrecionData.getTipoPrestacion())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(secrecionData), Secrecion.class
+        );
     }
 
     public static Sondaje convertToSondajeData(SondajeData sondajeData){
-        return new Sondaje()
-                .toBuilder()
-                .tipoSondaje(sondajeData.getTipoSondaje())
-                .tipoSonda(sondajeData.getSondaje())
-                .totalSesiones(sondajeData.getTotalSesiones())
-                .tipoPrestacion(sondajeData.getTipoPrestacion())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(sondajeData), Sondaje.class
+        );
     }
     public static TomaMuestra convertToTomaMuestraData(TomaMuestraData tomaMuestraData){
-        return new TomaMuestra()
-                .toBuilder()
-                .tipoMuestra(tomaMuestraData.getTipoMuestra())
-                .requiereAyuno(tomaMuestraData.getRequiereAyuno())
-                .tipoPrestacion(tomaMuestraData.getTipoPrestacion())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(tomaMuestraData), TomaMuestra.class
+        );
     }
     public static SoporteNutricional convertToSoporteNutricionalData(SoporteNutricionalData soporteNutricionalData){
         return new SoporteNutricional()

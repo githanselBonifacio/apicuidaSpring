@@ -2,26 +2,20 @@ package co.com.sura.postgres.repository.remision.adapter;
 
 
 import co.com.sura.dto.remision.*;
-import co.com.sura.entity.maestro.Ciudad;
 import co.com.sura.entity.remision.*;
+import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.remision.data.*;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
-public class ConverterRemision {
+public class ConverterRemision extends Converter {
     protected static Object convertToJsonObject (Json jsonByteArrayInput ){
         var gson = new Gson();
         byte[] byteArray = jsonByteArrayInput.asArray();
@@ -30,7 +24,6 @@ public class ConverterRemision {
         return   gson.fromJson(jsonString, Object.class);
     }
     public static RemisionData convertToRemisionRequest(RemisionRequest remisionRequest){
-
         return new RemisionData()
                 .toBuilder()
                 .idRemision(remisionRequest.getIdRemision())
@@ -43,19 +36,7 @@ public class ConverterRemision {
                 .idCiudad(remisionRequest.getCiudad().getIdCiudad())
                 .build();
     }
-    public static Remision convertToRemision(RemisionData remisionData){
 
-        return new Remision()
-                .toBuilder()
-                .idRemision(remisionData.getIdRemision())
-                .institucionRemite(remisionData.getInstitucionRemite())
-                .programa(remisionData.getPrograma())
-                .fechaAdmision(remisionData.getFechaAdmision())
-                .tipoAdmision(remisionData.getTipoAdmision())
-                .programa(remisionData.getPrograma())
-                .estado(remisionData.getEstado())
-                .build();
-    }
     public static  Paciente convertToPaciente (PacienteData pacienteData){
         return new Paciente()
                 .toBuilder()
@@ -72,19 +53,9 @@ public class ConverterRemision {
                 .build();
     }
     public static Ubicacion convertToUbicacion(UbicacionData ubicacionData){
-        return  new Ubicacion()
-                .toBuilder()
-                .latitud(ubicacionData.getLatitud())
-                .longitud(ubicacionData.getLongitud())
-                .direccion(ubicacionData.getDireccion())
-                .tipoVia(ubicacionData.getTipoVia())
-                .numero1(ubicacionData.getNumero1())
-                .numeroInterseccion(ubicacionData.getNumeroInterseccion())
-                .numero2(ubicacionData.getNumero2())
-                .barrio(ubicacionData.getBarrio())
-                .sinNomenclatura(ubicacionData.getSinNomenclatura())
-                .municipio(ubicacionData.getMunicipio())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(ubicacionData), Ubicacion.class
+        );
     }
     public static UbicacionData extraerUbicacionData(RemisionRequest remisionRequest){
         UbicacionRequest ubicacionRequest = remisionRequest.getDatosAtencionPaciente().getUbicacion();
@@ -161,8 +132,9 @@ public class ConverterRemision {
                         .getDatosAtencionPaciente().getUbicacion().getLongitud()))
                 .collect(Collectors.toList());
     }
-    public static DatosAtencionPacienteData convertirDatosAtencionPacienteData(
+    public static DatosAtencionPacienteData extraerDatosAtencionPacienteData(
             DatosAtencionPacienteRequest datosAtencionPacienteRequest, String idRemision){
+
         return new DatosAtencionPacienteData()
                 .toBuilder()
                 .nombreCuidador(datosAtencionPacienteRequest.getNombreCuidador())
@@ -173,7 +145,8 @@ public class ConverterRemision {
                 .idRemision(idRemision)
                 .build();
     }
-    protected static  TratamientoData convetirTratamientoData (TratamientoRequest tratamientoRequest){
+    protected static  TratamientoData extraerTratamientoData(TratamientoRequest tratamientoRequest){
+
         return new TratamientoData()
                 .toBuilder()
                 .tipoTratamiento(tratamientoRequest.getTipoTratamiento().getNombre())
@@ -195,7 +168,7 @@ public class ConverterRemision {
                 .stream()
                 .map(citaRequest -> citaRequest.getTratamientos()
                         .stream()
-                        .map(ConverterRemision ::convetirTratamientoData)
+                        .map(ConverterRemision ::extraerTratamientoData)
                         .peek(tratamientoData -> tratamientoData.setIdCita(citaRequest.getIdCita()))
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
@@ -203,11 +176,9 @@ public class ConverterRemision {
     }
 
     protected static CanalizacionData convertirCanalizacionData(Canalizacion canalizacion ){
-        return new CanalizacionData()
-                .toBuilder()
-                .tipoCanalizacion(canalizacion.getTipoCanalizacion())
-                .tipoPrestacion(canalizacion.getTipoPrestacion())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(canalizacion), CanalizacionData.class
+        );
     }
 
     public  static  List<CanalizacionData> extraerCanalizacionData (List<CitaRequest> listacitasRequest) {
@@ -223,13 +194,9 @@ public class ConverterRemision {
     }
 
     protected static FototerapiaData convertirFototerapiaData(Fototerapia fototerapia ){
-        return new FototerapiaData()
-                .toBuilder()
-                .diasTratamiento(fototerapia.getDiasTratamiento())
-                .cantidadDosis(fototerapia.getCantidadDosis())
-                .tipofrecuencia(fototerapia.getTipoFrecuencia())
-                .tipoPrestacion(fototerapia.getTipoPrestacion())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(fototerapia), FototerapiaData.class
+        );
     }
 
     public  static  List<FototerapiaData> extraerFototerapiaData (List<CitaRequest> listacitasRequest) {
@@ -244,17 +211,10 @@ public class ConverterRemision {
                 .collect(Collectors.toList());
     }
 
-    protected static SecrecionData convertirSecrecionData(SecrecionRequest secrecionRequest ){
-        return new SecrecionData()
-                .toBuilder()
-                .diasTratamiento(Integer.parseInt(secrecionRequest.getDiasTratamiento()))
-                .envioAspirador(secrecionRequest.isEnvioAspirador())
-                .isNasal(secrecionRequest.isNasal())
-                .isTraqueostomia(secrecionRequest.isTraqueostomia())
-                .visitaEnfermeria(secrecionRequest.isVisitaEnfermeria())
-                .tipoSonda(secrecionRequest.getTipoSonda())
-                .tipoPrestacion(secrecionRequest.getTipoPrestacion())
-                .build();
+    protected static SecrecionData extraerSecrecionData(SecrecionRequest secrecionRequest ){
+        return deserializarJson(
+                convertirObjetoAJson(secrecionRequest), SecrecionData.class
+        );
     }
 
     public  static  List<SecrecionData> extraerSecrecionData (List<CitaRequest> listacitasRequest) {
@@ -262,7 +222,7 @@ public class ConverterRemision {
                 .stream()
                 .map(citaRequest -> citaRequest.getProcedimientos().getSecreciones()
                         .stream()
-                        .map(ConverterRemision :: convertirSecrecionData)
+                        .map(ConverterRemision ::extraerSecrecionData)
                         .peek(secrecionData -> secrecionData.setIdCita(citaRequest.getIdCita()))
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
@@ -272,7 +232,7 @@ public class ConverterRemision {
     protected static SondajeData convertirSondajeData(SondajeRequest sondajeRequest ){
         return new SondajeData()
                 .toBuilder()
-                .sondaje(sondajeRequest.getSondaje())
+                .tipoSondaje(sondajeRequest.getSondaje())
                 .tipoSondaje(sondajeRequest.getTipoSondaje())
                 .totalSesiones(sondajeRequest.getTotalSesiones())
                 .tipoPrestacion(sondajeRequest.getTipoPrestacion())
@@ -290,8 +250,9 @@ public class ConverterRemision {
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
     }
-    protected static SoporteNutricionalData convertirSoporteNutricional(
+    protected static SoporteNutricionalData extraerSoporteNutricional(
             SoporteNutricionalRequest soporteNutricionalRequest ){
+
         return new SoporteNutricionalData()
                 .toBuilder()
                 .descripcion(soporteNutricionalRequest.getDescripcion())
@@ -310,18 +271,19 @@ public class ConverterRemision {
     }
 
     public  static  List<SoporteNutricionalData> extraerSoporteNutricionalData (List<CitaRequest> listacitasRequest) {
+
         return listacitasRequest
                 .stream()
                 .map(citaRequest -> citaRequest.getProcedimientos().getSoporteNutricionales()
                         .stream()
-                        .map(ConverterRemision :: convertirSoporteNutricional)
+                        .map(ConverterRemision ::extraerSoporteNutricional)
                         .peek(soporteNutricionalData -> soporteNutricionalData.setIdCita(citaRequest.getIdCita()))
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
     }
-    protected static TomaMuestraData convertirSoporteNutricional(TomaMuestraRequest tomaMuestraRequest ){
-        return new TomaMuestraData()
+    protected static TomaMuestraData extraerTomaMuestra(TomaMuestraRequest tomaMuestraRequest ){
+       return new TomaMuestraData()
                 .toBuilder()
                 .tipoMuestra(tomaMuestraRequest.getTipoMuestra().getDescripcion())
                 .requiereAyuno(tomaMuestraRequest.isRequiereAyuno())
@@ -334,14 +296,15 @@ public class ConverterRemision {
                 .stream()
                 .map(citaRequest -> citaRequest.getProcedimientos().getTomaMuestras()
                         .stream()
-                        .map(ConverterRemision :: convertirSoporteNutricional)
+                        .map(ConverterRemision :: extraerTomaMuestra)
                         .peek(tomaMuestraData ->  tomaMuestraData.setIdCita(citaRequest.getIdCita()))
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
     }
 
-    protected static CuracionData convertirCuracionData(CuracionRequest curacionRequest ){
+    protected static CuracionData extraerCuracionData(CuracionRequest curacionRequest ){
+
         return new CuracionData()
                 .toBuilder()
                 .tipoCuracion(curacionRequest.getTipoCuracion().getDescripcion())
@@ -355,7 +318,7 @@ public class ConverterRemision {
                 .stream()
                 .map(citaRequest -> citaRequest.getProcedimientos().getCuraciones()
                         .stream()
-                        .map(ConverterRemision :: convertirCuracionData)
+                        .map(ConverterRemision ::extraerCuracionData)
                         .peek(curacionData ->  curacionData.setIdCita(citaRequest.getIdCita()))
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
@@ -364,14 +327,9 @@ public class ConverterRemision {
 
     public static DatosAtencionPaciente convertToDatosAtencionPaciente(
             DatosAtencionPacienteData datosAtencionPacienteData){
-        return new DatosAtencionPaciente()
-                .toBuilder()
-                .nombreCuidador(datosAtencionPacienteData.getNombreCuidador())
-                .nombreResponsable(datosAtencionPacienteData.getNombreResponsable())
-                .telefonoPaciente(datosAtencionPacienteData.getTelefonoPaciente())
-                .celularPaciente2(datosAtencionPacienteData.getCelularPaciente2())
-                .celularPaciente(datosAtencionPacienteData.getCelularPaciente())
-                .build();
+        return deserializarJson(
+                convertirObjetoAJson(datosAtencionPacienteData), DatosAtencionPaciente.class
+        );
     }
 
     public static  RegistroHistorialRemision convertToRegistroHistoriaRemision(

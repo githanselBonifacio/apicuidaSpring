@@ -1,5 +1,6 @@
 package co.com.sura.entity.remision;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class Canalizacion {
+    @JsonIgnore
+    private Integer idCanalizacion;
+    private String idCita;
     private String tipoCanalizacion;
     private String tipoPrestacion;
 }

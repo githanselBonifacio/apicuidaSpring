@@ -1,5 +1,6 @@
 package co.com.sura.entity.remision;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,9 @@ public class Cita {
     private String idRemision;
     private Integer duracion;
     private Integer holgura;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fechaInicio;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fechaProgramada;
     private Double latitud;
     private Double longitud;

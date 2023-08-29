@@ -1,6 +1,8 @@
 package co.com.sura.entity.moviles;
 
 import co.com.sura.entity.agenda.Profesional;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class Desplazamiento {
+    private Integer idDesplazamiento;
     private String idCitaPartida;
     private String idCitaDestino;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fechaProgramada;
     private Integer idHorarioTurno;
     private String tipo;
@@ -22,7 +26,5 @@ public class Desplazamiento {
     private Integer duracion;
     private Integer holgura;
     private String idMovil;
-
-    private Conductor conductor;
     private Profesional profesional;
 }

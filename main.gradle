@@ -27,7 +27,11 @@ subprojects {
         implementation "io.projectreactor:reactor-core:${reactorVersion}"
         implementation "io.projectreactor.addons:reactor-extra:${reactorExtraVersion}"
 
-        implementation 'com.google.code.gson:gson:2.8.9'
+        implementation "com.google.code.gson:gson:${gsonVersion}"
+
+
+        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDataTypejsrVersion}"
+
 
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

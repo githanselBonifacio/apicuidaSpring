@@ -19,7 +19,7 @@ import javax.persistence.Entity;
 public class TomaMuestraData {
     @Id
     @Column("id_toma_muestra")
-    private Integer idtomaMuestra;
+    private Integer idTomaMuestra;
 
     @Column("tipo_muestra")
     private String tipoMuestra;

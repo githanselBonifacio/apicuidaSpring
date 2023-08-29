@@ -17,10 +17,6 @@ public interface MaestroRepository {
     Flux<TipoIdentificacion> consultarTipoIdentificacion();
     Mono<TipoIdentificacion> consultarTipoIdentificacionById(Integer idTipoIdentificacion);
 
-    //plan salud
-    Flux<PlanSalud> consultarPlanSalud();
-    Mono<PlanSalud> consultarPlanSaludById(Integer idPlanSalud);
-
     //estado citas
     Flux<EstadoCita> consultarEstadosCita();
 

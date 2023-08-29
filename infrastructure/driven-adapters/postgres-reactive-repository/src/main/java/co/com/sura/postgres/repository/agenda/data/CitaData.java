@@ -1,5 +1,6 @@
 package co.com.sura.postgres.repository.agenda.data;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,8 +26,12 @@ public class CitaData {
     private String idRemision;
     private Integer duracion;
     private Integer holgura;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     @Column("fecha_inicio")
     private LocalDateTime fechaInicio;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     @Column("fecha_programada")
     private LocalDateTime fechaProgramada;
     private String especialidad;

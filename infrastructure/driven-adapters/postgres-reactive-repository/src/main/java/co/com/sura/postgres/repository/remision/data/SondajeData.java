@@ -24,8 +24,8 @@ public class SondajeData {
     @Column("tipo_sondaje")
     private String tipoSondaje;
 
-    @Column("sondaje")
-    private String sondaje;
+    @Column("tipo_sonda")
+    private String tipoSonda;
 
     @Column("total_sesiones")
     private Integer totalSesiones;

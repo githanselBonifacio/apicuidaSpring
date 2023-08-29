@@ -1,5 +1,6 @@
 package co.com.sura.postgres.repository.remision.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class UbicacionData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column("id_ubicacion")
+    @JsonIgnore
     private String idUbicacion;
     private Double latitud;
     private Double longitud;
@@ -31,6 +33,7 @@ public class UbicacionData {
     @Column("numero1")
     private String numero1;
     @Column("nro_interseccion")
+    @JsonIgnore
     private String numeroInterseccion;
     @Column("numero2")
     private String numero2;
@@ -39,5 +42,6 @@ public class UbicacionData {
     private Boolean sinNomenclatura;
     private String municipio;
     @Column("id_ciudad")
+    @JsonIgnore
     private String idCiudad;
 }

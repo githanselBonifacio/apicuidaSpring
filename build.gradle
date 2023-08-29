@@ -12,7 +12,9 @@ buildscript {
 		mapboxVersion          = '6.12.0'
 		javatuplesVersion      = '1.2'
 		jacksondatabindVersion = '2.12.4'
-		lombokVersion          = '1.18.16'
+		jacksonDataTypejsrVersion = '2.14.2'
+		gsonVersion            = '2.8.9'
+ 		lombokVersion          = '1.18.16'
 	}
 	repositories {
 		mavenCentral()

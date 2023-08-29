@@ -23,8 +23,8 @@ public class ProfesionalData {
     private String numeroIdentificacion;
     @Column("id_tipo_identificacion")
     private Integer idTipoIdentificacion;
-    private String nombre;
-    private String apellido;
+    private String nombres;
+    private String apellidos;
     @Column("fecha_nacimiento")
     private LocalDate fechaNacimiento;
 

@@ -36,14 +36,6 @@ public class CrudMaestroUseCase implements MaestroFactory {
         return maestroRepository.consultarTipoIdentificacionById(idTipoIdentificacion);
     }
 
-    // Tipo Identificacion
-    public Flux<PlanSalud> consultarPlanSalud(){
-        return maestroRepository.consultarPlanSalud();
-    }
-
-    public Mono<PlanSalud> consultarPlanSaludById(Integer idPlanSalud){
-        return maestroRepository.consultarPlanSaludById(idPlanSalud);
-    }
 
     public Flux<EstadoCita> consultarEstadosCita(){return  maestroRepository.consultarEstadosCita();}
 }

@@ -25,7 +25,7 @@ public class FototerapiaData {
     private Integer diasTratamiento;
 
     @Column("tipo_frecuencia")
-    private String tipofrecuencia;
+    private String tipoFrecuencia;
 
     @Column("cantidad_dosis")
     private Integer cantidadDosis;

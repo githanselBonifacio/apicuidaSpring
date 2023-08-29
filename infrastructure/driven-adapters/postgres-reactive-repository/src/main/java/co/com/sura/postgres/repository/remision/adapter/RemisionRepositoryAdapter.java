@@ -155,7 +155,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     protected  Mono<Void> registrarDatosRemision(RemisionRequest remisionRequest, boolean esNovedad){
         var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
         var datosAtencionPacienteData = ConverterRemision
-                .convertirDatosAtencionPacienteData(
+                .extraerDatosAtencionPacienteData(
                         remisionRequest.getDatosAtencionPaciente(), remisionRequest.getIdRemision());
 
         List<RemisionDiagnosticoData> diagnosticosData = ConverterRemision

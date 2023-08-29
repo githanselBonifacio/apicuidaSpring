@@ -61,17 +61,6 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
                 .map(ConverterMaestros :: convertToTipoIdentificacion);
     }
 
-    @Override
-    public Flux<PlanSalud> consultarPlanSalud() {
-        return planSaludRepository.findAll()
-                .map(ConverterMaestros :: convertToTipoIdentificacion);
-    }
-
-    @Override
-    public Mono<PlanSalud> consultarPlanSaludById(Integer idPlanSalud) {
-        return planSaludRepository.findById(idPlanSalud)
-                .map(ConverterMaestros :: convertToTipoIdentificacion);
-    }
 
     @Override
     public Flux<EstadoCita> consultarEstadosCita() {
