@@ -85,8 +85,99 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         return remisionRepository.findAllRemision();
     }
 
+    protected Mono<Void> registrarUbicacionRemision(RemisionRequest remisionRequest, boolean esNovedad){
+        var ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
+        var pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
+
+        if(esNovedad){
+            return Mono.from(ubicacionRepository.save(ubicacionData))
+                    .then(Mono.from(pacienteRepository.save(pacienteData)))
+                    .then();
+        }else {
+            return Mono.from(pacienteRepository.existsById(pacienteData.getNumeroIdentificacion()))
+                    .flatMap(pacienteExiste ->{
+                        if (Boolean.TRUE.equals(pacienteExiste)){
+                            return pacienteRepository.save(pacienteData)
+                                    .then(Mono.from(ubicacionRepository.save(ubicacionData))).then();
+                        }else{
+                            return  pacienteRepository.insertpaciente(pacienteData)
+                                    .then(Mono.from(ubicacionRepository.insertUbicacion(ubicacionData))).then();
+                        }
+                    });
+        }
+    }
+    protected  Mono<Void> registrarPlanManejo(RemisionRequest remisionRequest, List<CitaRequest> citasRequest){
+        var counter = new AtomicInteger(
+                citaRepository.findLastNumberCitaRemision(remisionRequest.getIdRemision())
+                        .blockOptional()
+                        .orElse(0) + 1);
+        citasRequest.forEach(citaRequest -> {
+            String newIdCita = remisionRequest.getIdRemision() + "_" + counter;
+            citaRequest.setIdCita(newIdCita);
+            counter.getAndIncrement();
+        });
+
+        List<CitaData> citasData = ConverterRemision.convertirCitasDataList(citasRequest, remisionRequest);
+        List<TratamientoData> tratamientosData = ConverterRemision.extraerTratamientoData(citasRequest);
+        List<CanalizacionData> canalizacionesData = ConverterRemision.extraerCanalizacionData(citasRequest);
+        List<FototerapiaData> fototerapiaData = ConverterRemision.extraerFototerapiaData(citasRequest);
+        List<SecrecionData> secrecionData = ConverterRemision.extraerSecrecionData(citasRequest);
+        List<SondajeData> sondajeData = ConverterRemision.extraerSondajeData(citasRequest);
+        List<SoporteNutricionalData> soporteNutricionalData = ConverterRemision
+                .extraerSoporteNutricionalData(citasRequest);
+
+        List<TomaMuestraData> tomaMuestraData = ConverterRemision.extraerSoporteTomaMuestraData(citasRequest);
+        List<CuracionData> curacionesData = ConverterRemision.extraerCuracionData(citasRequest);
+
+        Flux<TratamientoData> tratamientosFlux         = tratamientoRepository.saveAll(tratamientosData);
+        Flux<CanalizacionData> canalizacionDataFlux    = canalizacionRepository.saveAll(canalizacionesData);
+        Flux<FototerapiaData> fototerapiaDataFlux      = fototerapiaRepository.saveAll(fototerapiaData);
+        Flux<SecrecionData> secrecionDataFlux          = secrecionRepository.saveAll(secrecionData);
+        Flux<SondajeData> sondajeDataFlux              = sondajeRepository.saveAll(sondajeData);
+        Flux<SoporteNutricionalData> soporteNutricionalDataFlux = soporteNutricionalRepository
+                .saveAll(soporteNutricionalData);
+
+        Flux<TomaMuestraData> tomaMuestraDataFlux = tomaMuestraRepository.saveAll(tomaMuestraData);
+        Flux<CuracionData> curacionDataFlux = curacionRepository.saveAll(curacionesData);
+
+        return  Mono.from(Mono.from(citaRepository.insertMultiplescitas(citasData)))
+                .then(tratamientosFlux.collectList())
+                .then(canalizacionDataFlux.collectList())
+                .then(fototerapiaDataFlux.collectList())
+                .then(secrecionDataFlux.collectList())
+                .then(sondajeDataFlux.collectList())
+                .then(soporteNutricionalDataFlux.collectList())
+                .then(tomaMuestraDataFlux.collectList())
+                .then(curacionDataFlux.collectList())
+                .then();
+
+    }
+    protected  Mono<Void> registrarDatosRemision(RemisionRequest remisionRequest, boolean esNovedad){
+        var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
+        var datosAtencionPacienteData = ConverterRemision
+                .convertirDatosAtencionPacienteData(
+                        remisionRequest.getDatosAtencionPaciente(), remisionRequest.getIdRemision());
+
+        List<RemisionDiagnosticoData> diagnosticosData = ConverterRemision
+                .extraerRemisionDiagnosticoData(remisionRequest.getDiagnosticos(), remisionRequest.getIdRemision());
+
+       if(esNovedad){
+           return   Mono.from(Mono.from(remisionRepository.save(remisionData)))
+                   .then(Mono.from(datosAtencionPacienteRepository.updateDatosAtencion(datosAtencionPacienteData)))
+                   .then(Mono.from(remisionDiagnosticoRepository.updateMultiplesDiagnosticos(diagnosticosData)))
+                   .then();
+
+       }else {
+           return  Mono.from(Mono.from(remisionRepository.insertRemision(remisionData)))
+                   .then(Mono.from(datosAtencionPacienteRepository.save(datosAtencionPacienteData)))
+                   .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)))
+                   .then();
+       }
+    }
+
+    @Override
     public Mono<Void> crearRemisionCita(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
-        //Remision
+
         String idRemision = remisionRequest.getIdRemision();
         Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
         validarRemision.subscribe();
@@ -94,94 +185,47 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         if(validarRemision.blockOptional().orElse(false)){
             return Mono.error(new Throwable("Ya existe una remision con el id "+idRemision));
         }
-        var ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
-        var pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
-        var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
-        var datosAtencionPacienteData = ConverterRemision
-                .convertirDatosAtencionPacienteData(remisionRequest.getDatosAtencionPaciente(), idRemision);
 
-        List<RemisionDiagnosticoData> diagnosticosData = ConverterRemision
-                .extraerRemisionDiagnosticoData(remisionRequest.getDiagnosticos(), idRemision);
-
-        //citas
-        var counter = new AtomicInteger(
-                citaRepository.findLastNumberCitaRemision(remisionRequest.getIdRemision())
-                .blockOptional()
-                .orElse(0) + 1);
-        citasRequest.forEach(citaRequest -> {
-            String newIdCita = idRemision + "_" + counter;
-            citaRequest.setIdCita(newIdCita);
-            counter.getAndIncrement();
-        });
-
-        List<CitaData> citasData = ConverterRemision.convertirCitasDataList(citasRequest, remisionRequest);
-
-        List<TratamientoData> tratamientosData = ConverterRemision.extraerTratamientoData(citasRequest);
-
-        List<CanalizacionData> canalizacionesData = ConverterRemision.extraerCanalizacionData(citasRequest);
-
-        List<FototerapiaData> fototerapiaData = ConverterRemision.extraerFototerapiaData(citasRequest);
-
-        List<SecrecionData> secrecionData = ConverterRemision.extraerSecrecionData(citasRequest);
-
-        List<SondajeData> sondajeData = ConverterRemision.extraerSondajeData(citasRequest);
-
-        List<SoporteNutricionalData> soporteNutricionalData = ConverterRemision
-                .extraerSoporteNutricionalData(citasRequest);
-
-        List<TomaMuestraData> tomaMuestraData = ConverterRemision.extraerSoporteTomaMuestraData(citasRequest);
-
-        List<CuracionData> curacionesData = ConverterRemision.extraerCuracionData(citasRequest);
-
-
-        Flux<TratamientoData> tratamientosFlux         = tratamientoRepository.saveAll(tratamientosData);
-        //Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
-        Flux<CanalizacionData> canalizacionDataFlux    = canalizacionRepository.saveAll(canalizacionesData);
-        Flux<FototerapiaData> fototerapiaDataFlux      = fototerapiaRepository.saveAll(fototerapiaData);
-        Flux<SecrecionData> secrecionDataFlux          = secrecionRepository.saveAll(secrecionData);
-        Flux<SondajeData> sondajeDataFlux              = sondajeRepository.saveAll(sondajeData);
-
-        Flux<SoporteNutricionalData> soporteNutricionalDataFlux = soporteNutricionalRepository
-                    .saveAll(soporteNutricionalData);
-
-        Flux<TomaMuestraData> tomaMuestraDataFlux = tomaMuestraRepository.saveAll(tomaMuestraData);
-        Flux<CuracionData> curacionDataFlux = curacionRepository.saveAll(curacionesData);
-
-        return Mono.from(pacienteRepository.existsById(pacienteData.getNumeroIdentificacion()))
-                    .flatMap(pacienteExiste ->{
-                        if (Boolean.TRUE.equals(pacienteExiste)){
-                            return pacienteRepository.save(pacienteData)
-                                    .then(Mono.from(ubicacionRepository.save(ubicacionData)));
-                        }else{
-                            return  pacienteRepository.insertpaciente(pacienteData)
-                                    .then(Mono.from(ubicacionRepository.insertUbicacion(ubicacionData)));
-                        }
-                    })
-                    .then(Mono.from(remisionRepository.insertRemision(remisionData)))
-
-                    .then(Mono.from(citaRepository.insertMultiplescitas(citasData)))
-
-                    .then(Mono.from(datosAtencionPacienteRepository
-                            .save(datosAtencionPacienteData)))
-
-                    .then(tratamientosFlux.collectList())
-                    .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)))
-                    .then(canalizacionDataFlux.collectList())
-                    .then(fototerapiaDataFlux.collectList())
-                    .then(secrecionDataFlux.collectList())
-                    .then(sondajeDataFlux.collectList())
-                    .then(soporteNutricionalDataFlux.collectList())
-                    .then(tomaMuestraDataFlux.collectList())
-                    .then(curacionDataFlux.collectList())
-                    .then()
+        String numeroIdentificacionPaciente = remisionRequest.getNumeroIdentificacion();
+        return registrarUbicacionRemision(remisionRequest,false)
+                    .then(registrarDatosRemision(remisionRequest,false))
+                    .then(registrarPlanManejo(remisionRequest,citasRequest))
                     .onErrorMap(throwable -> {
                        Mono<Void>  error = Mono.from(
-                           remisionRepository.deleteAllDataRemision(idRemision,pacienteData.getNumeroIdentificacion()));
+                           remisionRepository.deleteAllDataRemision(idRemision,numeroIdentificacionPaciente));
                        error.subscribe();
                        return new Exception("Error al crear remision");
                     });
     }
+    @Override
+    public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
+                                                   NovedadRequest novedadRequest) {
 
+        String idRemision = remisionRequest.getIdRemision();
+        Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
+        validarRemision.subscribe();
+
+        if(!validarRemision.blockOptional().orElse(false)){
+            return Mono.error(new Throwable("No existe una remision con el id "+idRemision));
+        }
+
+        Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
+             registroHistorialRemisionRepository
+                 .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
+        registroRemision.subscribe();
+
+        var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
+        registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
+        registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
+
+        return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
+                .then(Mono.from(citaRepository
+                        .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
+                .then(registrarUbicacionRemision(remisionRequest,true))
+                .then(registrarDatosRemision(remisionRequest,true))
+                .then(registrarPlanManejo(remisionRequest,citasRequest))
+                .then();
+    }
     @Override
     public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByIdRemision(String idRemision) {
         return datosAtencionPacienteRepository.findByIdRemision(idRemision)
@@ -242,109 +286,6 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 .map(ConverterRemision::convertToRegistroHistoriaRemision);
     }
 
-    @Override
-    public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
-                                                   NovedadRequest novedadRequest) {
-
-        String idRemision = remisionRequest.getIdRemision();
-        Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
-        validarRemision.subscribe();
-
-        if(!validarRemision.blockOptional().orElse(false)){
-            return Mono.error(new Throwable("No existe una remision con el id "+idRemision));
-        }
-
-        Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
-             registroHistorialRemisionRepository
-                .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
-        registroRemision.subscribe();
-        var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
-        registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
-        registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
-
-        ///envio de remision
-        //Remision
-        var ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
-        var pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
-        var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
-        var datosAtencionPacienteData = ConverterRemision
-                .convertirDatosAtencionPacienteData(remisionRequest.getDatosAtencionPaciente(), idRemision);
-
-        List<RemisionDiagnosticoData> diagnosticosData = ConverterRemision
-                .extraerRemisionDiagnosticoData(remisionRequest.getDiagnosticos(), idRemision);
-        diagnosticosData.forEach(System.out::println);
-        //citas
-        var counter = new AtomicInteger(
-                citaRepository.findLastNumberCitaRemision(remisionRequest.getIdRemision())
-                        .blockOptional()
-                        .orElse(0) + 1);
-        citasRequest.forEach(citaRequest -> {
-            String newIdCita = idRemision + "_" + counter;
-            citaRequest.setIdCita(newIdCita);
-            counter.getAndIncrement();
-        });
-
-        List<CitaData> citasData = ConverterRemision.convertirCitasDataList(citasRequest, remisionRequest);
-
-        List<TratamientoData> tratamientosData = ConverterRemision.extraerTratamientoData(citasRequest);
-
-        List<CanalizacionData> canalizacionesData = ConverterRemision.extraerCanalizacionData(citasRequest);
-
-        List<FototerapiaData> fototerapiaData = ConverterRemision.extraerFototerapiaData(citasRequest);
-
-        List<SecrecionData> secrecionData = ConverterRemision.extraerSecrecionData(citasRequest);
-
-        List<SondajeData> sondajeData = ConverterRemision.extraerSondajeData(citasRequest);
-
-        List<SoporteNutricionalData> soporteNutricionalData = ConverterRemision
-                .extraerSoporteNutricionalData(citasRequest);
-
-        List<TomaMuestraData> tomaMuestraData = ConverterRemision.extraerSoporteTomaMuestraData(citasRequest);
-
-        List<CuracionData> curacionesData = ConverterRemision.extraerCuracionData(citasRequest);
-
-
-        Flux<TratamientoData> tratamientosFlux         = tratamientoRepository.saveAll(tratamientosData);
-        //Flux<RemisionDiagnosticoData> diagnosticosFlux = remisionDiagnosticoRepository.saveAll(diagnosticosData);
-        Flux<CanalizacionData> canalizacionDataFlux    = canalizacionRepository.saveAll(canalizacionesData);
-        Flux<FototerapiaData> fototerapiaDataFlux      = fototerapiaRepository.saveAll(fototerapiaData);
-        Flux<SecrecionData> secrecionDataFlux          = secrecionRepository.saveAll(secrecionData);
-        Flux<SondajeData> sondajeDataFlux              = sondajeRepository.saveAll(sondajeData);
-
-        Flux<SoporteNutricionalData> soporteNutricionalDataFlux = soporteNutricionalRepository
-                .saveAll(soporteNutricionalData);
-
-        Flux<TomaMuestraData> tomaMuestraDataFlux = tomaMuestraRepository.saveAll(tomaMuestraData);
-        Flux<CuracionData> curacionDataFlux = curacionRepository.saveAll(curacionesData);
-
-
-        return Mono.from(registroHistorialRemisionRepository
-                .save(registroRemisionData))
-                .then(Mono.from(citaRepository
-                        .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
-                .then(ubicacionRepository.save(ubicacionData))
-
-                .then(Mono.from(pacienteRepository.save(pacienteData)))
-
-                .then(Mono.from(remisionRepository.save(remisionData)))
-
-                .then(Mono.from(citaRepository.insertMultiplescitas(citasData)))
-
-                .then(Mono.from(datosAtencionPacienteRepository
-                        .save(datosAtencionPacienteData)))
-
-                .then(tratamientosFlux.collectList())
-                .then(Mono.from(remisionDiagnosticoRepository.updateMultiplesDiagnosticos(diagnosticosData)))
-                //.then(diagnosticosFlux.collectList())
-                .then(canalizacionDataFlux.collectList())
-                .then(fototerapiaDataFlux.collectList())
-                .then(secrecionDataFlux.collectList())
-                .then(sondajeDataFlux.collectList())
-                .then(soporteNutricionalDataFlux.collectList())
-                .then(tomaMuestraDataFlux.collectList())
-                .then(curacionDataFlux.collectList())
-                .then();
-    }
 
 
 }
