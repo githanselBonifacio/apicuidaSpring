@@ -4,21 +4,44 @@ import co.com.sura.dto.remision.CitaRequest;
 import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
 import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.remision.*;
+import co.com.sura.entity.remision.Remision;
+import co.com.sura.entity.remision.RemisionCrudRepository;
+import co.com.sura.entity.remision.Paciente;
+import co.com.sura.entity.remision.DatosAtencionPaciente;
+import co.com.sura.entity.remision.RegistroHistorialRemision;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
-import co.com.sura.postgres.repository.remision.data.*;
-import io.r2dbc.spi.ConnectionFactory;
+import co.com.sura.postgres.repository.remision.data.RegistroHistorialRepository;
+import co.com.sura.postgres.repository.remision.data.SoporteNutricionalRepository;
+import co.com.sura.postgres.repository.remision.data.RemisionRepository;
+import co.com.sura.postgres.repository.remision.data.UbicacionRepository;
+import co.com.sura.postgres.repository.remision.data.PacienteRepository;
+import co.com.sura.postgres.repository.remision.data.DatosAtencionPacienteRepository;
+import co.com.sura.postgres.repository.remision.data.RemisionDiagnosticoRepository;
+import co.com.sura.postgres.repository.remision.data.TratamientoRepository;
+import co.com.sura.postgres.repository.remision.data.CanalizacionRepository;
+import co.com.sura.postgres.repository.remision.data.SecrecionRepository;
+import co.com.sura.postgres.repository.remision.data.CuracionRepository;
+import co.com.sura.postgres.repository.remision.data.FototerapiaRepository;
+import co.com.sura.postgres.repository.remision.data.SondajeRepository;
+import co.com.sura.postgres.repository.remision.data.TomaMuestraRepository;
+import co.com.sura.postgres.repository.remision.data.SoporteNutricionalData;
+import co.com.sura.postgres.repository.remision.data.SondajeData;
+import co.com.sura.postgres.repository.remision.data.SecrecionData;
+import co.com.sura.postgres.repository.remision.data.FototerapiaData;
+import co.com.sura.postgres.repository.remision.data.CanalizacionData;
+import co.com.sura.postgres.repository.remision.data.TratamientoData;
+import co.com.sura.postgres.repository.remision.data.CuracionData;
+import co.com.sura.postgres.repository.remision.data.TomaMuestraData;
+import co.com.sura.postgres.repository.remision.data.RegistroHistorialRemisionData;
+import co.com.sura.postgres.repository.remision.data.RemisionDiagnosticoData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import static co.com.sura.entity.remision.TipoNotificacionFarmacia.APLICACION_MEDICAMENTO;
 import static co.com.sura.entity.remision.TipoNotificacionFarmacia.SOPORTE_NUTRICIONAL;
 
@@ -26,59 +49,49 @@ import static co.com.sura.entity.remision.TipoNotificacionFarmacia.SOPORTE_NUTRI
 @Repository
 public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
-    @Autowired
-    private RemisionRepository remisionRepository;
+    private final RemisionRepository remisionRepository;
+    private final UbicacionRepository ubicacionRepository;
+    private final PacienteRepository pacienteRepository;
+    private final DatosAtencionPacienteRepository datosAtencionPacienteRepository;
+    private final RemisionDiagnosticoRepository remisionDiagnosticoRepository;
+    private final CitaRepository citaRepository;
+    private final TratamientoRepository tratamientoRepository;
+    private final CanalizacionRepository canalizacionRepository;
+    private final SecrecionRepository secrecionRepository;
+    private final CuracionRepository curacionRepository;
+    private final FototerapiaRepository fototerapiaRepository;
+    private final SondajeRepository sondajeRepository;
+    private final TomaMuestraRepository tomaMuestraRepository;
+    private final SoporteNutricionalRepository soporteNutricionalRepository;
+    private final RegistroHistorialRepository registroHistorialRemisionRepository;
 
     @Autowired
-    private UbicacionRepository ubicacionRepository;
+    public RemisionRepositoryAdapter(
+            RemisionRepository remisionRepository, UbicacionRepository ubicacionRepository,
+            PacienteRepository pacienteRepository, DatosAtencionPacienteRepository datosAtencionPacienteRepository,
+            RemisionDiagnosticoRepository remisionDiagnosticoRepository, CitaRepository citaRepository,
+            TratamientoRepository tratamientoRepository, CanalizacionRepository canalizacionRepository,
+            SecrecionRepository secrecionRepository, CuracionRepository curacionRepository,
+            FototerapiaRepository fototerapiaRepository, SondajeRepository sondajeRepository,
+            TomaMuestraRepository tomaMuestraRepository, SoporteNutricionalRepository soporteNutricionalRepository,
+            RegistroHistorialRepository registroHistorialRemisionRepository) {
 
-    @Autowired
-    private PacienteRepository pacienteRepository;
-
-    @Autowired
-    private DatosAtencionPacienteRepository datosAtencionPacienteRepository;
-
-    @Autowired
-    private RemisionDiagnosticoRepository remisionDiagnosticoRepository;
-
-    @Autowired
-    private CitaRepository citaRepository;
-
-    @Autowired
-    private  TratamientoRepository tratamientoRepository;
-
-    @Autowired
-    private CanalizacionRepository canalizacionRepository;
-
-    @Autowired
-    private SecrecionRepository secrecionRepository;
-
-    @Autowired
-    private CuracionRepository curacionRepository;
-
-    @Autowired
-    private FototerapiaRepository fototerapiaRepository;
-
-    @Autowired
-    private SondajeRepository sondajeRepository;
-
-    @Autowired
-    private TomaMuestraRepository tomaMuestraRepository;
-
-    @Autowired
-    private SoporteNutricionalRepository soporteNutricionalRepository;
-
-    @Autowired
-    private RegistroHistorialRepository registroHistorialRemisionRepository;
-
-    private final ConnectionFactory connectionFactory;
-    private final DatabaseClient databaseClient;
-
-    public RemisionRepositoryAdapter(ConnectionFactory connectionFactory, DatabaseClient databaseClient) {
-        this.connectionFactory = connectionFactory;
-        this.databaseClient = databaseClient;
+        this.remisionRepository = remisionRepository;
+        this.ubicacionRepository = ubicacionRepository;
+        this.pacienteRepository = pacienteRepository;
+        this.datosAtencionPacienteRepository = datosAtencionPacienteRepository;
+        this.remisionDiagnosticoRepository = remisionDiagnosticoRepository;
+        this.citaRepository = citaRepository;
+        this.tratamientoRepository = tratamientoRepository;
+        this.canalizacionRepository = canalizacionRepository;
+        this.secrecionRepository = secrecionRepository;
+        this.curacionRepository = curacionRepository;
+        this.fototerapiaRepository = fototerapiaRepository;
+        this.sondajeRepository = sondajeRepository;
+        this.tomaMuestraRepository = tomaMuestraRepository;
+        this.soporteNutricionalRepository = soporteNutricionalRepository;
+        this.registroHistorialRemisionRepository = registroHistorialRemisionRepository;
     }
-
 
     @Override
     public Flux<Remision> consultarRemisiones() {

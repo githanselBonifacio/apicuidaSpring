@@ -59,47 +59,47 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private static final Integer NUMERO_PADRES_EMPAREJADOS     = 5;
     private static final Integer HOLGURA_DEFECTO               = 1200;
     private static final double  PENALIZACION_HOLGURA_NEGATIVA = 1e6;
-
     private static final String DESPLAZAMIENTO_VISITA          = "dvisita";
     private static final String TIPO_TAREA_VISITA              = "visita";
 
-    @Autowired
-    private MapboxService mapboxService;
+    private final MapboxService mapboxService;
+    private final TurnoProfesionalesRepository turnoProfesionalesRepository;
+    private final ProfesionalRepository profesionalRepository;
+    private final CitaRepository citaRepository;
+    private final DesplazamientoRepository desplazamientoRepository;
+    private final TratamientoRepository tratamientoRepository;
+    private final CuracionRepository curacionRepository;
+    private final CanalizacionRepository canalizacionRepository;
+    private final FototerapiaRepository fototerapiaRepository;
+    private final SecrecionRepository secrecionRepository;
+    private final SondajeRepository sondajeRepository;
+    private final SoporteNutricionalRepository soporteNutricionalRepository;
+    private final TomaMuestraRepository tomaMuestraRepository;
 
     @Autowired
-    private TurnoProfesionalesRepository turnoProfesionalesRepository;
+    public AgendaRepositoryAdapter(
+            MapboxService mapboxService, TurnoProfesionalesRepository turnoProfesionalesRepository,
+            ProfesionalRepository profesionalRepository, CitaRepository citaRepository,
+            DesplazamientoRepository desplazamientoRepository, TratamientoRepository tratamientoRepository,
+            CuracionRepository curacionRepository, CanalizacionRepository canalizacionRepository,
+            FototerapiaRepository fototerapiaRepository, SecrecionRepository secrecionRepository,
+            SondajeRepository sondajeRepository, SoporteNutricionalRepository soporteNutricionalRepository,
+            TomaMuestraRepository tomaMuestraRepository) {
 
-    @Autowired
-    private ProfesionalRepository profesionalRepository;
-
-    @Autowired
-    private CitaRepository citaRepository;
-
-    @Autowired
-    private DesplazamientoRepository desplazamientoRepository;
-    @Autowired
-    private TratamientoRepository tratamientoRepository;
-
-    @Autowired
-    private CuracionRepository curacionRepository;
-
-    @Autowired
-    private CanalizacionRepository canalizacionRepository;
-
-    @Autowired
-    private FototerapiaRepository fototerapiaRepository;
-
-    @Autowired
-    private SecrecionRepository secrecionRepository;
-
-    @Autowired
-    private SondajeRepository sondajeRepository;
-
-    @Autowired
-    private SoporteNutricionalRepository soporteNutricionalRepository;
-
-    @Autowired
-    private TomaMuestraRepository tomaMuestraRepository;
+        this.mapboxService = mapboxService;
+        this.turnoProfesionalesRepository = turnoProfesionalesRepository;
+        this.profesionalRepository = profesionalRepository;
+        this.citaRepository = citaRepository;
+        this.desplazamientoRepository = desplazamientoRepository;
+        this.tratamientoRepository = tratamientoRepository;
+        this.curacionRepository = curacionRepository;
+        this.canalizacionRepository = canalizacionRepository;
+        this.fototerapiaRepository = fototerapiaRepository;
+        this.secrecionRepository = secrecionRepository;
+        this.sondajeRepository = sondajeRepository;
+        this.soporteNutricionalRepository = soporteNutricionalRepository;
+        this.tomaMuestraRepository = tomaMuestraRepository;
+    }
 
     @Override
     public Flux<Profesional> consultarProfesionales() {
@@ -273,21 +273,17 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
          .then(citaRepository.findCitasByTurnoCiudad(fechaTurno,idHorarioTurno,idCiudad)
          .collectList()
          .flatMap(citaDataList -> profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
-             .collectList()
-             .flatMap(profesionalesDataList -> {
+             .collectList().flatMap(profesionalesDataList -> {
+
                var autoAgendador = new AutoAgendador(
-                  OrigenCiudad.getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
-                  ConverterAgenda.convertToListCitaGenetic(citaDataList),
-                  profesionalesDataList.size(),
+                       OrigenCiudad.getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
+                  ConverterAgenda.convertToListCitaGenetic(citaDataList), profesionalesDataList.size(),
                   NUMERO_GENERACIONES, SIZE_POBLACION_INICIAL, NUMERO_PADRES_EMPAREJADOS, PENALIZACION_HOLGURA_NEGATIVA,
                         mapboxService);
 
-                        autoAgendador.run();
-                        var mejoResultado = autoAgendador.mejorSolucion();
-                        return asignarListaCitaToProfesionalAutoagendar(
-                                       profesionalesDataList,mejoResultado
-                               );
-               })
+               autoAgendador.run();
+               return asignarListaCitaToProfesionalAutoagendar(profesionalesDataList,autoAgendador.mejorSolucion());
+             })
          )).then(insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno));
     }
 
@@ -324,8 +320,9 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                          desplazamientosList.add(desplazamientoData);
 
                          return desplazamientoRepository.saveAll(desplazamientosList);
-                         }
-                      ).then()
+                   }
+               )
+               .then()
         );
     }
 
