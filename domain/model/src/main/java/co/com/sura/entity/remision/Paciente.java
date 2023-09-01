@@ -14,8 +14,8 @@ import java.time.LocalDate;
 public class Paciente {
     private String tipoIdentificacion;
     private String numeroIdentificacion;
-    private String nombre;
-    private String apellido;
+    private String nombres;
+    private String apellidos;
     private String edad;
     private String sexo;
     private String peso;

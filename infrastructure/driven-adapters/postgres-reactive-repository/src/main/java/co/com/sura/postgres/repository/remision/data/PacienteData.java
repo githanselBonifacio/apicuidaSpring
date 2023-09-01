@@ -26,8 +26,8 @@ public class PacienteData {
     @Column("tipo_identificacion")
     private String tipoIdentificacion;
 
-    private String nombre;
-    private String apellido;
+    private String nombres;
+    private String apellidos;
     private String edad;
     private String sexo;
     private String peso;
