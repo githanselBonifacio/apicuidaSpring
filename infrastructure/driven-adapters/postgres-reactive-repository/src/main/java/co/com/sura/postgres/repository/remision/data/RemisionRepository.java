@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,String> {
 
     @Query("SELECT remision.*, " +
-            "CONCAT(paciente.nombre, ' ', paciente.apellido) as paciente, "+
+            "CONCAT(paciente.nombres, ' ', paciente.apellidos) as paciente, "+
             "ciudad.nombre as ciudad "+
             "FROM public.remision " +
             "INNER JOIN ciudad ON remision.id_ciudad = ciudad.id_ciudad " +

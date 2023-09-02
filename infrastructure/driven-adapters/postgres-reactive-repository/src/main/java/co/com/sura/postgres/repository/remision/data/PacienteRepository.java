@@ -67,7 +67,8 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
                 pacienteData.getIdUbicacion()
         );
     }
-    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombre,paciente.apellido,  " +
+    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos,  " +
+            "remision.id_remision, "+
             "tratamiento.* , " +
             "cita.fecha_programada " +
             "FROM paciente " +
@@ -77,7 +78,8 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
     Flux<PacienteTratamientoCita> findAllTratamientosPacientes();
 
 
-    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombre,paciente.apellido, " +
+    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos, " +
+            "remision.id_remision, "+
             "soporte_nutricional.* , " +
             "cita.fecha_programada " +
             "FROM paciente " +

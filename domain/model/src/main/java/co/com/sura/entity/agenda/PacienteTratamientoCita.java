@@ -12,12 +12,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PacienteTratamientoCita {
+    private String idRemision;
     private Integer idTratamiento;
     private Integer idSoporteNutricional;
     private String numeroIdentificacion;
     private String tipoIdentificacion;
-    private String nombre;
-    private String apellido;
+    private String nombres;
+    private String apellidos;
     private String idMedicamento;
     private String nombreMedicamento;
     private String presentacionMedicamento;
