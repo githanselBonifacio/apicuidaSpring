@@ -9,6 +9,7 @@ import co.com.sura.entity.remision.RemisionCrudRepository;
 import co.com.sura.entity.remision.Paciente;
 import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.RegistroHistorialRemision;
+import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
 import co.com.sura.postgres.repository.remision.data.RegistroHistorialRepository;
@@ -119,13 +120,21 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                     });
         }
     }
-    protected  Mono<Void> registrarPlanManejo(RemisionRequest remisionRequest, List<CitaRequest> citasRequest){
+    protected  Mono<Void> registrarPlanManejo(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
+                                              NovedadRequest novedadRequest){
         var counter = new AtomicInteger(
                 citaRepository.findLastNumberCitaRemision(remisionRequest.getIdRemision())
                         .blockOptional()
                         .orElse(0) + 1);
+
+        if(novedadRequest.getFechaAplicarNovedad() !=null){
+            citasRequest.removeIf(
+                    citaRequest -> citaRequest.getFechaInicio().isBefore(novedadRequest.getFechaAplicarNovedad()));
+        }
+
+
         citasRequest.forEach(citaRequest -> {
-            String newIdCita = remisionRequest.getIdRemision() + "_" + counter;
+            String newIdCita = remisionRequest.getIdRemision() + "-" + counter;
             citaRequest.setIdCita(newIdCita);
             counter.getAndIncrement();
         });
@@ -202,7 +211,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         String numeroIdentificacionPaciente = remisionRequest.getNumeroIdentificacion();
         return registrarUbicacionRemision(remisionRequest,false)
                     .then(registrarDatosRemision(remisionRequest,false))
-                    .then(registrarPlanManejo(remisionRequest,citasRequest))
+                    .then(registrarPlanManejo(remisionRequest,citasRequest,new NovedadRequest()))
                     .onErrorMap(throwable -> {
                        Mono<Void>  error = Mono.from(
                            remisionRepository.deleteAllDataRemision(idRemision,numeroIdentificacionPaciente));
@@ -236,7 +245,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                         .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
                 .then(registrarUbicacionRemision(remisionRequest,true))
                 .then(registrarDatosRemision(remisionRequest,true))
-                .then(registrarPlanManejo(remisionRequest,citasRequest))
+                .then(registrarPlanManejo(remisionRequest,citasRequest, novedadRequest))
                 .then();
     }
     @Override

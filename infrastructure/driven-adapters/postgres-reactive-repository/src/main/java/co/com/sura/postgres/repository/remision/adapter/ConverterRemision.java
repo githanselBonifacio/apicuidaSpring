@@ -6,7 +6,9 @@ import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.remision.data.*;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +19,9 @@ import java.util.stream.Collectors;
 @Component
 public class ConverterRemision extends Converter {
     protected static Object convertToJsonObject (Json jsonByteArrayInput ){
-        var gson = new Gson();
         byte[] byteArray = jsonByteArrayInput.asArray();
         var jsonString = new String(byteArray);
-
-        return   gson.fromJson(jsonString, Object.class);
+        return  Converter.deserializarJson(jsonString, Object.class);
     }
     public static RemisionData convertToRemisionRequest(RemisionRequest remisionRequest){
         return new RemisionData()

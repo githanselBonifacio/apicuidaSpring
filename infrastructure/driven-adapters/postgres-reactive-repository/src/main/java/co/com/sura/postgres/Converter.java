@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+
 public class Converter {
 
     public static <T> T deserializarJson (String json, Class<T> clazz){
-        var mapper = new ObjectMapper().registerModule(new JavaTimeModule());;
+        var mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         try {
-            return mapper.readValue(json,clazz);
+            return mapper.readValue(toCamelCase(json),clazz);
         } catch (JsonProcessingException e) {
             return null;
         }
@@ -17,12 +18,31 @@ public class Converter {
 
     public static String  convertirObjetoAJson(Object object){
         var mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch (JsonProcessingException e) {
             return null;
         }
     }
+    private static String toCamelCase(String str) {
+        var builder = new StringBuilder();
+        var capitalizeNext = false;
 
+        for (char c : str.toCharArray()) {
+            if (c == '_') {
+                capitalizeNext = true;
+            } else {
+                if (capitalizeNext) {
+                    builder.append(Character.toUpperCase(c));
+                    capitalizeNext = false;
+                } else {
+                    builder.append(c);
+                }
+            }
+        }
+
+        return builder.toString();
+    }
 
 }
