@@ -59,4 +59,5 @@ public class RegistroHistorialRemisionData {
 
     @Column("fecha_registro")
     private LocalDateTime fechaRegistro;
+
 }

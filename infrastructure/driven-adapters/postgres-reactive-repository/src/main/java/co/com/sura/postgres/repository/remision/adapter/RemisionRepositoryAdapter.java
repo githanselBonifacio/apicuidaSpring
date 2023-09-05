@@ -9,7 +9,6 @@ import co.com.sura.entity.remision.RemisionCrudRepository;
 import co.com.sura.entity.remision.Paciente;
 import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.RegistroHistorialRemision;
-import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
 import co.com.sura.postgres.repository.remision.data.RegistroHistorialRepository;
@@ -99,7 +98,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         return remisionRepository.findAllRemision();
     }
 
-    protected Mono<Void> registrarUbicacionRemision(RemisionRequest remisionRequest, boolean esNovedad){
+    protected Mono<Void> registrarPacienteRemision(RemisionRequest remisionRequest, boolean esNovedad){
         var ubicacionData = ConverterRemision.extraerUbicacionData(remisionRequest);
         var pacienteData = ConverterRemision.extraerPacienteData(remisionRequest);
 
@@ -209,7 +208,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         }
 
         String numeroIdentificacionPaciente = remisionRequest.getNumeroIdentificacion();
-        return registrarUbicacionRemision(remisionRequest,false)
+        return registrarPacienteRemision(remisionRequest,false)
                     .then(registrarDatosRemision(remisionRequest,false))
                     .then(registrarPlanManejo(remisionRequest,citasRequest,new NovedadRequest()))
                     .onErrorMap(throwable -> {
@@ -243,7 +242,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
                 .then(Mono.from(citaRepository
                         .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
-                .then(registrarUbicacionRemision(remisionRequest,true))
+                .then(registrarPacienteRemision(remisionRequest,true))
                 .then(registrarDatosRemision(remisionRequest,true))
                 .then(registrarPlanManejo(remisionRequest,citasRequest, novedadRequest))
                 .then();
