@@ -239,13 +239,24 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
         registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
 
-        return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
-                .then(Mono.from(citaRepository
-                        .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
-                .then(registrarPacienteRemision(remisionRequest,true))
-                .then(registrarDatosRemision(remisionRequest,true))
-                .then(registrarPlanManejo(remisionRequest,citasRequest, novedadRequest))
-                .then();
+        if(citasRequest == null){
+            registroRemisionData.setCitas(null);
+            return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
+                    .then(Mono.from(citaRepository
+                            .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
+                    .then(registrarPacienteRemision(remisionRequest,true))
+                    .then(registrarDatosRemision(remisionRequest,true))
+                    .then();
+        }else{
+            return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
+                    .then(Mono.from(citaRepository
+                            .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
+                    .then(registrarPacienteRemision(remisionRequest,true))
+                    .then(registrarDatosRemision(remisionRequest,true))
+                    .then(registrarPlanManejo(remisionRequest,citasRequest, novedadRequest))
+                    .then();
+        }
+
     }
     @Override
     public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByIdRemision(String idRemision) {
