@@ -14,6 +14,15 @@ import java.util.List;
 
 public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> {
 
+    @Query("SELECT EXISTS(SELECT * FROM cita WHERE id_remision = $1 AND id_estado IN (3, 4));")
+    Mono<Boolean>validarEstadosCitasToEgreso(String idRemision);
+
+    @Query("UPDATE cita " +
+            "SET id_estado = 5 " +
+            "WHERE id_remision = $1 " +
+            "AND id_estado NOT IN (3, 4, 6) "+
+            "AND fecha_programada > NOW();")
+    Mono<Boolean> cancelarCitasForEgresoRemision(String idRemision);
 
     @Query("SELECT cita.* FROM cita " +
             "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita " +

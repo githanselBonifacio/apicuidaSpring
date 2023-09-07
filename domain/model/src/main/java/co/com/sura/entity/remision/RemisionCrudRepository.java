@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface RemisionCrudRepository {
     Flux<Remision>                consultarRemisiones();
-    Mono<Void>                    crearRemisionCita (RemisionRequest remisionRequest, List<CitaRequest> citas);
+    Mono<Boolean>                 crearRemisionCita (RemisionRequest remisionRequest, List<CitaRequest> citas);
     Mono<DatosAtencionPaciente>   consultarDatosAtencionPacienteByIdRemision (String idRemision);
     Mono<Paciente>                consultarPacienteFromRemision (String idRemision);
 
@@ -24,4 +24,6 @@ public interface RemisionCrudRepository {
 
     Mono<Void>    actualizarRemisionPorNovedad(
                            RemisionRequest remisionRequest, List<CitaRequest> citas, NovedadRequest novedadRequest);
+
+    Mono<Boolean> egresarRemisionById(String idRemision);
 }

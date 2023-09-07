@@ -21,7 +21,8 @@ public class RemisionUseCase implements RemisionFactory {
     public Flux<Remision> consultarRemisiones(){
         return remisionCrudRepository.consultarRemisiones();
     }
-    public Mono<Void> crearRemisionCitas (RemisionRequest remisionRequest, List<CitaRequest> citas){
+
+    public Mono<Boolean> crearRemisionCitas (RemisionRequest remisionRequest, List<CitaRequest> citas){
         return remisionCrudRepository
                 .crearRemisionCita(
                         remisionRequest,
@@ -52,5 +53,8 @@ public class RemisionUseCase implements RemisionFactory {
     }
     public Mono<RegistroHistorialRemision> consultarDataActualRemision(String idRemision){
         return remisionCrudRepository.consultarDatosRemision(idRemision);
+    }
+    public Mono<Boolean> egresarRemisionById(String idRemision){
+        return remisionCrudRepository.egresarRemisionById(idRemision);
     }
 }

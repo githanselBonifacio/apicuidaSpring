@@ -1,5 +1,6 @@
 package co.com.sura.postgres.repository.remision.adapter;
 
+import co.com.sura.constantes.Mensajes;
 import co.com.sura.dto.remision.CitaRequest;
 import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
@@ -42,6 +43,9 @@ import reactor.core.publisher.Mono;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static co.com.sura.constantes.Mensajes.REMISION_CITAS_PROGRESO;
+import static co.com.sura.constantes.Mensajes.REMISION_NO_EXISTENTE;
 import static co.com.sura.entity.remision.TipoNotificacionFarmacia.APLICACION_MEDICAMENTO;
 import static co.com.sura.entity.remision.TipoNotificacionFarmacia.SOPORTE_NUTRICIONAL;
 
@@ -197,14 +201,14 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     }
 
     @Override
-    public Mono<Void> crearRemisionCita(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
+    public Mono<Boolean> crearRemisionCita(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
 
         String idRemision = remisionRequest.getIdRemision();
         Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
         validarRemision.subscribe();
 
         if(validarRemision.blockOptional().orElse(false)){
-            return Mono.error(new Throwable("Ya existe una remision con el id "+idRemision));
+            return Mono.error(new Throwable(Mensajes.REMISION_EXISTENTE.getValue().replace("?",idRemision)));
         }
 
         String numeroIdentificacionPaciente = remisionRequest.getNumeroIdentificacion();
@@ -216,7 +220,8 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                            remisionRepository.deleteAllDataRemision(idRemision,numeroIdentificacionPaciente));
                        error.subscribe();
                        return new Exception("Error al crear remision");
-                    });
+                    })
+                .then(Mono.just(true));
     }
     @Override
     public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
@@ -226,38 +231,56 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
         validarRemision.subscribe();
 
-        if(!validarRemision.blockOptional().orElse(false)){
-            return Mono.error(new Throwable("No existe una remision con el id "+idRemision));
+        if (!validarRemision.blockOptional().orElse(false)) {
+            return Mono.error(new Throwable(REMISION_NO_EXISTENTE.getValue().replace("?", idRemision)));
         }
 
         Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
-             registroHistorialRemisionRepository
-                 .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()));
+            registroHistorialRemisionRepository
+                .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(), novedadRequest.getFechaAplicarNovedad()));
         registroRemision.subscribe();
 
         var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
         registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
         registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
 
-        if(citasRequest == null){
+        if (citasRequest == null) {
             registroRemisionData.setCitas(null);
             return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
                     .then(Mono.from(citaRepository
-                            .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
-                    .then(registrarPacienteRemision(remisionRequest,true))
-                    .then(registrarDatosRemision(remisionRequest,true))
+                            .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
+                    .then(registrarPacienteRemision(remisionRequest, true))
+                    .then(registrarDatosRemision(remisionRequest, true))
                     .then();
-        }else{
+        } else {
             return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
                     .then(Mono.from(citaRepository
-                            .deleteCitaDataByIdRemision(idRemision,novedadRequest.getFechaAplicarNovedad())))
-                    .then(registrarPacienteRemision(remisionRequest,true))
-                    .then(registrarDatosRemision(remisionRequest,true))
-                    .then(registrarPlanManejo(remisionRequest,citasRequest, novedadRequest))
+                            .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
+                    .then(registrarPacienteRemision(remisionRequest, true))
+                    .then(registrarDatosRemision(remisionRequest, true))
+                    .then(registrarPlanManejo(remisionRequest, citasRequest, novedadRequest))
                     .then();
         }
 
     }
+
+    @Override
+    public Mono<Boolean> egresarRemisionById(String idRemision) {
+        return remisionRepository.validarEstadosRemisionToEgreso(idRemision)
+           .flatMap(exists -> {
+               if (Boolean.FALSE.equals(exists)) {
+                 return Mono.error(new Throwable(REMISION_NO_EXISTENTE.getValue().replace("?", idRemision)));
+               }
+               return citaRepository.validarEstadosCitasToEgreso(idRemision)
+               .flatMap(valid -> {if (Boolean.TRUE.equals(valid)) {
+                   return Mono.error(new Throwable(REMISION_CITAS_PROGRESO.getValue().replace("?", idRemision)));
+               }
+               return citaRepository.cancelarCitasForEgresoRemision(idRemision)
+                       .then(remisionRepository.egresarRemisionById(idRemision));
+               });
+           }).then(Mono.just(true));
+    }
+
     @Override
     public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByIdRemision(String idRemision) {
         return datosAtencionPacienteRepository.findByIdRemision(idRemision)

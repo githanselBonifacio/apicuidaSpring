@@ -12,6 +12,14 @@ import java.time.LocalDate;
 
 public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,String> {
 
+    @Query("SELECT EXISTS(SELECT * FROM remision WHERE id_remision = $1 AND estado = 'ADMITIDO');")
+    Mono<Boolean>validarEstadosRemisionToEgreso(String idRemision);
+
+    @Query("UPDATE remision " +
+            " SET estado = 'EGRESADO' " +
+            " WHERE id_remision = $1;")
+    Mono<Boolean> egresarRemisionById(String idRemision);
+
     @Query("SELECT remision.*, " +
             "CONCAT(paciente.nombres, ' ', paciente.apellidos) as paciente, "+
             "ciudad.nombre as ciudad "+
