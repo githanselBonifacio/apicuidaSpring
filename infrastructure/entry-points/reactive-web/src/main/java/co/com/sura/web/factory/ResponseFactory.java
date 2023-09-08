@@ -9,7 +9,6 @@ public class ResponseFactory {
 
         return Response.<T>builder()
                 .status(status)
-                .error(null)
                 .message(mensaje)
                 .tecnicalMessage(dsMensaje)
                 .detail(detail)

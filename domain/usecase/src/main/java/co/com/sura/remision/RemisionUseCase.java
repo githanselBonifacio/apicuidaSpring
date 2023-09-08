@@ -47,7 +47,7 @@ public class RemisionUseCase implements RemisionFactory {
         return remisionCrudRepository.consultarHistoricoRemision(idRemision);
     }
 
-    public Mono<Void> actualizarRemisionPorNovedad(
+    public Mono<Boolean> actualizarRemisionPorNovedad(
             RemisionRequest remisionRequest, List<CitaRequest> citas, NovedadRequest novedadRequest){
         return remisionCrudRepository.actualizarRemisionPorNovedad(remisionRequest,citas,novedadRequest);
     }

@@ -93,12 +93,25 @@ public class RemisionController {
     }
 
     @PostMapping("/actualizarRemisionPorNovedad")
-    public Mono<Void> actualizarRemisionPorNovedad(@RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
+    public Mono<Response<Boolean>> actualizarRemisionPorNovedad(
+            @RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
         return remisionUseCase.actualizarRemisionPorNovedad(
                 crearRemisionCitasRequest.getRemision(),
                 crearRemisionCitasRequest.getCitas(),
-                crearRemisionCitasRequest.getNovedad()
-        );
+                crearRemisionCitasRequest.getNovedad())
+                .map(fueActualizada ->ResponseFactory.createStatus(
+                        fueActualizada,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.REMISION_ACTUALIZADA.getValue(),
+                        Mensajes.REMISION_ACTUALIZADA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.ERROR_ACTUALIZAR_REMISION.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @PostMapping(value="/egresar/{idRemision}")

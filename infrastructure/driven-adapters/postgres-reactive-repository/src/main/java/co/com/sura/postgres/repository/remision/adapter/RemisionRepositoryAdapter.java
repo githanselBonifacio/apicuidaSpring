@@ -114,8 +114,8 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
             return Mono.from(pacienteRepository.existsById(pacienteData.getNumeroIdentificacion()))
                     .flatMap(pacienteExiste ->{
                         if (Boolean.TRUE.equals(pacienteExiste)){
-                            return pacienteRepository.save(pacienteData)
-                                    .then(Mono.from(ubicacionRepository.save(ubicacionData))).then();
+                            return ubicacionRepository.save(ubicacionData)
+                                    .then(Mono.from(pacienteRepository.save(pacienteData))).then();
                         }else{
                             return  pacienteRepository.insertpaciente(pacienteData)
                                     .then(Mono.from(ubicacionRepository.insertUbicacion(ubicacionData))).then();
@@ -219,16 +219,16 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                        Mono<Void>  error = Mono.from(
                            remisionRepository.deleteAllDataRemision(idRemision,numeroIdentificacionPaciente));
                        error.subscribe();
-                       return new Exception("Error al crear remision");
+                       return new Exception(throwable.getMessage());
                     })
                 .then(Mono.just(true));
     }
     @Override
-    public Mono<Void> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
+    public Mono<Boolean> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
                                                    NovedadRequest novedadRequest) {
 
         String idRemision = remisionRequest.getIdRemision();
-        Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
+        Mono<Boolean> validarRemision = remisionRepository.validarEstadosRemisionToEgreso(idRemision);
         validarRemision.subscribe();
 
         if (!validarRemision.blockOptional().orElse(false)) {
@@ -251,7 +251,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                             .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
                     .then(registrarPacienteRemision(remisionRequest, true))
                     .then(registrarDatosRemision(remisionRequest, true))
-                    .then();
+                    .then(Mono.just(Boolean.TRUE));
         } else {
             return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
                     .then(Mono.from(citaRepository
@@ -259,7 +259,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                     .then(registrarPacienteRemision(remisionRequest, true))
                     .then(registrarDatosRemision(remisionRequest, true))
                     .then(registrarPlanManejo(remisionRequest, citasRequest, novedadRequest))
-                    .then();
+                    .then(Mono.just(Boolean.TRUE));
         }
 
     }

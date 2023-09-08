@@ -9,7 +9,6 @@ import lombok.*;
 public class Response <T> {
     private Integer status;
     private Boolean flag;
-    private String error;
     private String message;
     private String tecnicalMessage;
     private String detail;

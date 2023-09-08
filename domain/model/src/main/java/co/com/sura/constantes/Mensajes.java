@@ -9,10 +9,12 @@ public enum Mensajes {
     PETICION_FALLIDA("Error en petición"),
 
     REMISION_CREADA("Se ha creado la remisión exitosamente"),
+    REMISION_ACTUALIZADA("Se ha creado la novedad exitosamente"),
     REMISION_EXISTENTE("Ya existe una remisión con el id ?"),
     REMISION_NO_EXISTENTE("No existe o ya fue egresada la remisión con el id ?"),
     REMISION_CITAS_PROGRESO("la remisión con el id ? tiene citas confirmadas o en progreso"),
     ERROR_CREAR_REMISION("error al crear remisión"),
+    ERROR_ACTUALIZAR_REMISION("error al actualizar remisión"),
 
     REMISION_EGRESADA("Se ha egresado la remisión"),
     ERROR_EGRESAR_REMISION("error a egresar remisión");

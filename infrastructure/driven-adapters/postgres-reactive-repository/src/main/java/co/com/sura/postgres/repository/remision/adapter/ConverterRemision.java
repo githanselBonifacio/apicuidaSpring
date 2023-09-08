@@ -61,7 +61,7 @@ public class ConverterRemision extends Converter {
         UbicacionRequest ubicacionRequest = remisionRequest.getDatosAtencionPaciente().getUbicacion();
         return new UbicacionData()
                 .toBuilder()
-                .idUbicacion(remisionRequest.getIdRemision()+"_ubicacion")
+                .idUbicacion(remisionRequest.getNumeroIdentificacion()+"_ubicacion")
                 .latitud(ubicacionRequest.getLatitud())
                 .longitud(ubicacionRequest.getLongitud())
                 .direccion(ubicacionRequest.getDireccion())
@@ -89,7 +89,7 @@ public class ConverterRemision extends Converter {
                 .tipoAfiliacion(remisionRequest.getTipoAfiliacion().getNombre())
                 .nombreAseguradora(remisionRequest.getTipoAfiliacion().getNombreAseguradora())
                 .fechaNacimiento(remisionRequest.getFechaNacimiento())
-                .idUbicacion(remisionRequest.getIdRemision()+"_ubicacion")
+                .idUbicacion(remisionRequest.getNumeroIdentificacion()+"_ubicacion")
                 .build();
     }
     public static List<RemisionDiagnosticoData> extraerRemisionDiagnosticoData(

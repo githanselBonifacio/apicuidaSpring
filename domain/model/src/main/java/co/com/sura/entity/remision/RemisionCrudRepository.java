@@ -22,7 +22,7 @@ public interface RemisionCrudRepository {
     Flux<RegistroHistorialRemision>consultarHistoricoRemision(String idRemision);
     Mono<RegistroHistorialRemision>consultarDatosRemision(String idRemision);
 
-    Mono<Void>    actualizarRemisionPorNovedad(
+    Mono<Boolean>    actualizarRemisionPorNovedad(
                            RemisionRequest remisionRequest, List<CitaRequest> citas, NovedadRequest novedadRequest);
 
     Mono<Boolean> egresarRemisionById(String idRemision);
