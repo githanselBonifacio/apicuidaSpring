@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConverterMaestros  extends Converter {
 
-    public static Ciudad convertToCiudad(CiudadData ciudadData){
+    public static Regional convertToCiudad(CiudadData ciudadData){
         return deserializarJson(
-                convertirObjetoAJson(ciudadData), Ciudad.class
+                convertirObjetoAJson(ciudadData), Regional.class
         );
     }
 

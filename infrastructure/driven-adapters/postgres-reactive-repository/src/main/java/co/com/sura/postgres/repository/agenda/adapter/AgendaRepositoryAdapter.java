@@ -11,15 +11,7 @@ import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Tarea;
-import co.com.sura.entity.remision.Cita;
-import co.com.sura.entity.remision.Curacion;
-import co.com.sura.entity.remision.Canalizacion;
-import co.com.sura.entity.remision.Secrecion;
-import co.com.sura.entity.remision.SoporteNutricional;
-import co.com.sura.entity.remision.Sondaje;
-import co.com.sura.entity.remision.Tratamiento;
-import co.com.sura.entity.remision.Fototerapia;
-import co.com.sura.entity.remision.TomaMuestra;
+import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
@@ -121,7 +113,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Mono<Void> asignarProfesionalTurno(
+    public Mono<Boolean> asignarProfesionalTurno(
             LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional) {
         return turnoProfesionalesRepository.save(
                 new TurnoProfesionalesData()
@@ -130,14 +122,16 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                         .idHorarioTurno(idHorarioTurno)
                         .idProfesional(idProfesional)
                         .build()
-        ).then();
+        ).then(Mono.just(Boolean.TRUE));
     }
 
     @Override
-    public Mono<Void> desasignarProfesionalTurno(LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional) {
+    public Mono<Boolean> desasignarProfesionalTurno(
+            LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional) {
         return  citaRepository.desagendarAllFromIdProfesional( fechaTurno,  idHorarioTurno, idProfesional)
                 .then(Mono.from(turnoProfesionalesRepository.deleteByFechaTurnoIdHorarioProfesional(
-                        fechaTurno,idHorarioTurno,idProfesional)));
+                        fechaTurno,idHorarioTurno,idProfesional)))
+                .then(Mono.just(Boolean.TRUE));
     }
 
     @Override
@@ -218,25 +212,28 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Mono<Void> reprogramarCita(LocalDateTime fechaProgramada, String idCita) {
+    public Mono<Boolean> reprogramarCita(LocalDateTime fechaProgramada, String idCita) {
         return citaRepository.actualizarFechaProgramada(fechaProgramada,idCita)
-                .then();
+                .then(Mono.just(Boolean.TRUE));
     }
 
     @Override
-    public Mono<Void> agendarToProfesional(String idRemision, String idProfesional) {
-        return citaRepository.agendarToProfesional(idRemision,idProfesional);
+    public Mono<Boolean> agendarToProfesional(String idRemision, String idProfesional) {
+        return citaRepository.agendarToProfesional(idRemision,idProfesional)
+                .then(Mono.just(Boolean.TRUE));
     }
 
     @Override
-    public Mono<Void> desagendarToProfesional(String idCita) {
-        return citaRepository.desagendarToProfesional(idCita);
+    public Mono<Boolean> desagendarToProfesional(String idCita) {
+        return citaRepository.desagendarToProfesional(idCita)
+                .then(Mono.just(Boolean.TRUE));
     }
 
     @Override
-    public Mono<Void> desagendarTurnocompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
+    public Mono<Boolean> desagendarTurnocompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
         return desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idCiudad)
-                .then(citaRepository.desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idCiudad));
+                .then(citaRepository.desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idCiudad))
+                .then(Mono.just(Boolean.TRUE));
     }
 
     private Mono<Void> asignarListaCitaToProfesionalAutoagendar (
@@ -268,7 +265,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Mono<Void> autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
+    public Mono<Boolean> autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
       return desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idCiudad)
          .then(citaRepository.findCitasByTurnoCiudad(fechaTurno,idHorarioTurno,idCiudad)
          .collectList()
@@ -284,7 +281,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                autoAgendador.run();
                return asignarListaCitaToProfesionalAutoagendar(profesionalesDataList,autoAgendador.mejorSolucion());
              })
-         )).then(insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno));
+         )).then(insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno))
+              .then(Mono.just(Boolean.TRUE));
     }
 
     @Override
@@ -295,7 +293,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Mono<Void> calcularDesplazamientoCitaByProfesional(
+    public Mono<Boolean> calcularDesplazamientoCitaByProfesional(
             LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad, String idProfesional) {
 
         return desplazamientoRepository.deleteByFechaTurnoProfesional(fechaTurno,idHorarioTurno,idProfesional)
@@ -322,7 +320,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                          return desplazamientoRepository.saveAll(desplazamientosList);
                    }
                )
-               .then()
+               .then(Mono.just(Boolean.TRUE))
         );
     }
 
@@ -330,6 +328,29 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     public Flux<Tratamiento> consultarTratamientoByCitas(String idCita) {
         return tratamientoRepository.findByIdCita(idCita)
                 .map(ConverterAgenda :: convertToTratamiento);
+    }
+
+    @Override
+    public Mono<Procedimientos> consultarProcedimientosByIdCita(String idCita) {
+        return Mono.zip(
+                        consultarCanalizacionesByCitas(idCita).collectList(),
+                        consultarCuracionesByCitas(idCita).collectList(),
+                        consultarFototerapiasByCitas(idCita).collectList(),
+                        consultarSecrecionesByCitas(idCita).collectList(),
+                        consultarSondajesByCitas(idCita).collectList(),
+                        consultarTomaMuestrasByCitas(idCita).collectList(),
+                        consultarSoporteNutricionalesByCitas(idCita).collectList())
+                .map(tuple->Procedimientos.builder()
+                                .canalizaciones(tuple.getT1())
+                                .curaciones(tuple.getT2())
+                                .fototerapias(tuple.getT3())
+                                .secreciones(tuple.getT4())
+                                .sondajes(tuple.getT5())
+                                .tomaMuestras(tuple.getT6())
+                                .soporteNutricionales(tuple.getT7())
+                                .build()
+
+        );
     }
 
     @Override

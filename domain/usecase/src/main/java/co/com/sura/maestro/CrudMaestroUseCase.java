@@ -14,9 +14,9 @@ public class CrudMaestroUseCase implements MaestroFactory {
         this.maestroRepository = maestroRepository;
     }
     //ciudades
-    public Flux<Ciudad> consultarCiudad(){return maestroRepository.consultarCiudad();}
+    public Flux<Regional> consultarCiudad(){return maestroRepository.consultarCiudad();}
 
-    public Mono<Ciudad> consultarCiudadById(String idCiudad){
+    public Mono<Regional> consultarCiudadById(String idCiudad){
         return maestroRepository.consultarCiudadById(idCiudad);
     }
 

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.List;
 
@@ -58,38 +57,143 @@ public class RemisionController {
     }
 
     @GetMapping(value = "")
-    public Flux<Remision> consultarRemisiones(){
-        return remisionUseCase.consultarRemisiones();
+    public Mono<Response<List<Remision>>> consultarRemisiones(){
+        return remisionUseCase.consultarRemisiones()
+                .collectList()
+                .map(remisiones -> ResponseFactory.createStatus(
+                        remisiones,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+
     }
 
     @GetMapping(value = "datosAtencionPaciente/{idRemision}")
-    public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByRemision(@PathVariable String idRemision){
-        return remisionUseCase.consultarDatosAtencionPacienteByRemision(idRemision);
+    public Mono<Response<DatosAtencionPaciente>> consultarDatosAtencionPacienteByRemision(
+            @PathVariable String idRemision){
+        return remisionUseCase.consultarDatosAtencionPacienteByRemision(idRemision)
+                .map(datosAtencion -> ResponseFactory.createStatus(
+                        datosAtencion,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping(value = "pacienteFromRemision/{idRemision}")
-    public Mono<Paciente> consultarPacienteFromRemision(@PathVariable String idRemision){
-        return remisionUseCase.consultarPacienteFromRemision(idRemision);
+    public Mono<Response<Paciente>> consultarPacienteFromRemision(@PathVariable String idRemision){
+        return remisionUseCase.consultarPacienteFromRemision(idRemision)
+                .map(paciente -> ResponseFactory.createStatus(
+                        paciente,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping(value = "tratamientosFarmacia")
-    public Flux<PacienteTratamientoCita> consultarMedicamentosToFarmacia(){
-        return remisionUseCase.consultarAllTratamientosToFarmacia();
+    public Mono<Response<List<PacienteTratamientoCita>>> consultarMedicamentosToFarmacia(){
+        return remisionUseCase.consultarAllTratamientosToFarmacia()
+                .collectList()
+                .map(pacientes -> ResponseFactory.createStatus(
+                        pacientes,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @PostMapping(value = "notificarFarmacia")
-    public Mono<Void>notificarMedicamentosToFarmacia(@RequestBody List<PacienteTratamientoCita> tratamientoCitasList){
-        return remisionUseCase.notificarMedicamentosToFarmacia(tratamientoCitasList);
+    public Mono<Response<Boolean>>notificarMedicamentosToFarmacia(
+            @RequestBody List<PacienteTratamientoCita> tratamientoCitasList){
+        return remisionUseCase.notificarMedicamentosToFarmacia(tratamientoCitasList)
+                .map(seNotifico -> ResponseFactory.createStatus(
+                        seNotifico,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.SE_NOTIFICO_FARMACIA.getValue(),
+                        Mensajes.SE_NOTIFICO_FARMACIA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.NO_NOTIFICO_FARMACIA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping(value = "historial/{idRemision}")
-    public Flux<RegistroHistorialRemision> consultarHistorialRemisionById(@PathVariable String idRemision){
-        return remisionUseCase.consultarHistorialRemisionById(idRemision);
+    public Mono<Response<List<RegistroHistorialRemision>>> consultarHistorialRemisionById(
+            @PathVariable String idRemision){
+        return remisionUseCase.consultarHistorialRemisionById(idRemision)
+                .collectList()
+                .map(historial -> ResponseFactory.createStatus(
+                        historial,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping(value = "/{idRemision}")
-    public Mono<RegistroHistorialRemision> consultarAllDataRemisionById(@PathVariable String idRemision){
-        return remisionUseCase.consultarDataActualRemision(idRemision);
+    public Mono<Response<RegistroHistorialRemision>> consultarAllDataRemisionById(@PathVariable String idRemision){
+        return remisionUseCase.consultarDataActualRemision(idRemision)
+                .map(registroHistorial -> ResponseFactory.createStatus(
+                        registroHistorial,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @PostMapping("/actualizarRemisionPorNovedad")
@@ -120,7 +224,7 @@ public class RemisionController {
                 .map(fueEgresada -> ResponseFactory.createStatus(
                         fueEgresada,
                         StatusCode.STATUS_200.getValue(),
-                        Mensajes.REMISION_EGRESADA.getValue(),
+                        Mensajes.TURNO_DESAGENDADO.getValue(),
                         Mensajes.REMISION_EGRESADA.getValue(),
                         Mensajes.PETICION_EXITOSA.getValue()))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(

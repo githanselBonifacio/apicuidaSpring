@@ -84,9 +84,12 @@ public class ConverterAgenda extends Converter {
     }
 
     public static Cita convertToCita(CitaData citaData){
-        return deserializarJson(
+        var cita =  deserializarJson(
                 convertirObjetoAJson(citaData), Cita.class
         );
+        //mientra se vuelven a crear las citas sin el _
+        cita.setIdCita(citaData.getIdCita());
+        return cita;
     }
     public static  List<CitaGenetic> convertToListCitaGenetic(List<CitaData> citas){
         return citas

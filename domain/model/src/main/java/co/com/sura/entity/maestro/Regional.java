@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class Ciudad {
+public class Regional {
     private String id;
     private String nombre;
     private Double latitud;

@@ -315,7 +315,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     }
 
     @Override
-    public Mono<Void> notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList) {
+    public Mono<Boolean> notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList) {
         return Flux.fromIterable(tratamientoCitasList)
           .flatMap(pacienteTratamientoCita -> {
               Mono<Void> tratamientoUpdate = pacienteTratamientoCita.getIdTratamiento() != null ?
@@ -326,7 +326,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                         Mono.empty();
                     return Mono.when(tratamientoUpdate, soporteNutricionalUpdate);
                 })
-                .then();
+                .then(Mono.just(Boolean.TRUE));
     }
 
     @Override

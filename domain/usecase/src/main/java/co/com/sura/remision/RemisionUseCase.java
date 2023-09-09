@@ -40,7 +40,7 @@ public class RemisionUseCase implements RemisionFactory {
     public Flux<PacienteTratamientoCita> consultarAllTratamientosToFarmacia(){
         return remisionCrudRepository.consultarAllPacienteWithMedicamentosToFarmacia();
     }
-    public Mono<Void> notificarMedicamentosToFarmacia (List<PacienteTratamientoCita> tratamientoCitasList){
+    public Mono<Boolean> notificarMedicamentosToFarmacia (List<PacienteTratamientoCita> tratamientoCitasList){
         return remisionCrudRepository.notificarMedicamentosToFarmacia(tratamientoCitasList);
     }
     public Flux<RegistroHistorialRemision> consultarHistorialRemisionById (String idRemision){

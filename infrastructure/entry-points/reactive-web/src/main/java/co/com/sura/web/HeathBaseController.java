@@ -1,5 +1,6 @@
 package co.com.sura.web;
 
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -8,12 +9,12 @@ import reactor.core.publisher.Mono;
 public class HeathBaseController {
 
 
-    @GetMapping("/")
+    @GetMapping(value = "/")
     public Mono<String> root(){
         return Mono.just("apicuida ok");
     }
-    @GetMapping("/apicuida")
 
+    @GetMapping("/apicuida")
     public Mono<String> api(){
         return Mono.just("apicuida ok");
     }

@@ -1,11 +1,17 @@
 package co.com.sura.web.maestro;
 
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.entity.maestro.*;
+import co.com.sura.genericos.Response;
 import co.com.sura.maestro.CrudMaestroUseCase;
+import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -13,39 +19,145 @@ import reactor.core.publisher.Mono;
 public class MaestroController {
 
     @Autowired
-    CrudMaestroUseCase crudMaestroUseCase;
+    private CrudMaestroUseCase crudMaestroUseCase;
 
     //ciudades
-    @GetMapping("ciudades")
-    public Flux<Ciudad> consultarCiudad(){return crudMaestroUseCase.consultarCiudad();}
+    @GetMapping("regionales")
+    public Mono<Response<List<Regional>>> consultarCiudad(){
+        return crudMaestroUseCase.consultarCiudad()
+                .collectList()
+                .map(ciudades -> ResponseFactory.createStatus(
+                        ciudades,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
 
     @GetMapping("ciudad/{idCiudad}")
-    public Mono<Ciudad> consultarCiudadById(@PathVariable String idCiudad){
-        return crudMaestroUseCase.consultarCiudadById(idCiudad);
+    public Mono<Response<Regional>> consultarCiudadById(@PathVariable String idCiudad){
+        return crudMaestroUseCase.consultarCiudadById(idCiudad)
+                .map(ciudades -> ResponseFactory.createStatus(
+                        ciudades,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
     //horario turno
     @GetMapping("horarioTurno")
-    public Flux<HorarioTurno> consultarHorarioTurno(){return crudMaestroUseCase.consultarHorarioTurno();}
+    public Mono<Response<List<HorarioTurno>>> consultarHorarioTurno(){
+        return crudMaestroUseCase.consultarHorarioTurno()
+                .collectList()
+                .map(ciudades -> ResponseFactory.createStatus(
+                        ciudades,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
 
     @GetMapping("horarioTurno/{idHorarioTurno}")
-    public Mono<HorarioTurno> consultarHorarioTurnoById(@PathVariable Integer idHorarioTurno){
-        return crudMaestroUseCase.consultarHorarioTurnoById(idHorarioTurno);
+    public Mono<Response<HorarioTurno>> consultarHorarioTurnoById(@PathVariable Integer idHorarioTurno){
+        return crudMaestroUseCase.consultarHorarioTurnoById(idHorarioTurno)
+                .map(horarioTurno -> ResponseFactory.createStatus(
+                        horarioTurno,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     // tipo Identificacion
     @GetMapping("tipoIdentificacion")
-    public Flux<TipoIdentificacion> consultarTipoIdentificacion(){
-        return crudMaestroUseCase.consultarTipoIdentificacion();
+    public Mono<Response<List<TipoIdentificacion>>> consultarTipoIdentificacion(){
+        return crudMaestroUseCase.consultarTipoIdentificacion() .collectList()
+                .map(tipoIdentificacion -> ResponseFactory.createStatus(
+                        tipoIdentificacion,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping("tipoIdentificacion/{idTipoIdentificacion}")
-    public Mono<TipoIdentificacion> consultarTipoIdentificacionById(@PathVariable Integer idTipoIdentificacion){
-        return crudMaestroUseCase.consultarTipoIdentificacionById(idTipoIdentificacion);
+    public Mono<Response<TipoIdentificacion>> consultarTipoIdentificacionById(
+            @PathVariable Integer idTipoIdentificacion){
+        return crudMaestroUseCase.consultarTipoIdentificacionById(idTipoIdentificacion)
+                .map(tipoIdentificacion -> ResponseFactory.createStatus(
+                        tipoIdentificacion,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     // plan salud
     @GetMapping("estadosCita")
-    public Flux<EstadoCita> consultarPlanSalud(){
-        return crudMaestroUseCase.consultarEstadosCita();
+    public Mono<Response<List<EstadoCita>>> consultarPlanSalud(){
+        return crudMaestroUseCase.consultarEstadosCita()
+                .collectList()
+                .map(estadosCitas -> ResponseFactory.createStatus(
+                        estadosCitas,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 }

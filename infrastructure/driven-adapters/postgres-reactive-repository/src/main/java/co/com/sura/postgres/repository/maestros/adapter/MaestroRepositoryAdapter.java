@@ -1,6 +1,6 @@
 package co.com.sura.postgres.repository.maestros.adapter;
 
-import co.com.sura.entity.maestro.Ciudad;
+import co.com.sura.entity.maestro.Regional;
 import co.com.sura.entity.maestro.HorarioTurno;
 import co.com.sura.entity.maestro.TipoIdentificacion;
 import co.com.sura.entity.maestro.EstadoCita;
@@ -34,13 +34,13 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     }
 
     @Override
-    public Flux<Ciudad> consultarCiudad() {
+    public Flux<Regional> consultarCiudad() {
         return ciudadRepository.findAll()
                 .map(ConverterMaestros::convertToCiudad);
     }
 
     @Override
-    public Mono<Ciudad> consultarCiudadById(String idCiudad) {
+    public Mono<Regional> consultarCiudadById(String idCiudad) {
         return ciudadRepository.findById(idCiudad)
                 .map(ConverterMaestros::convertToCiudad);
     }

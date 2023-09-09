@@ -17,8 +17,37 @@ public enum Mensajes {
     ERROR_ACTUALIZAR_REMISION("error al actualizar remisión"),
 
     REMISION_EGRESADA("Se ha egresado la remisión"),
-    ERROR_EGRESAR_REMISION("error a egresar remisión");
+    ERROR_EGRESAR_REMISION("error a egresar remisión"),
 
+    //agenda
+    TURNO_DESAGENDADO("Se desagendó el turno completo"),
+    ERROR_TURNO_DESAGENDADO("Error al desagendar turno completo"),
+
+    TURNO_AUTOAGENDADO("Se programó el turno exitosamente,  validar si aún quedan citas pendientes por agendar"),
+    ERROR_AUTOAGENDADO("Error al autoagendar turno"),
+
+    SE_NOTIFICO_FARMACIA("Se ha notificado a farmacia exitosamente"),
+    NO_NOTIFICO_FARMACIA("Se presentó un error al notificar a farmacia"),
+
+    SE_ASIGNO_PROFESIONAL_CITA("Se ha agendado la cita  al profesional exitosamente"),
+    NO_ASIGNO_PROFESIONAL_CITA("Se presentó un error y no se pudo agendar la cita"),
+
+    SE_DESASIGNO_PROFESIONAL_CITA("Se ha desagendado la cita  al profesional exitosamente"),
+    NO_DESASIGNO_PROFESIONAL_CITA("Se presentó un error y no se pudo desagendar la cita"),
+
+    SE_REPROGRAMO_HORA_CITA("Se ha reprogramado hora la hora de la cita exitosamente"),
+    NO_REPROGRAMO_HORA_CITA("Se presentó un error y no se pudo reprogramar hora de la cita"),
+
+    SE_ASIGNO_PROFESIONAL_TURNO("Se ha agendado el profesional al turno  ? exitosamente"),
+    NO_ASIGNO_PROFESIONAL_TURNO("Se presentó un error y no se pudo asignar el profesional al turno"),
+
+    SE_DESASIGNO_PROFESIONAL_TURNO("Se ha desagendado el profesional al turno  ? exitosamente"),
+    NO_DESASIGNO_PROFESIONAL_TURNO("Se presentó un error y no se pudo desasignar el profesional al turno"),
+
+    SE_CALCULA_DESPLAZAMIENTO_CITAS_PROFESIONAL(
+            "Se ha actualizó desplazamientos en turno de profesional exitosamente"),
+    ERROR_CALCULAR_DESPLAZAMIENTO_CITAS_PROFESIONAL(
+            "Se presentó un error y no se pudo actualizar desplazamientos en turno de profesional");
 
 
     private final String value;
