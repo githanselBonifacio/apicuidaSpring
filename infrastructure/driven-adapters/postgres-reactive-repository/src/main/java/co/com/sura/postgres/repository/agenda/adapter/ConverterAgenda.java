@@ -68,7 +68,7 @@ public class ConverterAgenda extends Converter {
     public static Tarea convertToTarea(DesplazamientoData desplazamientoData){
         return new Tarea()
                 .toBuilder()
-                .id(String.valueOf(desplazamientoData.getIdDesplazamiento()))
+                .id(desplazamientoData.getIdCitaPartida()+" -> "+desplazamientoData.getIdCitaDestino())
                 .fechaInicio(desplazamientoData.getFechaProgramada())
                 .fechaProgramada(desplazamientoData.getFechaProgramada())
                 .tipo("dvisita")

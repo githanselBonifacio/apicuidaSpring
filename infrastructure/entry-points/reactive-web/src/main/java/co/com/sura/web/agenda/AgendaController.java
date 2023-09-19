@@ -206,11 +206,26 @@ public class AgendaController {
                 )));
     }
     @GetMapping(value = "/desplazamientoVisita")
-    public Flux<Desplazamiento> getDesplazamientoByIdCitaPartida(
+    public Mono<Response<List<Desplazamiento>>> getDesplazamientoByIdCitaPartida(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idCiudad ){
-        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idCiudad);
+        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idCiudad)
+                .collectList()
+                .map(actividades -> ResponseFactory.createStatus(
+                        actividades,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping(value = "/calcularDesplazamientoCitasByprofesional")
@@ -237,8 +252,23 @@ public class AgendaController {
     }
 
     @GetMapping(value = "/profesionales/{idCiudad}")
-    public Flux<Profesional> getProfesionalesByCiudad(@PathVariable String idCiudad){
-        return agendaUseCase.consultarProfesionalesByCiudad(idCiudad);
+    public Mono<Response<List<Profesional>>> getProfesionalesByCiudad(@PathVariable String idCiudad){
+        return agendaUseCase.consultarProfesionalesByCiudad(idCiudad)
+                .collectList()
+                .map(actividades -> ResponseFactory.createStatus(
+                        actividades,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @PostMapping(value = "/crearProfesional")

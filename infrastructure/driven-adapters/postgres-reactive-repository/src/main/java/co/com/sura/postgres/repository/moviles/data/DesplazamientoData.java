@@ -1,6 +1,7 @@
 package co.com.sura.postgres.repository.moviles.data;
 
 import co.com.sura.postgres.repository.agenda.data.CitaData;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class DesplazamientoData {
     @Column("id_cita_destino")
     private String idCitaDestino;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     @Column("fecha_programada")
     private LocalDateTime fechaProgramada;
 

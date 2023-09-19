@@ -1,8 +1,7 @@
 package co.com.sura.entity.moviles;
 
-import co.com.sura.entity.agenda.Profesional;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,5 +25,5 @@ public class Desplazamiento {
     private Integer duracion;
     private Integer holgura;
     private String idMovil;
-    private Profesional profesional;
+    private String idProfesional;
 }

@@ -1,13 +1,19 @@
 package co.com.sura.web.moviles;
 
 import co.com.sura.agenda.AgendaUseCase;
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.entity.moviles.Desplazamiento;
+import co.com.sura.genericos.Response;
+import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -17,10 +23,25 @@ public class MovilesController {
     private AgendaUseCase agendaUseCase;
 
     @GetMapping(value = "/desplazamientoVisita")
-    public Flux<Desplazamiento> getDesplazamientoByIdCitaPartida(
+    public Mono<Response<List<Desplazamiento>>> getDesplazamientoByIdCitaPartida(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
-            @RequestParam String idCiudad ){
-        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idCiudad);
+            @RequestParam String idRegional ){
+        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idRegional)
+                .collectList()
+                .map(desplazamientos -> ResponseFactory.createStatus(
+                        desplazamientos,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 }

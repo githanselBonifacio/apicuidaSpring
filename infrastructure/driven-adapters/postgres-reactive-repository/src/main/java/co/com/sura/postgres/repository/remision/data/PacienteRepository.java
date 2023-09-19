@@ -74,7 +74,8 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "FROM paciente " +
             "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
             "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
-            "INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita;")
+            "INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita "+
+            "WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllTratamientosPacientes();
 
 
@@ -85,6 +86,7 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "FROM paciente " +
             "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
             "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
-            "INNER JOIN soporte_nutricional ON soporte_nutricional.id_cita = cita.id_cita;")
+            "INNER JOIN soporte_nutricional ON soporte_nutricional.id_cita = cita.id_cita "+
+            "WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientes();
 }
