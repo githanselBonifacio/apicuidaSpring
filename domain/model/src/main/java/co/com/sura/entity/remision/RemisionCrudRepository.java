@@ -7,6 +7,7 @@ import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,7 +18,11 @@ public interface RemisionCrudRepository {
     Mono<Paciente>                consultarPacienteFromRemision (String idRemision);
 
     Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmacia();
-    Mono<Boolean>                    notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList);
+    Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
+            LocalDate fechaTurno, Integer idHorario, String idRegional
+    );
+
+    Mono<Boolean>                 notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList);
 
     Flux<RegistroHistorialRemision>consultarHistoricoRemision(String idRemision);
     Mono<RegistroHistorialRemision>consultarDatosRemision(String idRemision);

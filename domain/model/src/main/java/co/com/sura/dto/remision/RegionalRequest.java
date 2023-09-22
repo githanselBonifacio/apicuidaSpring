@@ -1,5 +1,6 @@
 package co.com.sura.dto.remision;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class CiudadRequest {
-    private String idCiudad;
+public class RegionalRequest {
+    @JsonProperty("idCiudad")
+    private String idRegional;
     private String nombre;
     private String codigoDANE;
     private String codigoIPS;

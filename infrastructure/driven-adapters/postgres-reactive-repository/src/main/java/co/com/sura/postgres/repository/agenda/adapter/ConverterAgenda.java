@@ -91,21 +91,21 @@ public class ConverterAgenda extends Converter {
         cita.setIdCita(citaData.getIdCita());
         return cita;
     }
-    public static  List<CitaGenetic> convertToListCitaGenetic(List<CitaData> citas){
+    public static  List<CitaGenetic> convertToListCitaGenetic(List<Cita> citas){
         return citas
                 .stream()
                 .map(ConverterAgenda::convertToCitaGenetic)
                 .collect(Collectors.toList());
     }
-    public static CitaGenetic convertToCitaGenetic(CitaData citaData){
+    public static CitaGenetic convertToCitaGenetic(Cita cita){
         return new CitaGenetic()
                 .toBuilder()
-                .idCita(citaData.getIdCita())
-                .duracion(citaData.getDuracion())
-                .holgura(citaData.getHolgura())
-                .fechaInicioIso(citaData.getFechaProgramada().toEpochSecond(ZoneOffset.UTC))
-                .latitud(citaData.getLatitud())
-                .longitud(citaData.getLongitud())
+                .idCita(cita.getIdCita())
+                .duracion(cita.getDuracion())
+                .holgura(cita.getHolgura())
+                .fechaInicioIso(cita.getFechaProgramada().toEpochSecond(ZoneOffset.UTC))
+                .latitud(cita.getLatitud())
+                .longitud(cita.getLongitud())
                 .build();
     }
     public static Desplazamiento converToDesplazamiento(DesplazamientoData desplazamientoData){

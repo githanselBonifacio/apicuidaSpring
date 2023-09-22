@@ -4,7 +4,7 @@ package co.com.sura.postgres.repository.agenda.adapter;
 
 import co.com.sura.autoagendador.AutoAgendador;
 
-import co.com.sura.autoagendador.OrigenCiudad;
+import co.com.sura.autoagendador.OrigenRegional;
 import co.com.sura.autoagendador.Resultado;
 import co.com.sura.entity.agenda.AgendaRepository;
 import co.com.sura.entity.agenda.Profesional;
@@ -39,7 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static co.com.sura.autoagendador.IdCiudad.getByIdCiudad;
+import static co.com.sura.autoagendador.IdRegional.getByIdCiudad;
 import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.crearDesplazamientoData;
 
 @Repository
@@ -101,14 +101,14 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Flux<Profesional> consultarProfesionalByTurnoCiudad(LocalDate fechaTurno, String idCiudad) {
-        return profesionalRepository.findByTurnoCiudad(fechaTurno,idCiudad)
+        return profesionalRepository.findByTurnoRegional(fechaTurno,idCiudad)
                 .map(ConverterAgenda :: convertToProfesional);
     }
 
     @Override
     public Flux<Profesional> consultarProfesionalFromTurnoCiudad(
             LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno) {
-        return profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
+        return profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
                 .map(ConverterAgenda :: convertToProfesional);
     }
 
@@ -135,8 +135,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Flux<Profesional> consultarProfesionalesByIdCiudad(String idCiudad) {
-        return profesionalRepository.findByIdCiudad(idCiudad)
+    public Flux<Profesional> consultarProfesionalesByIdCiudad(String idRegional) {
+        return profesionalRepository.findByIdRegional(idRegional)
                 .map(ConverterAgenda :: convertToProfesional);
     }
 
@@ -144,10 +144,10 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             ProfesionalData profesionalData,
             LocalDate fechaTurno,
             Integer idHorarioTurno,
-            String idCiudad){
+            String idRegional){
 
         return citaRepository
-                .findCitasByTurnoCiudadProfesional(fechaTurno, idHorarioTurno, idCiudad,
+                .findCitasByTurnoCiudadProfesional(fechaTurno, idHorarioTurno, idRegional,
                         profesionalData.getNumeroIdentificacion())
                 .map(ConverterAgenda :: convertToTarea)
                 .map(tarea -> {
@@ -157,7 +157,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 .mergeWith(
                         desplazamientoRepository
                                 .findByIdCitaPartidaByProfesional(
-                                        fechaTurno,idHorarioTurno,idCiudad,profesionalData.getNumeroIdentificacion())
+                                        fechaTurno,idHorarioTurno,idRegional,profesionalData.getNumeroIdentificacion())
                                 .map(ConverterAgenda :: convertToTarea)
                 );
     }
@@ -166,12 +166,12 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     public Flux<Actividad> consultarActividadesByProfesionalesCiudadHorarioTurno(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
-            String idCiudad) {
+            String idRegional) {
          return turnoProfesionalesRepository.findTurnoProfesionalByCiudadHorario(
-                 fechaTurno,idHorarioTurno,idCiudad)
+                 fechaTurno,idHorarioTurno,idRegional)
                  .flatMap(profesionalData -> {
                      Flux<Tarea> tareaFlux = consultarTareasTurnoByProfesional(
-                             profesionalData, fechaTurno, idHorarioTurno, idCiudad
+                             profesionalData, fechaTurno, idHorarioTurno, idRegional
                      );
                      return tareaFlux.collectList().map(citas ->{
                                  List<Tarea> tareaList = new ArrayList<>(citas);
@@ -192,7 +192,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 profesional.getNombres(),
                 profesional.getApellidos(),
                 profesional.getFechaNacimiento(),
-                profesional.getIdCiudad()
+                profesional.getIdRegional()
         );
     }
 
@@ -207,26 +207,32 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         return citaRepository.findCitasByTurnoCiudad(
                fechaTurno,
                 idHorarioTurno,
-                idCiudad
-        ).map(ConverterAgenda :: convertToCita);
+                idCiudad);
     }
 
     @Override
-    public Mono<Boolean> reprogramarCita(LocalDateTime fechaProgramada, String idCita) {
+    public Mono<Boolean> reprogramarCita(LocalDateTime fechaProgramada,
+                                         String idCita,
+                                         String idProfesional,
+                                         LocalDate fechaTurno,
+                                         Integer idHorarioTurno,
+                                         String idRegional) {
         return citaRepository.actualizarFechaProgramada(fechaProgramada,idCita)
-                .then(Mono.just(Boolean.TRUE));
+                .then(calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional));
     }
 
     @Override
-    public Mono<Boolean> agendarToProfesional(String idRemision, String idProfesional) {
-        return citaRepository.agendarToProfesional(idRemision,idProfesional)
-                .then(Mono.just(Boolean.TRUE));
+    public Mono<Boolean> agendarToProfesional(
+            String idCita, String idProfesional,  LocalDate fechaTurno,Integer idHorarioTurno,String idRegional) {
+        return citaRepository.agendarToProfesional(idCita,idProfesional)
+                .then(calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional));
     }
 
     @Override
-    public Mono<Boolean> desagendarToProfesional(String idCita) {
+    public Mono<Boolean> desagendarToProfesional(
+            String idCita,String idProfesional,LocalDate fechaTurno,Integer idHorarioTurno,String idRegional) {
         return citaRepository.desagendarToProfesional(idCita)
-                .then(Mono.just(Boolean.TRUE));
+                .then(calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional));
     }
 
     @Override
@@ -253,7 +259,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private Mono<Void> insertDesplazamientosAllCitasByProfesional(
             LocalDate fechaTurno, String idCiudad,Integer idHorarioTurno){
 
-        return profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
+        return profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
                 .collectList()
                 .flatMap(profesionalListData -> Flux.fromIterable(profesionalListData)
                         .flatMap(profesionalData -> calcularDesplazamientoCitaByProfesional(
@@ -269,11 +275,11 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
       return desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idCiudad)
          .then(citaRepository.findCitasByTurnoCiudad(fechaTurno,idHorarioTurno,idCiudad)
          .collectList()
-         .flatMap(citaDataList -> profesionalRepository.findFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno)
+         .flatMap(citaDataList -> profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
              .collectList().flatMap(profesionalesDataList -> {
 
                var autoAgendador = new AutoAgendador(
-                       OrigenCiudad.getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
+                       OrigenRegional.getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
                   ConverterAgenda.convertToListCitaGenetic(citaDataList), profesionalesDataList.size(),
                   NUMERO_GENERACIONES, SIZE_POBLACION_INICIAL, NUMERO_PADRES_EMPAREJADOS, PENALIZACION_HOLGURA_NEGATIVA,
                         mapboxService);
@@ -294,15 +300,15 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Mono<Boolean> calcularDesplazamientoCitaByProfesional(
-            LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad, String idProfesional) {
+            LocalDate fechaTurno, Integer idHorarioTurno,String idRegional, String idProfesional) {
 
         return desplazamientoRepository.deleteByFechaTurnoProfesional(fechaTurno,idHorarioTurno,idProfesional)
-               .then(citaRepository.findCitasByTurnoCiudadProfesional(fechaTurno,idHorarioTurno,idCiudad,idProfesional)
-               .collectList()
-               .flatMapMany(Flux::fromIterable)
-               .buffer(MAXSIZE,1)
-               .filter(citas -> citas.size() == MAXSIZE)
-               .flatMap(
+              .then(citaRepository.findCitasByTurnoCiudadProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional)
+              .collectList()
+              .flatMapMany(Flux::fromIterable)
+              .buffer(MAXSIZE,1)
+              .filter(citas -> citas.size() == MAXSIZE)
+              .flatMap(
                    citas ->{
                       List<DesplazamientoData> desplazamientosList = new ArrayList<>();
                       CitaData citaPartida = citas.get(0);

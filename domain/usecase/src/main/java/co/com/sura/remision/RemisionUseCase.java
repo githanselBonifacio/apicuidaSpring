@@ -8,6 +8,7 @@ import co.com.sura.entity.remision.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class RemisionUseCase implements RemisionFactory {
@@ -39,6 +40,11 @@ public class RemisionUseCase implements RemisionFactory {
 
     public Flux<PacienteTratamientoCita> consultarAllTratamientosToFarmacia(){
         return remisionCrudRepository.consultarAllPacienteWithMedicamentosToFarmacia();
+    }
+    public Flux<PacienteTratamientoCita> consultarAllTratamientosToFarmaciaWithFilter(
+            LocalDate fechaTurno, Integer idHorario, String idRegional){
+       return remisionCrudRepository.consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
+               fechaTurno,idHorario,idRegional);
     }
     public Mono<Boolean> notificarMedicamentosToFarmacia (List<PacienteTratamientoCita> tratamientoCitasList){
         return remisionCrudRepository.notificarMedicamentosToFarmacia(tratamientoCitasList);

@@ -8,7 +8,6 @@ import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class MaestroController {
 
     //ciudades
     @GetMapping("regionales")
-    public Mono<Response<List<Regional>>> consultarCiudad(){
+    public Mono<Response<List<Regional>>> consultarRegional(){
         return crudMaestroUseCase.consultarCiudad()
                 .collectList()
                 .map(ciudades -> ResponseFactory.createStatus(
@@ -42,9 +41,9 @@ public class MaestroController {
                 )));
     }
 
-    @GetMapping("ciudad/{idCiudad}")
-    public Mono<Response<Regional>> consultarCiudadById(@PathVariable String idCiudad){
-        return crudMaestroUseCase.consultarCiudadById(idCiudad)
+    @GetMapping("regionales/{idRegional}")
+    public Mono<Response<Regional>> consultarRegionalById(@PathVariable String idRegional){
+        return crudMaestroUseCase.consultarCiudadById(idRegional)
                 .map(ciudades -> ResponseFactory.createStatus(
                         ciudades,
                         StatusCode.STATUS_200.getValue(),

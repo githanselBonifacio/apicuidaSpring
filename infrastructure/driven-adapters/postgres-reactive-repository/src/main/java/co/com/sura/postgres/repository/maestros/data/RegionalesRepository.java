@@ -4,9 +4,9 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface CiudadRepository extends ReactiveCrudRepository<CiudadData,String> {
+public interface RegionalesRepository extends ReactiveCrudRepository<RegionalesData,String> {
 
-    Flux<CiudadData> findAll();
-    Mono<CiudadData> findById(String idCiudad);
+    Flux<RegionalesData> findAll();
+    Mono<RegionalesData> findById(String idRegional);
 
 }

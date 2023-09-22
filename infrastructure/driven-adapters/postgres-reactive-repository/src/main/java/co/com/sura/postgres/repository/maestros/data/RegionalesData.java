@@ -16,10 +16,10 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "ciudad")
-public class CiudadData {
+@Table(name = "regionales")
+public class RegionalesData {
     @Id
-    @Column("id_ciudad")
+    @Column("id_regional")
     private String id;
     private String nombre;
     private Double latitud;

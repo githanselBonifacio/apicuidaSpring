@@ -3,7 +3,7 @@ package co.com.sura.autoagendador;
 import lombok.Getter;
 
 @Getter
-public enum OrigenCiudad {
+public enum OrigenRegional {
     BARRANQUILLA (
             new CitaGenetic()
                     .toBuilder()
@@ -58,22 +58,22 @@ public enum OrigenCiudad {
 
     private final CitaGenetic citaGenetic;
 
-    OrigenCiudad(CitaGenetic citaGenetic) {
+    OrigenRegional(CitaGenetic citaGenetic) {
         this.citaGenetic = citaGenetic;
     }
-    public static OrigenCiudad getOrigenCiudadById(IdCiudad idCiudad) {
+    public static OrigenRegional getOrigenCiudadById(IdRegional idCiudad) {
 
         switch (idCiudad) {
             case BARRANQUILLA:
-                return OrigenCiudad.BARRANQUILLA;
+                return OrigenRegional.BARRANQUILLA;
             case MEDELLIN:
-                return OrigenCiudad.MEDELLIN;
+                return OrigenRegional.MEDELLIN;
             case RIONEGRO:
-                return OrigenCiudad.RIONEGRO;
+                return OrigenRegional.RIONEGRO;
             case BOGOTA:
-                return OrigenCiudad.BOGOTA;
+                return OrigenRegional.BOGOTA;
             case CALI:
-                return OrigenCiudad.CALI;
+                return OrigenRegional.CALI;
             default:
                 throw new IllegalArgumentException("Invalid idCiudad: " + idCiudad);
         }

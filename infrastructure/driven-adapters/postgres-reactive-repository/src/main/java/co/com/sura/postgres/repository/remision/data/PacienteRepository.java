@@ -2,7 +2,6 @@ package co.com.sura.postgres.repository.remision.data;
 
 
 import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.remision.Paciente;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -10,6 +9,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+
 
 public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,String> {
 
@@ -89,4 +89,35 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "INNER JOIN soporte_nutricional ON soporte_nutricional.id_cita = cita.id_cita "+
             "WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientes();
+
+    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos,  " +
+            "remision.id_remision, "+
+            "tratamiento.* , " +
+            "cita.fecha_programada " +
+            "FROM paciente " +
+            "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
+            "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
+            "INNER JOIN turno_cita ON turno_cita.id_cita = cita.id_cita " +
+            "and turno_cita.fecha_turno = $1 and turno_cita.id_horario_turno= $2 "+
+            "INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita and cita.id_regional = $3 "+
+            "WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
+    Flux<PacienteTratamientoCita> findAllTratamientosPacientesByTurnoRegionalHorario(
+            LocalDate turno,Integer idHorario, String idRegional);
+
+
+    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos, " +
+            " remision.id_remision, " +
+            " soporte_nutricional.* , " +
+            " cita.fecha_programada " +
+            " FROM paciente" +
+            " INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
+            " INNER JOIN cita ON cita.id_remision = remision.id_remision " +
+            " INNER JOIN turno_cita ON turno_cita.id_cita = cita.id_cita " +
+            " and turno_cita.fecha_turno = $1 and turno_cita.id_horario_turno= $2 "+
+            " INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita and cita.id_regional = $3 "+
+            " INNER JOIN soporte_nutricional ON soporte_nutricional.id_cita = cita.id_cita " +
+            " WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
+    Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
+            LocalDate turno,Integer idHorario, String idRegional
+    );
 }

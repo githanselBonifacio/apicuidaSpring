@@ -6,9 +6,6 @@ import co.com.sura.entity.remision.*;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.remision.data.*;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +30,7 @@ public class ConverterRemision extends Converter {
                 .tipoAdmision(remisionRequest.getTipoAdmision())
                 .numeroIdentificacionPaciente(remisionRequest.getNumeroIdentificacion())
                 .estado(remisionRequest.getEstado())
-                .idCiudad(remisionRequest.getCiudad().getIdCiudad())
+                .idRegional(remisionRequest.getRegional().getIdRegional())
                 .build();
     }
 
@@ -53,12 +50,13 @@ public class ConverterRemision extends Converter {
                 .build();
     }
     public static Ubicacion convertToUbicacion(UbicacionData ubicacionData){
+
         return deserializarJson(
                 convertirObjetoAJson(ubicacionData), Ubicacion.class
         );
     }
     public static UbicacionData extraerUbicacionData(RemisionRequest remisionRequest){
-        UbicacionRequest ubicacionRequest = remisionRequest.getDatosAtencionPaciente().getUbicacion();
+        var ubicacionRequest = remisionRequest.getDatosAtencionPaciente().getUbicacion();
         return new UbicacionData()
                 .toBuilder()
                 .idUbicacion(remisionRequest.getNumeroIdentificacion()+"_ubicacion")
@@ -72,7 +70,7 @@ public class ConverterRemision extends Converter {
                 .barrio(ubicacionRequest.getBarrio())
                 .sinNomenclatura(ubicacionRequest.isSinNomenclatura())
                 .municipio(ubicacionRequest.getMunicipio().getNombre())
-                .idCiudad(ubicacionRequest.getMunicipio().getIdCiudad())
+                .idRegional(remisionRequest.getRegional().getIdRegional())
                 .build();
     }
 
@@ -125,7 +123,7 @@ public class ConverterRemision extends Converter {
                 .stream()
                 .map(ConverterRemision :: convertirCitaData)
                 .peek(citaData -> citaData.setIdRemision(remisionRequest.getIdRemision()))
-                .peek(citaData -> citaData.setIdCiudad(remisionRequest.getCiudad().getIdCiudad()))
+                .peek(citaData -> citaData.setIdRegional(remisionRequest.getRegional().getIdRegional()))
                 .peek(citaData -> citaData.setLatitud(remisionRequest
                         .getDatosAtencionPaciente().getUbicacion().getLatitud()))
                 .peek(citaData -> citaData.setLongitud(remisionRequest

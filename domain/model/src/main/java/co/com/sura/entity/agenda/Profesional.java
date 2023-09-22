@@ -20,6 +20,6 @@ public class Profesional {
     private String apellidos;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaNacimiento;
-    private String idCiudad;
+    private String idRegional;
     private boolean activo;
 }

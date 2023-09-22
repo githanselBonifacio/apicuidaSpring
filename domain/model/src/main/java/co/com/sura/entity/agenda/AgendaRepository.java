@@ -11,39 +11,57 @@ import java.time.LocalDateTime;
 public interface AgendaRepository {
     //profesionales
     Flux<Profesional>   consultarProfesionales();
-    Flux<Profesional>   consultarProfesionalByTurnoCiudad(LocalDate fechaTurno, String idCiudad);
+    Flux<Profesional>   consultarProfesionalByTurnoCiudad(LocalDate fechaTurno, String idRegional);
 
     Flux<Profesional>   consultarProfesionalFromTurnoCiudad(
                             LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno);
 
-    Mono<Boolean>           asignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
-    Mono<Boolean>           desasignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
+    Mono<Boolean>       asignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
+    Mono<Boolean>       desasignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
 
-    Flux<Profesional>    consultarProfesionalesByIdCiudad(String idCiudad);
-    Flux<Actividad>      consultarActividadesByProfesionalesCiudadHorarioTurno(
+    Flux<Profesional>   consultarProfesionalesByIdCiudad(String idRegional);
+    Flux<Actividad>     consultarActividadesByProfesionalesCiudadHorarioTurno(
                             LocalDate fechaTurno,
                             Integer idHorarioTurno,
-                            String idCiudad
+                            String idRegional
                          );
 
-    Mono<Profesional>     crearProfesional(Profesional profesional);
-    Mono<Profesional>     actualizarProfesional(Profesional profesional);
+    Mono<Profesional>    crearProfesional(Profesional profesional);
+    Mono<Profesional>    actualizarProfesional(Profesional profesional);
 
     //citas
-    Flux<Cita>            consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);
-    Mono<Boolean>            reprogramarCita(LocalDateTime fechaProgramada, String idCita);
-    Mono<Boolean>            agendarToProfesional(String idCita, String idProfesional);
-    Mono<Boolean>            desagendarToProfesional(String idCita);
+    Flux<Cita>           consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);
+    Mono<Boolean>        reprogramarCita(LocalDateTime fechaProgramada,
+                                         String idCita,
+                                         String idProfesional,
+                                         LocalDate fechaTurno,
+                                         Integer idHorarioTurno,
+                                         String idRegional);
+
+    Mono<Boolean>        agendarToProfesional(
+                                                String idCita,
+                                                String idProfesional,
+                                                LocalDate fechaTurno,
+                                                Integer idHorarioTurno,
+                                                String idRegional);
+
+    Mono<Boolean>         desagendarToProfesional(
+                                                String idCita,
+                                                String idProfesional,
+                                                LocalDate fechaTurno,
+                                                Integer idHorarioTurno,
+                                                String idRegional);
+
     Mono<Boolean>         desagendarTurnocompleto(LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad);
-    Mono<Boolean>            autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);
+    Mono<Boolean>         autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);
 
     //desplazamientos
-    Flux<Desplazamiento>   consultarDesplazamientoByCitaPartida(
+    Flux<Desplazamiento>  consultarDesplazamientoByCitaPartida(
                                         LocalDate fechaProgramada,
                                         Integer idHorarioTurno,
                                         String idCiudad);
 
-    Mono<Boolean>              calcularDesplazamientoCitaByProfesional(
+    Mono<Boolean>         calcularDesplazamientoCitaByProfesional(
                                         LocalDate fechaProgramada,
                                         Integer idHorarioTurno,
                                         String idCiudad,
@@ -63,10 +81,10 @@ public interface AgendaRepository {
     Flux<Fototerapia>       consultarFototerapiasByCitas(String idCita);
 
     //Secreciones
-    Flux<Secrecion>          consultarSecrecionesByCitas(String idCita);
+    Flux<Secrecion>         consultarSecrecionesByCitas(String idCita);
 
     //sondaje
-    Flux<Sondaje>            consultarSondajesByCitas(String idCita);
+    Flux<Sondaje>           consultarSondajesByCitas(String idCita);
 
     //toma de muestras
     Flux<TomaMuestra>        consultarTomaMuestrasByCitas(String idCita);

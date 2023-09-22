@@ -40,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -310,6 +312,25 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                             pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
                             return pacienteTratamientoCita;
                 })
+                ).sort(Comparator.comparing(PacienteTratamientoCita::getNotificado).reversed()
+                        .thenComparing(PacienteTratamientoCita::getFechaProgramada).reversed());
+
+    }
+
+    @Override
+    public Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
+            LocalDate turno, Integer idHorario, String idRegional) {
+        return pacienteRepository.findAllTratamientosPacientesByTurnoRegionalHorario(turno,idHorario,idRegional)
+                .map(pacienteTratamientoCita -> {
+                            pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
+                            return pacienteTratamientoCita;
+                        }
+                ).mergeWith(pacienteRepository.findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
+                        turno,idHorario,idRegional)
+                        .map(pacienteTratamientoCita -> {
+                            pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
+                            return pacienteTratamientoCita;
+                        })
                 ).sort(Comparator.comparing(PacienteTratamientoCita::getNotificado).reversed()
                         .thenComparing(PacienteTratamientoCita::getFechaProgramada).reversed());
     }

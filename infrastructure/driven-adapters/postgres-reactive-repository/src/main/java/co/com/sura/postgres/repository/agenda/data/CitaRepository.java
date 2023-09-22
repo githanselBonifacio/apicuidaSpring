@@ -1,6 +1,7 @@
 package co.com.sura.postgres.repository.agenda.data;
 
 
+import co.com.sura.entity.remision.Cita;
 import org.springframework.data.r2dbc.repository.Query;
 
 import org.springframework.data.repository.query.Param;
@@ -24,29 +25,33 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "AND fecha_programada > NOW();")
     Mono<Boolean> cancelarCitasForEgresoRemision(String idRemision);
 
-    @Query("SELECT cita.* FROM cita " +
-            "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita " +
-            "WHERE turno_cita.fecha_turno = $1 " +
-            "AND turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_ciudad = $3 " +
+    @Query("SELECT cita.*, " +
+            "remision.numero_identificacion_paciente," +
+            "CONCAT (paciente.nombres,' ',paciente.apellidos) as paciente," +
+            "paciente.tipo_identificacion as tipo_identificacion_paciente FROM cita " +
+            "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita  and turno_cita.fecha_turno = $1" +
+            "INNER JOIN remision ON cita.id_remision = remision.id_remision " +
+            "INNER JOIN paciente ON paciente.numero_identificacion = remision.numero_identificacion_paciente  " +
+            "WHERE turno_cita.id_horario_turno = $2 " +
+            "AND cita.id_regional = $3 " +
             "AND cita.id_estado != 5;")
-    Flux<CitaData> findCitasByTurnoCiudad(
+    Flux<Cita> findCitasByTurnoCiudad(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
-            String idCiudad );
+            String idRegional );
 
     @Query("SELECT cita.* FROM cita " +
             "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita " +
             "WHERE turno_cita.fecha_turno = $1 " +
             "AND turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_ciudad = $3 " +
+            "AND cita.id_regional = $3 " +
             "AND cita.id_estado != 5 " +
             "AND cita.id_profesional = $4 " +
             "ORDER BY public.cita.fecha_programada ASC;")
     Flux<CitaData> findCitasByTurnoCiudadProfesional(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
-            String idCiudad,
+            String idRegional,
             String numeroIdentificacionProfesional);
 
 
@@ -54,7 +59,7 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "SET  id_estado=2, id_profesional=$2 " +
             "WHERE id_cita = $1 " +
             "AND " +
-            "(SELECT id_ciudad from public.profesionales WHERE numero_identificacion = $2) = public.cita.id_ciudad;")
+            "(SELECT id_regional from public.profesionales WHERE numero_identificacion= $2)= public.cita.id_regional;")
     Mono<Void> agendarToProfesional(String idCita, String idProfesional);
 
 
@@ -76,8 +81,8 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             "WHERE cita.id_cita = turno_cita.id_cita " +
             "AND turno_cita.fecha_turno = $1 " +
             "AND turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_ciudad = $3;")
-    Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad);
+            "AND cita.id_regional = $3;")
+    Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno,String idRegional);
 
     @Query("UPDATE cita " +
             "SET id_estado = 1 , id_profesional=NULL " +
@@ -89,7 +94,7 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional);
 
     @Query("INSERT INTO cita " +
-            "(id_cita, id_remision, duracion, holgura, fecha_inicio, especialidad, id_ciudad,fecha_programada" +
+            "(id_cita, id_remision, duracion, holgura, fecha_inicio, especialidad, id_regional,fecha_programada" +
             ",longitud, latitud)" +
             " VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9, $10);" )
     Mono<Void> insertCitaQuery(
@@ -99,7 +104,7 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             @Param("$4") Integer holgura,
             @Param("$5") LocalDateTime fechaInicio,
             @Param("$6") String especialidad,
-            @Param("$7") String idCiudad,
+            @Param("$7") String idRegional,
             @Param("$8") LocalDateTime fechaProgramada,
             @Param("$9") Double longitud,
             @Param("$10") Double latitud
@@ -113,7 +118,7 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
           citaData.getHolgura(),
           citaData.getFechaInicio(),
           citaData.getEspecialidad(),
-          citaData.getIdCiudad(),
+          citaData.getIdRegional(),
           citaData.getFechaInicio(),
           citaData.getLongitud(),
           citaData.getLatitud()

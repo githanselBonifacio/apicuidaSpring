@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class MunicipioRequest {
     private String idMunicipio;
-    private String idCiudad;
+    private String idRegional;
     private String nombre;
     private long latitud;
     private long longitud;

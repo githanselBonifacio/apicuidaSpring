@@ -26,7 +26,7 @@ public interface UbicacionRepository extends ReactiveCrudRepository<UbicacionDat
            " barrio," +
            " sin_nomenclatura," +
            " municipio," +
-           " id_ciudad)" +
+           " id_regional)" +
            " VALUES " +
            "($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11,$12)"
    )
@@ -42,7 +42,7 @@ public interface UbicacionRepository extends ReactiveCrudRepository<UbicacionDat
            @Param("$9")  String barrio,
            @Param("$10")  boolean sinNomenclatura,
            @Param("$11")  String municipio,
-           @Param("$12") String idCiudad
+           @Param("$12") String idRegional
    );
    default Mono<Void> insertUbicacion(UbicacionData ubicacionData){
        return insertUbicacionQuery(
@@ -57,7 +57,7 @@ public interface UbicacionRepository extends ReactiveCrudRepository<UbicacionDat
                ubicacionData.getBarrio(),
                ubicacionData.getSinNomenclatura(),
                ubicacionData.getMunicipio(),
-               ubicacionData.getIdCiudad()
+               ubicacionData.getIdRegional()
        );
    }
 }

@@ -15,9 +15,9 @@ public interface DesplazamientoRepository extends ReactiveCrudRepository<Desplaz
             "INNER JOIN public.cita ON cita.id_cita = public.desplazamiento.id_cita_partida " +
             "WHERE public.desplazamiento.fecha_programada::date = $1 " +
             "AND public.desplazamiento.id_horario_turno = $2 " +
-            "AND public.cita.id_ciudad = $3;")
+            "AND public.cita.id_regional = $3;")
     Flux<DesplazamientoData> findByIdCitaPartida(
-            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad);
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional);
 
 
     @Query("SELECT * " +
@@ -26,9 +26,9 @@ public interface DesplazamientoRepository extends ReactiveCrudRepository<Desplaz
             "AND public.cita.id_profesional = $4" +
             "WHERE public.desplazamiento.fecha_programada::date = $1 " +
             "AND public.desplazamiento.id_horario_turno = $2 " +
-            "AND public.cita.id_ciudad = $3;")
+            "AND public.cita.id_regional = $3;")
     Flux<DesplazamientoData> findByIdCitaPartidaByProfesional(
-            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad, String idProfesional);
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional, String idProfesional);
 
     @Query("DELETE FROM public.desplazamiento " +
             "WHERE public.desplazamiento.id_horario_turno = $2 " +
@@ -43,7 +43,7 @@ public interface DesplazamientoRepository extends ReactiveCrudRepository<Desplaz
             "  AND id_cita_partida IN ( " +
             "    SELECT id_cita " +
             "    FROM cita " +
-            "    WHERE id_ciudad = $3 " +
+            "    WHERE id_regional = $3 " +
             "  );")
-    Mono<Void> deleteAllByFechaTurno(LocalDate fechaTurno, Integer idHorarioTurno,String idCiudad);
+    Mono<Void> deleteAllByFechaTurno(LocalDate fechaTurno, Integer idHorarioTurno,String idRegional);
 }

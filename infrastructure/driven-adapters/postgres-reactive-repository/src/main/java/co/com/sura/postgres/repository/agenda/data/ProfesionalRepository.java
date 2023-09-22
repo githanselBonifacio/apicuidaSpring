@@ -16,37 +16,37 @@ public interface ProfesionalRepository extends ReactiveCrudRepository<Profesiona
 
     @Query("SELECT * " +
             "FROM public.profesionales " +
-            "Where id_ciudad = $1;")
-    Flux<ProfesionalData> findByIdCiudad(  @Param("$1") String idCiudad);
+            "Where id_regional = $1;")
+    Flux<ProfesionalData> findByIdRegional(@Param("$1") String idRegional);
 
     @Query("SELECT DISTINCT  public.profesionales.* " +
             "FROM public.profesionales " +
             "LEFT JOIN public.turno_profesional " +
             "on public.profesionales.numero_identificacion = public.turno_profesional.id_profesional " +
             "AND public.turno_profesional.fecha_turno = $1 "+
-            "WHERE public.profesionales.id_ciudad = $2 " +
+            "WHERE public.profesionales.id_regional = $2 " +
             "AND public.profesionales.activo = true " +
             "AND public.turno_profesional.id IS NULL;")
-    Flux<ProfesionalData> findByTurnoCiudad(
+    Flux<ProfesionalData> findByTurnoRegional(
             @Param("$1") LocalDate fechaTurno,
-            @Param("$2") String idCiudad
+            @Param("$2") String idRegional
     );
     @Query("SELECT * " +
             "FROM public.profesionales " +
             "INNER JOIN public.turno_profesional " +
             "on public.profesionales.numero_identificacion = public.turno_profesional.id_profesional " +
-            "WHERE public.profesionales.id_ciudad = $2 " +
+            "WHERE public.profesionales.id_regional = $2 " +
             "AND public.profesionales.activo = true " +
             "AND public.turno_profesional.id_horario_turno = $3" +
             "AND public.turno_profesional.fecha_turno = $1")
-    Flux<ProfesionalData> findFromTurnoCiudad(
+    Flux<ProfesionalData> findFromTurnoRegional(
             @Param("$1") LocalDate fechaTurno,
-            @Param("$2") String idCiudad,
+            @Param("$2") String idRegional,
             @Param("$3") Integer idHorarioTurno
     );
 
     @Query("INSERT INTO profesionales " +
-            "(numero_identificacion, id_tipo_identificacion, nombre, apellido, fecha_nacimiento, id_ciudad)" +
+            "(numero_identificacion, id_tipo_identificacion, nombre, apellido, fecha_nacimiento, id_regional)" +
             " VALUES ($1, $2,$3, $4,$5, $6)")
     Mono<Profesional> insertProfesional(
             @Param("$1") String numeroIdentificacion,
@@ -54,6 +54,6 @@ public interface ProfesionalRepository extends ReactiveCrudRepository<Profesiona
             @Param("$3") String nombre,
             @Param("$4") String apellido,
             @Param("$5") LocalDate fechaNacimiento,
-            @Param("$6") String idCiudad);
+            @Param("$6") String idRegional);
 
 }

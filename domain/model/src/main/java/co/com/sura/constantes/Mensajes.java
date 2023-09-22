@@ -47,10 +47,21 @@ public enum Mensajes {
     SE_CALCULA_DESPLAZAMIENTO_CITAS_PROFESIONAL(
             "Se ha actualizó desplazamientos en turno de profesional exitosamente"),
     ERROR_CALCULAR_DESPLAZAMIENTO_CITAS_PROFESIONAL(
-            "Se presentó un error y no se pudo actualizar desplazamientos en turno de profesional");
+            "Se presentó un error y no se pudo actualizar desplazamientos en turno de profesional"),
+
+    QSL_EJEMPLO("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos, " +
+            " remision.id_remision, " +
+            " tratamiento.* , " +
+            " cita.fecha_programada " +
+            " FROM paciente " +
+            " INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
+            " INNER JOIN cita ON cita.id_remision = remision.id_remision " +
+            " INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita " +
+            " WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;");
 
 
     private final String value;
+
 
     Mensajes(String value) {
         this.value = value;

@@ -1,7 +1,7 @@
 package co.com.sura.dto.remision;
 
 import co.com.sura.entity.remision.Diagnostico;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +27,8 @@ public class RemisionRequest {
     private String peso;
     private TipoAfiliacionRequest tipoAfiliacion;
     private ProgramaRequest programa;
-    private CiudadRequest ciudad;
+    @JsonProperty("ciudad")
+    private RegionalRequest regional;
     private String tipoAdmision;
     private String institucionRemite;
     private DatosAtencionPacienteRequest datosAtencionPaciente;

@@ -35,8 +35,8 @@ public class CitaData {
     @Column("fecha_programada")
     private LocalDateTime fechaProgramada;
     private String especialidad;
-    @Column("id_ciudad")
-    private String idCiudad;
+    @Column("id_regional")
+    private String idRegional;
     @Column("id_estado")
     private Integer idEstado;
     @Column("id_profesional")

@@ -41,7 +41,6 @@ public class UbicacionData {
     @Column("sin_nomenclatura")
     private Boolean sinNomenclatura;
     private String municipio;
-    @Column("id_ciudad")
-    @JsonIgnore
-    private String idCiudad;
+    @Column("id_regional")
+    private String idRegional;
 }

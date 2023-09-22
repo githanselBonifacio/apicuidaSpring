@@ -24,4 +24,5 @@ public class Ubicacion {
     private String barrio;
     private boolean sinNomenclatura;
     private String municipio;
+    private String idRegional;
 }

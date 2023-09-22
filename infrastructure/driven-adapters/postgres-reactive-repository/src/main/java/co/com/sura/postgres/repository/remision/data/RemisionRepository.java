@@ -1,7 +1,6 @@
 package co.com.sura.postgres.repository.remision.data;
 
 import co.com.sura.entity.remision.Remision;
-import com.google.gson.JsonObject;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -22,9 +21,9 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
 
     @Query("SELECT remision.*, " +
             "CONCAT(paciente.nombres, ' ', paciente.apellidos) as paciente, "+
-            "ciudad.nombre as ciudad "+
+            "regionales.nombre as regional "+
             "FROM public.remision " +
-            "INNER JOIN ciudad ON remision.id_ciudad = ciudad.id_ciudad " +
+            "INNER JOIN regionales ON remision.id_regional = regionales.id_regional " +
             "INNER JOIN paciente ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
             "ORDER BY remision.fecha_admision; " )
     Flux<Remision> findAllRemision();
@@ -43,7 +42,7 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
             "tipo_admision, " +
             "institucion_remite, " +
             "numero_identificacion_paciente," +
-            "id_ciudad) " +
+            "id_regional) " +
             " VALUES " +
             "($1, $2, $3, $4, $5, $6, $7,$8)")
     Mono<Void> insertRemisionQuery(
@@ -54,7 +53,7 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
             @Param("$5") String tipoAdmision,
             @Param("$6") String institucionRemite,
             @Param("$7") String numeroIdentificacionPaciente,
-            @Param("$8") String idCiudad
+            @Param("$8") String idRegional
     );
     default Mono<Void> insertRemision(RemisionData remisionData){
         return insertRemisionQuery(
@@ -65,7 +64,7 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
                 remisionData.getTipoAdmision(),
                 remisionData.getInstitucionRemite(),
                 remisionData.getNumeroIdentificacionPaciente(),
-                remisionData.getIdCiudad()
+                remisionData.getIdRegional()
         );
     }
 

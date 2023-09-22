@@ -54,8 +54,8 @@ public class AgendaController {
     @GetMapping(value = "/profesionalesByTurnoCiudad")
     public Mono<Response<List<Profesional>>> getProfesionalesbyTurnoCiudad(
              @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-             @RequestParam String idCiudad){
-        return agendaUseCase.consultarProfesionalesByTurnoCiudad(fechaTurno, idCiudad)
+             @RequestParam String idRegional){
+        return agendaUseCase.consultarProfesionalesByTurnoCiudad(fechaTurno, idRegional)
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
@@ -76,9 +76,9 @@ public class AgendaController {
     @GetMapping(value = "/profesionalesFromTurnoCiudad")
     public Mono<Response<List<Profesional>>> getProfesionalesfromTurnoCiudad(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam String idCiudad,
+            @RequestParam String idRegional,
             @RequestParam Integer idHorarioTurno){
-        return agendaUseCase.consultarProfesionalesFromTurnoCiudad(fechaTurno, idCiudad, idHorarioTurno)
+        return agendaUseCase.consultarProfesionalesFromTurnoCiudad(fechaTurno, idRegional, idHorarioTurno)
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
@@ -144,8 +144,8 @@ public class AgendaController {
     public Mono<Response<Boolean>> desagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
-            @RequestParam String idCiudad){
-        return agendaUseCase.desagendarTurnoCompleto(fechaTurno, idHorarioTurno,idCiudad)
+            @RequestParam String idRegional){
+        return agendaUseCase.desagendarTurnoCompleto(fechaTurno, idHorarioTurno,idRegional)
                 .map(seDesagendo -> ResponseFactory.createStatus(
                         seDesagendo,
                         StatusCode.STATUS_200.getValue(),
@@ -164,9 +164,9 @@ public class AgendaController {
     public Mono<Response<Boolean>> autoagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
-            @RequestParam String idCiudad
+            @RequestParam String idRegional
     ){
-        return agendaUseCase.autoagendarTurnoCompleto(fechaTurno, idHorarioTurno, idCiudad)
+        return agendaUseCase.autoagendarTurnoCompleto(fechaTurno, idHorarioTurno, idRegional)
                 .map(turnoAutoagendado -> ResponseFactory.createStatus(
                         turnoAutoagendado,
                         StatusCode.STATUS_200.getValue(),
@@ -187,8 +187,8 @@ public class AgendaController {
     public Mono<Response<List<Actividad>>> getActividadesByProfesionalesCiudadHorario(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
-            @RequestParam String idCiudad){
-        return agendaUseCase.consultarActividadesProfesionalesCiudadHorario(fechaTurno,idHorarioTurno,idCiudad)
+            @RequestParam String idRegional){
+        return agendaUseCase.consultarActividadesProfesionalesCiudadHorario(fechaTurno,idHorarioTurno,idRegional)
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
@@ -209,8 +209,8 @@ public class AgendaController {
     public Mono<Response<List<Desplazamiento>>> getDesplazamientoByIdCitaPartida(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
-            @RequestParam String idCiudad ){
-        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idCiudad)
+            @RequestParam String idRegional ){
+        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idRegional)
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
@@ -228,32 +228,9 @@ public class AgendaController {
                 )));
     }
 
-    @GetMapping(value = "/calcularDesplazamientoCitasByprofesional")
-    public Mono<Response<Boolean>> calcularDesplazamientoCitaByProfesional(
-            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam Integer idHorarioTurno,
-            @RequestParam String idCiudad,
-            @RequestParam String idProfesional){
-        return agendaUseCase.calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idCiudad,idProfesional)
-                .map(actividades -> ResponseFactory.createStatus(
-                        actividades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_CALCULA_DESPLAZAMIENTO_CITAS_PROFESIONAL.getValue(),
-                        Mensajes.SE_CALCULA_DESPLAZAMIENTO_CITAS_PROFESIONAL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_CALCULAR_DESPLAZAMIENTO_CITAS_PROFESIONAL.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-
     @GetMapping(value = "/profesionales/{idCiudad}")
-    public Mono<Response<List<Profesional>>> getProfesionalesByCiudad(@PathVariable String idCiudad){
-        return agendaUseCase.consultarProfesionalesByCiudad(idCiudad)
+    public Mono<Response<List<Profesional>>> getProfesionalesByCiudad(@PathVariable String idRegional){
+        return agendaUseCase.consultarProfesionalesByCiudad(idRegional)
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
@@ -287,8 +264,8 @@ public class AgendaController {
     public Mono<Response<List<Cita>>> getCitasByTurnoCiudad(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
-            @RequestParam String idCiudad) {
-        return agendaUseCase.consultarCitasByTurnoCiudad(fechaTurno,idHorarioTurno, idCiudad)
+            @RequestParam String idRegional) {
+        return agendaUseCase.consultarCitasByTurnoCiudad(fechaTurno,idHorarioTurno, idRegional)
                 .collectList()
                 .map(citas -> ResponseFactory.createStatus(
                         citas,
@@ -310,7 +287,11 @@ public class AgendaController {
     public Mono<Response<Boolean>> reprogramarCita(
             @RequestParam("fechaProgramada")  String fechaProgramada,
             @RequestParam String idCita,
-            @RequestParam String nuevaHora) {
+            @RequestParam String nuevaHora,
+            @RequestParam String idProfesional,
+            @RequestParam ("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idRegional) {
 
         var hora = nuevaHora.split(":");
 
@@ -318,7 +299,8 @@ public class AgendaController {
         var localDateTime = LocalDateTime.parse(fechaProgramada, formatter)
                 .withHour(Integer.parseInt(hora[0])).withMinute(Integer.parseInt(hora[1]));
 
-        return agendaUseCase.reprogramarCitaById(localDateTime,idCita)
+        return agendaUseCase.reprogramarCitaById(
+                localDateTime,idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional)
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
                         StatusCode.STATUS_200.getValue(),
@@ -338,8 +320,13 @@ public class AgendaController {
 
     @GetMapping(value = "/asignarProfesionalCita")
     public Mono<Response<Boolean>> asignarProfesionalCita(
-            @RequestParam String idCita,@RequestParam String idProfesional) {
-        return agendaUseCase.asignarProfesionaCita(idCita,idProfesional)
+            @RequestParam String idCita,
+            @RequestParam String idProfesional,
+            @RequestParam ("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idRegional
+    ) {
+        return agendaUseCase.asignarProfesionaCita(idCita, idProfesional, fechaTurno, idHorarioTurno, idRegional)
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
                         StatusCode.STATUS_200.getValue(),
@@ -357,8 +344,13 @@ public class AgendaController {
 
     }
     @GetMapping(value = "/desasignarProfesionalCita")
-    public Mono<Response<Boolean>> desasignarProfesionalCita(@RequestParam String idCita) {
-        return agendaUseCase.desasignarProfesionaCita(idCita)
+    public Mono<Response<Boolean>> desasignarProfesionalCita(
+            @RequestParam String idCita,
+            @RequestParam String idProfesional,
+            @RequestParam ("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
+            @RequestParam Integer idHorarioTurno,
+            @RequestParam String idRegional) {
+        return agendaUseCase.desasignarProfesionaCita(idCita, idProfesional, fechaTurno, idHorarioTurno, idRegional)
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
                         StatusCode.STATUS_200.getValue(),

@@ -28,7 +28,7 @@ public class ProfesionalData {
     @Column("fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
-    @Column("id_ciudad")
-    private String idCiudad;
+    @Column("id_regional")
+    private String idRegional;
     private boolean activo;
 }

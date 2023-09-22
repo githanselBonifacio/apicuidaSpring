@@ -24,7 +24,10 @@ public class Cita {
     private Double longitud;
     private String especialidad;
     private Integer idEstado;
-    private String idCiudad;
+    private String idRegional;
     private String idProfesional;
     private String idConductor;
+    private String paciente;
+    private String numeroIdentificacionPaciente;
+    private String tipoIdentificacionPaciente;
 }

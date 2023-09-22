@@ -16,11 +16,11 @@ public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<Tu
             "WHERE public.turno_profesional.fecha_turno = $1 " +
             "AND public.turno_profesional.id_horario_turno = $2 " +
             "AND public.profesionales.activo= true " +
-            "AND public.profesionales.id_ciudad= $3;")
+            "AND public.profesionales.id_regional= $3;")
     Flux<ProfesionalData> findTurnoProfesionalByCiudadHorario(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
-            String idCiudad
+            String idRegional
     );
 
     @Query("DELETE FROM public.turno_profesional " +
@@ -30,6 +30,6 @@ public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<Tu
     Mono<Void> deleteByFechaTurnoIdHorarioProfesional(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
-            String idCiudad
+            String idRegional
     );
 }
