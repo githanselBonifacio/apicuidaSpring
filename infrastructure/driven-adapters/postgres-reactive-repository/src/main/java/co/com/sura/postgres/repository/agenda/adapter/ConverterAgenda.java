@@ -44,6 +44,13 @@ public class ConverterAgenda extends Converter {
                 convertirObjetoAJson(profesionalData), Profesional.class
         );
     }
+
+    public static ProfesionalData convertToProfesionalData(Profesional profesional){
+        return deserializarJson(
+                convertirObjetoAJson(profesional), ProfesionalData.class
+        );
+    }
+
     public static Actividad convertToActividad(ProfesionalData profesionalData){
         return new Actividad()
                 .toBuilder()
@@ -75,12 +82,6 @@ public class ConverterAgenda extends Converter {
                 .duracion(desplazamientoData.getDuracion())
                 .holgura(desplazamientoData.getHolgura())
                 .build();
-    }
-
-    public static ProfesionalData convertToProfesionalData(Profesional profesional){
-        return deserializarJson(
-                convertirObjetoAJson(profesional), ProfesionalData.class
-        );
     }
 
     public static Cita convertToCita(CitaData citaData){

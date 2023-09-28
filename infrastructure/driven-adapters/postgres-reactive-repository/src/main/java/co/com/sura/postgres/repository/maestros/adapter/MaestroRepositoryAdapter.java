@@ -1,14 +1,7 @@
 package co.com.sura.postgres.repository.maestros.adapter;
 
-import co.com.sura.entity.maestro.Regional;
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.maestro.TipoIdentificacion;
-import co.com.sura.entity.maestro.EstadoCita;
-import co.com.sura.entity.maestro.MaestroRepository;
-import co.com.sura.postgres.repository.maestros.data.RegionalesRepository;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
-import co.com.sura.postgres.repository.maestros.data.TipoIdentificacionRepository;
-import co.com.sura.postgres.repository.maestros.data.EstadoCitaRepository;
+import co.com.sura.entity.maestro.*;
+import co.com.sura.postgres.repository.maestros.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -22,15 +15,16 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     private final HorarioTurnoRepository horarioTurnoRepository;
     private final TipoIdentificacionRepository tipoIdentificacionRepository;
     private final EstadoCitaRepository estadoCitaRepository;
-
+    private final ProfesionRepository profesionRepository;
     @Autowired
     public MaestroRepositoryAdapter(RegionalesRepository ciudadRepository, HorarioTurnoRepository horarioTurnoRepository,
                                     TipoIdentificacionRepository tipoIdentificacionRepository,
-                                    EstadoCitaRepository estadoCitaRepository){
+                                    EstadoCitaRepository estadoCitaRepository, ProfesionRepository profesionRepository){
         this.ciudadRepository = ciudadRepository;
         this.horarioTurnoRepository = horarioTurnoRepository;
         this.tipoIdentificacionRepository = tipoIdentificacionRepository;
         this.estadoCitaRepository = estadoCitaRepository;
+        this.profesionRepository = profesionRepository;
     }
 
     @Override
@@ -74,5 +68,11 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     public Flux<EstadoCita> consultarEstadosCita() {
         return estadoCitaRepository.findAll()
                 .map(ConverterMaestros ::convertToEstadoCita);
+    }
+
+    @Override
+    public Flux<Profesion> consultarProfesiones() {
+        return profesionRepository.findAll()
+                .map(ConverterMaestros::converToProfesionData);
     }
 }

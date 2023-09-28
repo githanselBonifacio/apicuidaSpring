@@ -95,6 +95,51 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    @GetMapping(value = "/profesionales/{idCiudad}")
+    public Mono<Response<List<Profesional>>> getProfesionalesByCiudad(@PathVariable String idRegional){
+        return agendaUseCase.consultarProfesionalesByCiudad(idRegional)
+                .collectList()
+                .map(actividades -> ResponseFactory.createStatus(
+                        actividades,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
+
+    @PostMapping(value = "/crearProfesional")
+    public Mono<Response<Profesional>> crearProfesional(@RequestBody Profesional profesional) {
+        return agendaUseCase.crearProfesional(profesional)
+                .map(profesionalCreado -> ResponseFactory.createStatus(
+                        profesionalCreado,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.SE_CREA_PROFESIONAL.getValue(),
+                        Mensajes.SE_CREA_PROFESIONAL.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.ERROR_CREAR_PROFESIONAL.getValue(),
+                        Mensajes.ERROR_CREAR_PROFESIONAL.getValue(),
+                        e.getMessage()
+                )));
+
+    }
+
+    @PutMapping(value = "/actualizarProfesional")
+    public Mono<Profesional> actualizarProfesional(@RequestBody Profesional profesional) {
+        return agendaUseCase.actualizarProfesional(profesional);
+
+    }
 
     @GetMapping(value = "/asignarProfesionalTurno")
     public Mono<Response<Boolean>> asignarProfesionalTurno(
@@ -139,7 +184,7 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
-
+    //turno
     @GetMapping(value = "/desagendarTurnoCompleto")
     public Mono<Response<Boolean>> desagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -182,7 +227,7 @@ public class AgendaController {
                 )))
                 .timeout(Duration.ofSeconds(TIMEOUT));
     }
-
+   //actividades
     @GetMapping(value = "/actividadesByprofesionalesCiudadHorario")
     public Mono<Response<List<Actividad>>> getActividadesByProfesionalesCiudadHorario(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -226,38 +271,6 @@ public class AgendaController {
                         Mensajes.PETICION_FALLIDA.getValue(),
                         e.getMessage()
                 )));
-    }
-
-    @GetMapping(value = "/profesionales/{idCiudad}")
-    public Mono<Response<List<Profesional>>> getProfesionalesByCiudad(@PathVariable String idRegional){
-        return agendaUseCase.consultarProfesionalesByCiudad(idRegional)
-                .collectList()
-                .map(actividades -> ResponseFactory.createStatus(
-                        actividades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-
-    @PostMapping(value = "/crearProfesional")
-    public Mono<Profesional> crearProfesional(@RequestBody Profesional profesional) {
-        return agendaUseCase.crearProfesional(profesional);
-
-    }
-
-    @PutMapping(value = "/actualizarProfesional")
-    public Mono<Profesional> actualizarProfesional(@RequestBody Profesional profesional) {
-        return agendaUseCase.actualizarProfesional(profesional);
-
     }
 
     @GetMapping(value = "/citas")

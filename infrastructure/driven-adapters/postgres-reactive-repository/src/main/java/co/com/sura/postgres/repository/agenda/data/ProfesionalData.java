@@ -18,13 +18,25 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "profesionales")
 public class ProfesionalData {
-    @Id
+
     @Column("numero_identificacion")
+    @Id
     private String numeroIdentificacion;
+
     @Column("id_tipo_identificacion")
     private Integer idTipoIdentificacion;
+
     private String nombres;
     private String apellidos;
+    private String email;
+    private String telefono;
+    private String celular;
+    private String direccion;
+    private String genero;
+
+    @Column(value = "id_profesion")
+    private Integer idProfesion;
+
     @Column("fecha_nacimiento")
     private LocalDate fechaNacimiento;
 

@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static co.com.sura.autoagendador.IdRegional.getByIdCiudad;
+import static co.com.sura.constantes.Mensajes.PROFESIONAL_YA_EXISTE;
+import static co.com.sura.constantes.Mensajes.REMISION_NO_EXISTENTE;
 import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.crearDesplazamientoData;
 
 @Repository
@@ -186,20 +188,25 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Mono<Profesional> crearProfesional(Profesional profesional) {
-        return profesionalRepository.insertProfesional(
-                profesional.getNumeroIdentificacion(),
-                profesional.getIdTipoIdentificacion(),
-                profesional.getNombres(),
-                profesional.getApellidos(),
-                profesional.getFechaNacimiento(),
-                profesional.getIdRegional()
-        );
+
+        return profesionalRepository.existsById(profesional.getNumeroIdentificacion())
+                .flatMap(exist ->  {
+                    if (Boolean.TRUE.equals(exist)) {
+                        return Mono.error(new Throwable(PROFESIONAL_YA_EXISTE.getValue()));
+                    }
+                    return profesionalRepository.insertProfesional(profesional);
+                })
+                .then(Mono.just(profesional));
+
+
     }
 
     @Override
     public Mono<Profesional> actualizarProfesional(Profesional profesional) {
-        return profesionalRepository.save(ConverterAgenda.convertToProfesionalData(profesional))
-                .map(ConverterAgenda :: convertToProfesional);
+        return Mono.just(profesional)
+                .map(ConverterAgenda::convertToProfesionalData)
+                .flatMap(profesionalRepository::save)
+                .then(Mono.just(profesional));
     }
 
     @Override

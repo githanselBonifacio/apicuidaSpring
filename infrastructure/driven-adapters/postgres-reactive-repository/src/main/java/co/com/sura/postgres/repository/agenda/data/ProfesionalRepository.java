@@ -45,15 +45,47 @@ public interface ProfesionalRepository extends ReactiveCrudRepository<Profesiona
             @Param("$3") Integer idHorarioTurno
     );
 
-    @Query("INSERT INTO profesionales " +
-            "(numero_identificacion, id_tipo_identificacion, nombre, apellido, fecha_nacimiento, id_regional)" +
-            " VALUES ($1, $2,$3, $4,$5, $6)")
-    Mono<Profesional> insertProfesional(
+    @Query("INSERT INTO public.profesionales( " +
+            " numero_identificacion, " +
+            " id_tipo_identificacion, " +
+            " nombres, apellidos, " +
+            " fecha_nacimiento, " +
+            " id_regional, activo, " +
+            " genero, direccion, " +
+            " email, celular, " +
+            " telefono, id_profesion) " +
+            " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);")
+    Mono<Void> insertQueryProfesional(
             @Param("$1") String numeroIdentificacion,
             @Param("$2") Integer idTipoIdentificacion,
-            @Param("$3") String nombre,
-            @Param("$4") String apellido,
+            @Param("$3") String nombres,
+            @Param("$4") String apellidos,
             @Param("$5") LocalDate fechaNacimiento,
-            @Param("$6") String idRegional);
+            @Param("$6") String idRegional,
+            @Param("$7") boolean activo,
+            @Param("$8") String genero,
+            @Param("$9") String direccion,
+            @Param("$10") String email,
+            @Param("$11") String celular,
+            @Param("$12") String telefono,
+            @Param("$13") Integer idProfesional);
+
+  default Mono<Void> insertProfesional (Profesional Profesional){
+      return insertQueryProfesional(
+                Profesional.getNumeroIdentificacion(),
+                Profesional.getIdTipoIdentificacion(),
+                Profesional.getNombres(),
+                Profesional.getApellidos(),
+                Profesional.getFechaNacimiento(),
+                Profesional.getIdRegional(),
+                Profesional.isActivo(),
+                Profesional.getGenero(),
+                Profesional.getDireccion(),
+                Profesional.getEmail(),
+                Profesional.getCelular(),
+                Profesional.getTelefono(),
+                Profesional.getIdProfesion()
+        );
+    }
 
 }

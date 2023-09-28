@@ -32,4 +32,9 @@ public class ConverterMaestros  extends Converter {
                 convertirObjetoAJson(estadoCitaData), EstadoCita.class
         );
     }
+    public static Profesion converToProfesionData(ProfesionData profesionData){
+        return deserializarJson(
+                convertirObjetoAJson(profesionData),Profesion.class
+        );
+    }
 }

@@ -18,7 +18,7 @@ public class Remision {
     private String paciente;
     private LocalDate fechaAdmision;
     private String programa;
-    private String ciudad;
+    private String regional;
     private String tipoAdmision;
     private String institucionRemite;
 }

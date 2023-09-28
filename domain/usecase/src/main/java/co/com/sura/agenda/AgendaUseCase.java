@@ -65,12 +65,6 @@ public class AgendaUseCase implements AgendaFactory {
         return agendaRepository.consultarDesplazamientoByCitaPartida(
                 fechaProgramada,idHorarioTurno,idCiudad);
     }
-    public Mono<Boolean> calcularDesplazamientoCitaByProfesional(
-            LocalDate fechaProgramada, Integer idHorarioTurno, String idRegional, String idProfesional){
-        return agendaRepository.calcularDesplazamientoCitaByProfesional(
-                fechaProgramada,idHorarioTurno,idRegional,idProfesional
-        );
-    }
 
     public Mono<Profesional> crearProfesional(Profesional profesional) {
         return agendaRepository.crearProfesional(profesional);

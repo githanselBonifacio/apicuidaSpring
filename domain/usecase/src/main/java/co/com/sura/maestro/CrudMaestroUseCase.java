@@ -38,4 +38,7 @@ public class CrudMaestroUseCase implements MaestroFactory {
 
 
     public Flux<EstadoCita> consultarEstadosCita(){return  maestroRepository.consultarEstadosCita();}
+
+    //profesiones
+    public Flux<Profesion> consultarProfesiones(){return  maestroRepository.consultarProfesiones();}
 }

@@ -20,4 +20,7 @@ public interface MaestroRepository {
     //estado citas
     Flux<EstadoCita> consultarEstadosCita();
 
+    //profesiones
+    Flux<Profesion> consultarProfesiones();
+
 }

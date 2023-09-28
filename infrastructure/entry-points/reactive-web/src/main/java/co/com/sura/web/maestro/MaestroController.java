@@ -159,4 +159,25 @@ public class MaestroController {
                         e.getMessage()
                 )));
     }
+
+    //profesiones
+    @GetMapping("profesiones")
+    public Mono<Response<List<Profesion>>> consultarProfesiones(){
+        return crudMaestroUseCase.consultarProfesiones()
+                .collectList()
+                .map(estadosCitas -> ResponseFactory.createStatus(
+                        estadosCitas,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
 }
