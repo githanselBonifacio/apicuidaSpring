@@ -73,6 +73,10 @@ public class AgendaUseCase implements AgendaFactory {
         return agendaRepository.actualizarProfesional(profesional);
     }
 
+    public  Flux<Conductor> consultarConductores(){
+        return agendaRepository.consultarConductores();
+    }
+
     public Flux<Cita> consultarCitasByTurnoCiudad (LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad){
         return agendaRepository.consultarCitasByTurnoCiudad(fechaTurno, idHorarioTurno, idCiudad);
     }

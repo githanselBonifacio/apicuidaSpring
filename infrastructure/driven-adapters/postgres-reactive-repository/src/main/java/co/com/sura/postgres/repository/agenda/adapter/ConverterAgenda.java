@@ -3,6 +3,7 @@ package co.com.sura.postgres.repository.agenda.adapter;
 
 import co.com.sura.autoagendador.CitaGenetic;
 import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.Conductor;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.agenda.Tarea;
@@ -18,6 +19,7 @@ import co.com.sura.entity.remision.Secrecion;
 import co.com.sura.entity.remision.Medicamento;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
+import co.com.sura.postgres.repository.agenda.data.ConductorData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
 import co.com.sura.postgres.repository.remision.data.TratamientoData;
@@ -50,7 +52,22 @@ public class ConverterAgenda extends Converter {
                 convertirObjetoAJson(profesional), ProfesionalData.class
         );
     }
-
+    public  static Conductor converToConductor(ConductorData conductorData){
+        return Conductor.builder()
+                .idTipoIdentificacion(conductorData.getIdTipoIdentificacion())
+                .numeroIdentificacion(conductorData.getNumeroIdentificacion())
+                .nombres(conductorData.getNombres())
+                .apellidos(conductorData.getApellidos())
+                .direccion(conductorData.getDireccion())
+                .email(conductorData.getEmail())
+                .celular(conductorData.getCelular())
+                .telefono(conductorData.getTelefono())
+                .fechaNacimiento(conductorData.getFechaNacimiento())
+                .genero(conductorData.getGenero())
+                .idRegional(conductorData.getIdRegional())
+                .activo(conductorData.getActivo())
+                .build();
+    }
     public static Actividad convertToActividad(ProfesionalData profesionalData){
         return new Actividad()
                 .toBuilder()

@@ -6,19 +6,11 @@ import co.com.sura.autoagendador.AutoAgendador;
 
 import co.com.sura.autoagendador.OrigenRegional;
 import co.com.sura.autoagendador.Resultado;
-import co.com.sura.entity.agenda.AgendaRepository;
-import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.entity.agenda.*;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.agenda.Actividad;
-import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.remision.*;
-import co.com.sura.postgres.repository.agenda.data.CitaData;
+import co.com.sura.postgres.repository.agenda.data.*;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
-import co.com.sura.postgres.repository.agenda.data.CitaRepository;
-import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
-import co.com.sura.postgres.repository.agenda.data.TurnoProfesionalesData;
-import co.com.sura.postgres.repository.agenda.data.ProfesionalRepository;
-import co.com.sura.postgres.repository.agenda.data.TurnoProfesionalesRepository;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.repository.remision.data.TomaMuestraRepository;
 import co.com.sura.postgres.repository.remision.data.CanalizacionRepository;
@@ -40,8 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static co.com.sura.autoagendador.IdRegional.getByIdCiudad;
-import static co.com.sura.constantes.Mensajes.PROFESIONAL_YA_EXISTE;
-import static co.com.sura.constantes.Mensajes.REMISION_NO_EXISTENTE;
+import static co.com.sura.constantes.Mensajes.*;
 import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.crearDesplazamientoData;
 
 @Repository
@@ -69,6 +60,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private final SondajeRepository sondajeRepository;
     private final SoporteNutricionalRepository soporteNutricionalRepository;
     private final TomaMuestraRepository tomaMuestraRepository;
+    private final ConductorRepository conductorRepository;
 
     @Autowired
     public AgendaRepositoryAdapter(
@@ -78,7 +70,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             CuracionRepository curacionRepository, CanalizacionRepository canalizacionRepository,
             FototerapiaRepository fototerapiaRepository, SecrecionRepository secrecionRepository,
             SondajeRepository sondajeRepository, SoporteNutricionalRepository soporteNutricionalRepository,
-            TomaMuestraRepository tomaMuestraRepository) {
+            TomaMuestraRepository tomaMuestraRepository, ConductorRepository conductorRepository) {
 
         this.mapboxService = mapboxService;
         this.turnoProfesionalesRepository = turnoProfesionalesRepository;
@@ -93,6 +85,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         this.sondajeRepository = sondajeRepository;
         this.soporteNutricionalRepository = soporteNutricionalRepository;
         this.tomaMuestraRepository = tomaMuestraRepository;
+        this.conductorRepository = conductorRepository;
     }
 
     @Override
@@ -196,7 +189,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                     }
                     return profesionalRepository.insertProfesional(profesional);
                 })
-                .then(Mono.just(profesional));
+                .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
+                .map(ConverterAgenda::convertToProfesional);
 
 
     }
@@ -204,9 +198,46 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     @Override
     public Mono<Profesional> actualizarProfesional(Profesional profesional) {
         return Mono.just(profesional)
-                .map(ConverterAgenda::convertToProfesionalData)
-                .flatMap(profesionalRepository::save)
-                .then(Mono.just(profesional));
+                .then(profesionalRepository.existsById(profesional.getNumeroIdentificacion()))
+                .flatMap(exist ->{
+                    if (Boolean.FALSE.equals(exist)) {
+                        return Mono.error(new Throwable(PROFESIONAL_NO_EXISTE.getValue()));
+                    }
+                    return profesionalRepository.save(ConverterAgenda.convertToProfesionalData(profesional));
+                })
+                .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
+                .map(ConverterAgenda::convertToProfesional);
+    }
+
+    @Override
+    public Mono<Conductor> crearConductor(Conductor profesional) {
+        return null;
+    }
+
+    @Override
+    public Mono<Conductor> actualizarConductor(Conductor profesional) {
+        return null;
+    }
+
+    @Override
+    public Flux<Conductor> consultarConductores() {
+        return conductorRepository.findAll()
+                .map(ConverterAgenda::converToConductor);
+    }
+
+    @Override
+    public Mono<Movil> crearMovil(Movil movil) {
+        return null;
+    }
+
+    @Override
+    public Mono<Movil> actualizarMovil(Movil movil) {
+        return null;
+    }
+
+    @Override
+    public Flux<Conductor> consultarMovilIdRegional(String idRegional) {
+        return null;
     }
 
     @Override

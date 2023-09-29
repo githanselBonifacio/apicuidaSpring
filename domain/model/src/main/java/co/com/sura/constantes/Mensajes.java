@@ -51,8 +51,11 @@ public enum Mensajes {
 
    //profesionales
     PROFESIONAL_YA_EXISTE("Error al crear profesional, ya existe profesional"),
+    PROFESIONAL_NO_EXISTE("Error al actualizar, el profesional no existe profesional"),
     SE_CREA_PROFESIONAL("Se ha creado profesional exitoxamente !!"),
-    ERROR_CREAR_PROFESIONAL("Error al crear al profesional");
+    SE_ACTUALIZA_PROFESIONAL("Se ha actualizado profesional exitoxamente !!"),
+    ERROR_CREAR_PROFESIONAL("Error al crear al profesional"),
+    ERROR_ACTTUALIZAR_PROFESIONAL("Error al actualizar profesional");
 
 
     private final String value;

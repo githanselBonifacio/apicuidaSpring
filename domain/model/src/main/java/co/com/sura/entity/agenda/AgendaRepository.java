@@ -25,9 +25,20 @@ public interface AgendaRepository {
                             Integer idHorarioTurno,
                             String idRegional
                          );
-
+    //profesionales
     Mono<Profesional>    crearProfesional(Profesional profesional);
     Mono<Profesional>    actualizarProfesional(Profesional profesional);
+
+
+    //conductores
+    Mono<Conductor>    crearConductor(Conductor profesional);
+    Mono<Conductor>    actualizarConductor(Conductor profesional);
+    Flux<Conductor>    consultarConductores();
+
+    //moviles
+    Mono<Movil>         crearMovil(Movil movil);
+    Mono<Movil>         actualizarMovil(Movil movil);
+    Flux<Conductor>     consultarMovilIdRegional(String idRegional);
 
     //citas
     Flux<Cita>           consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);

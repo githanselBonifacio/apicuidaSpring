@@ -4,6 +4,7 @@ import co.com.sura.agenda.AgendaUseCase;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
 import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.Conductor;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.remision.*;
@@ -12,7 +13,6 @@ import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -129,15 +129,29 @@ public class AgendaController {
                         null,
                         StatusCode.STATUS_500.getValue(),
                         Mensajes.ERROR_CREAR_PROFESIONAL.getValue(),
-                        Mensajes.ERROR_CREAR_PROFESIONAL.getValue(),
+                        e.getMessage(),
                         e.getMessage()
                 )));
 
     }
 
     @PutMapping(value = "/actualizarProfesional")
-    public Mono<Profesional> actualizarProfesional(@RequestBody Profesional profesional) {
-        return agendaUseCase.actualizarProfesional(profesional);
+    public Mono<Response<Profesional>> actualizarProfesional(@RequestBody Profesional profesional) {
+        return agendaUseCase.actualizarProfesional(profesional)
+                .map(profesionalCreado -> ResponseFactory.createStatus(
+                        profesionalCreado,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.SE_ACTUALIZA_PROFESIONAL.getValue(),
+                        Mensajes.SE_ACTUALIZA_PROFESIONAL.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.ERROR_ACTTUALIZAR_PROFESIONAL.getValue(),
+                        e.getMessage(),
+                        e.getMessage()
+                )));
 
     }
 
@@ -180,6 +194,26 @@ public class AgendaController {
                         null,
                         StatusCode.STATUS_500.getValue(),
                         Mensajes.NO_DESASIGNO_PROFESIONAL_TURNO.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
+    //conductores
+    @GetMapping(value = "/conductores")
+    public Mono<Response<List<Conductor>>> getConductores(){
+        return agendaUseCase.consultarConductores()
+                .collectList()
+                .map(profesionales -> ResponseFactory.createStatus(
+                        profesionales,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
                         Mensajes.PETICION_FALLIDA.getValue(),
                         e.getMessage()
                 )));
