@@ -61,6 +61,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private final SoporteNutricionalRepository soporteNutricionalRepository;
     private final TomaMuestraRepository tomaMuestraRepository;
     private final ConductorRepository conductorRepository;
+    private final MovilRepository movilRepository;
 
     @Autowired
     public AgendaRepositoryAdapter(
@@ -70,7 +71,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             CuracionRepository curacionRepository, CanalizacionRepository canalizacionRepository,
             FototerapiaRepository fototerapiaRepository, SecrecionRepository secrecionRepository,
             SondajeRepository sondajeRepository, SoporteNutricionalRepository soporteNutricionalRepository,
-            TomaMuestraRepository tomaMuestraRepository, ConductorRepository conductorRepository) {
+            TomaMuestraRepository tomaMuestraRepository, ConductorRepository conductorRepository,
+            MovilRepository movilRepository) {
 
         this.mapboxService = mapboxService;
         this.turnoProfesionalesRepository = turnoProfesionalesRepository;
@@ -86,6 +88,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         this.soporteNutricionalRepository = soporteNutricionalRepository;
         this.tomaMuestraRepository = tomaMuestraRepository;
         this.conductorRepository = conductorRepository;
+        this.movilRepository = movilRepository;
     }
 
     @Override
@@ -210,13 +213,32 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Mono<Conductor> crearConductor(Conductor profesional) {
-        return null;
+    public Mono<Conductor> crearConductor(Conductor conductor) {
+
+        return  conductorRepository.existsById(conductor.getNumeroIdentificacion())
+                .flatMap(exist ->  {
+                    if (Boolean.TRUE.equals(exist)) {
+                        return Mono.error(new Throwable(CONDUCTOR_YA_EXISTE.getValue()));
+                    }
+                    return conductorRepository.insertConductor(conductor);
+                })
+                .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
+                .map(ConverterAgenda::converToConductor);
     }
 
     @Override
-    public Mono<Conductor> actualizarConductor(Conductor profesional) {
-        return null;
+    public Mono<Conductor> actualizarConductor(Conductor conductor) {
+        System.out.println(conductor.getNumeroIdentificacion());
+        return Mono.just(conductor)
+                .then(conductorRepository.existsById(conductor.getNumeroIdentificacion()))
+                .flatMap(exist ->{
+                    if (Boolean.FALSE.equals(exist)) {
+                        return Mono.error(new Throwable(CONDUCTOR_NO_EXISTE.getValue()));
+                    }
+                    return conductorRepository.save(ConverterAgenda.converToConductorData(conductor));
+                })
+                .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
+                .map(ConverterAgenda::converToConductor);
     }
 
     @Override
@@ -234,10 +256,20 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     public Mono<Movil> actualizarMovil(Movil movil) {
         return null;
     }
-
     @Override
-    public Flux<Conductor> consultarMovilIdRegional(String idRegional) {
-        return null;
+    public Flux<Movil> consultarMoviles() {
+        return movilRepository.findAll()
+                .map(ConverterAgenda::convertToMovil);
+    }
+    @Override
+    public Flux<Movil> consultarMovilesSinConductor() {
+        return movilRepository.findAllWithoutConductor()
+                .map(ConverterAgenda::convertToMovil);
+    }
+    @Override
+    public Flux<Movil> consultarMovilesByIdRegional(String idRegional) {
+        return movilRepository.findByIdRegional(idRegional)
+                .map(ConverterAgenda::convertToMovil);
     }
 
     @Override

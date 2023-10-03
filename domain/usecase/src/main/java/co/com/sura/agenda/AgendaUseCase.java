@@ -77,6 +77,20 @@ public class AgendaUseCase implements AgendaFactory {
         return agendaRepository.consultarConductores();
     }
 
+    public Mono<Conductor> crearConductor(Conductor conductor){return agendaRepository.crearConductor(conductor);}
+    public Mono<Conductor> actualizarConductor(Conductor conductor){
+        return agendaRepository.actualizarConductor(conductor);}
+
+    public Flux<Movil> consultarMoviles(){
+        return agendaRepository.consultarMoviles();
+    }
+    public Flux<Movil> consultarMovilesSinConductor(){
+        return agendaRepository.consultarMovilesSinConductor();
+    }
+    public Flux<Movil> consultarMovilesByIdRegional(String idRegional){
+        return agendaRepository.consultarMovilesByIdRegional(idRegional);
+    }
+
     public Flux<Cita> consultarCitasByTurnoCiudad (LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad){
         return agendaRepository.consultarCitasByTurnoCiudad(fechaTurno, idHorarioTurno, idCiudad);
     }

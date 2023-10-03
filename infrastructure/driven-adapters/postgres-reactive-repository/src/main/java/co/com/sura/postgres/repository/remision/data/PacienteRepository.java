@@ -13,18 +13,18 @@ import java.time.LocalDate;
 
 public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,String> {
 
-    @Query("SELECT public.paciente.*, to_json(public.ubicacion.*) as id_ubicacion " +
-            "FROM public.remision " +
-            "INNER JOIN public.paciente ON public.paciente.numero_identificacion = " +
-            "public.remision.numero_identificacion_paciente " +
-            "INNER JOIN public.ubicacion ON public.paciente.id_ubicacion = public.ubicacion.id_ubicacion " +
-            "WHERE public.remision.id_remision = $1;")
+    @Query("SELECT public.pacientes.*, to_json(public.ubicaciones.*) as id_ubicaciones " +
+            "FROM public.remisiones " +
+            "INNER JOIN public.pacientes ON public.pacientes.numero_identificacion = " +
+            "public.remisiones.numero_identificacion_paciente " +
+            "INNER JOIN public.ubicaciones ON public.pacientes.id_ubicacion = public.ubicaciones.id_ubicacion " +
+            "WHERE public.remisiones.id_remision = $1;")
     Mono<PacienteData> findPacienteByNumeroIdRemision(String idRemision);
 
     @Override
     Mono<Boolean> existsById(String numeroIdentificacion);
 
-    @Query("INSERT INTO paciente( " +
+    @Query("INSERT INTO pacientes( " +
             " numero_identificacion," +
             " tipo_identificacion," +
             " nombre," +
@@ -67,56 +67,60 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
                 pacienteData.getIdUbicacion()
         );
     }
-    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos,  " +
-            "remision.id_remision, "+
-            "tratamiento.* , " +
-            "cita.fecha_programada " +
-            "FROM paciente " +
-            "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
-            "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
-            "INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita "+
-            "WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
+    @Query("SELECT pacientes.numero_identificacion, " +
+            "pacientes.tipo_identificacion,pacientes.nombres,pacientes.apellidos, " +
+            "remisiones.id_remision, "+
+            "tratamientos.* , " +
+            "citas.fecha_programada " +
+            "FROM pacientes " +
+            "INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
+            "INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
+            "INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita "+
+            "WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllTratamientosPacientes();
 
 
-    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos, " +
-            "remision.id_remision, "+
-            "soporte_nutricional.* , " +
-            "cita.fecha_programada " +
-            "FROM paciente " +
-            "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
-            "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
-            "INNER JOIN soporte_nutricional ON soporte_nutricional.id_cita = cita.id_cita "+
-            "WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
+    @Query("SELECT pacientes.numero_identificacion, " +
+            "pacientes.tipo_identificacion,pacientes.nombres,pacientes.apellidos, " +
+            "remisiones.id_remision, "+
+            "soporte_nutricionales.* , " +
+            "citas.fecha_programada " +
+            "FROM pacientes " +
+            "INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
+            "INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
+            "INNER JOIN soporte_nutricionales ON soporte_nutricionales.id_cita = citas.id_cita "+
+            "WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientes();
 
-    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos,  " +
-            "remision.id_remision, "+
-            "tratamiento.* , " +
-            "cita.fecha_programada " +
-            "FROM paciente " +
-            "INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
-            "INNER JOIN cita ON cita.id_remision = remision.id_remision " +
-            "INNER JOIN turno_cita ON turno_cita.id_cita = cita.id_cita " +
+    @Query("SELECT pacientes.numero_identificacion,pacientes.tipo_identificacion, " +
+            "pacientes.nombres,pacientes.apellidos,  " +
+            "remisiones.id_remision, "+
+            "tratamientos.* , " +
+            "citas.fecha_programada " +
+            "FROM pacientes " +
+            "INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
+            "INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
+            "INNER JOIN turno_cita ON turno_cita.id_cita = citas.id_cita " +
             "and turno_cita.fecha_turno = $1 and turno_cita.id_horario_turno= $2 "+
-            "INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita and cita.id_regional = $3 "+
-            "WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
+            "INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $3 "+
+            "WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllTratamientosPacientesByTurnoRegionalHorario(
             LocalDate turno,Integer idHorario, String idRegional);
 
 
-    @Query("SELECT paciente.numero_identificacion,paciente.tipo_identificacion,paciente.nombres,paciente.apellidos, " +
-            " remision.id_remision, " +
-            " soporte_nutricional.* , " +
-            " cita.fecha_programada " +
-            " FROM paciente" +
-            " INNER JOIN remision ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
-            " INNER JOIN cita ON cita.id_remision = remision.id_remision " +
-            " INNER JOIN turno_cita ON turno_cita.id_cita = cita.id_cita " +
+    @Query("SELECT pacientes.numero_identificacion,pacientes.tipo_identificacion, " +
+            "pacientes.nombres,pacientes.apellidos, " +
+            " remisiones.id_remision, " +
+            " soporte_nutricionales.* , " +
+            " citas.fecha_programada " +
+            " FROM pacientes" +
+            " INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
+            " INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
+            " INNER JOIN turno_cita ON turno_cita.id_cita = citas.id_cita " +
             " and turno_cita.fecha_turno = $1 and turno_cita.id_horario_turno= $2 "+
-            " INNER JOIN tratamiento ON tratamiento.id_cita = cita.id_cita and cita.id_regional = $3 "+
-            " INNER JOIN soporte_nutricional ON soporte_nutricional.id_cita = cita.id_cita " +
-            " WHERE cita.id_estado = 3 or cita.id_estado = 4 or cita.id_estado = 6 ;")
+            " INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $3 "+
+            " INNER JOIN soporte_nutricionales ON soporte_nutricionales.id_cita = citas.id_cita " +
+            " WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
             LocalDate turno,Integer idHorario, String idRegional
     );

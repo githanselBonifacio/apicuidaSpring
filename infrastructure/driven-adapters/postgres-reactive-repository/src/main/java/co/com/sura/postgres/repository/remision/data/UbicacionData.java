@@ -18,7 +18,7 @@ import javax.persistence.GenerationType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "ubicacion")
+@Table(name = "ubicaciones")
 public class UbicacionData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

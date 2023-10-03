@@ -15,7 +15,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "canalizacion")
+@Table(name = "canalizaciones")
 public class CanalizacionData {
     @Id
     @Column("id_canalizacion")

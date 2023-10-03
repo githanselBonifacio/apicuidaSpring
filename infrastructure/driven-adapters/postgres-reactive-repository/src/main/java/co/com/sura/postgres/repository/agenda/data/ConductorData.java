@@ -20,9 +20,10 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "conductores")
 public class ConductorData {
-    @Id
+
     @Column("id_tipo_identificacion")
     private Integer idTipoIdentificacion;
+    @Id
     @Column("numero_identificacion")
     private String  numeroIdentificacion;
     private String nombres;
@@ -39,7 +40,5 @@ public class ConductorData {
 
     @Column("id_regional")
     private String idRegional;
-    @Column("matricula_movil")
-    private String matriculaMovil;
-    private Boolean activo;
+    private boolean activo;
 }

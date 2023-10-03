@@ -1,9 +1,12 @@
 package co.com.sura.entity.agenda;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -11,7 +14,9 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class Movil {
     private String matricula;
-    private String numeroIdentificacionConductor;
     private String idRegional;
+    private String marca;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate modelo;
     private Boolean activo;
 }

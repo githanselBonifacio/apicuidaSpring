@@ -16,7 +16,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "soporte_nutricional")
+@Table(name = "soporte_nutricionales")
 public class SoporteNutricionalData {
 
     @Id

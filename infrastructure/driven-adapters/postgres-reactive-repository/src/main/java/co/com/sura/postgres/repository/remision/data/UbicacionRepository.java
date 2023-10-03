@@ -11,10 +11,10 @@ public interface UbicacionRepository extends ReactiveCrudRepository<UbicacionDat
    @Override
    Mono<Boolean> existsById(String idUbicacion);
 
-   @Query("DELETE FROM public.ubicacion WHERE id_ubicacion=$1;")
+   @Query("DELETE FROM public.ubicaciones WHERE id_ubicacion=$1;")
    Mono<Void> deleteByIdUbicacion(String idUbicacion);
 
-   @Query("INSERT INTO ubicacion (" +
+   @Query("INSERT INTO ubicaciones (" +
            " id_ubicacion," +
            " latitud," +
            " longitud," +

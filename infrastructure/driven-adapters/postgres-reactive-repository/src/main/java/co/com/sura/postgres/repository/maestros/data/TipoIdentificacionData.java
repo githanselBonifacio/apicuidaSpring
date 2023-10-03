@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.persistence.Entity;
@@ -20,4 +21,6 @@ public class TipoIdentificacionData {
     private Integer id;
     private String idTipo;
     private String nombre;
+    @Column("es_mayor_edad")
+    private Boolean esMayorEdad;
 }

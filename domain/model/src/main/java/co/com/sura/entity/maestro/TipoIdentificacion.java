@@ -13,4 +13,5 @@ public class TipoIdentificacion {
     private Integer id;
     private String idTipo;
     private String nombre;
+    private Boolean esMayorEdad;
 }

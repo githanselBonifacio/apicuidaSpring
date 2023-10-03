@@ -25,6 +25,5 @@ public class Conductor {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate fechaNacimiento;
     private String idRegional;
-    private Movil movil;
-    private Boolean activo;
+    private boolean activo;
 }

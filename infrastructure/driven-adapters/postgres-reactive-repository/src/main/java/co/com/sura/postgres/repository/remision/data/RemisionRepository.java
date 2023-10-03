@@ -11,21 +11,21 @@ import java.time.LocalDate;
 
 public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,String> {
 
-    @Query("SELECT EXISTS(SELECT * FROM remision WHERE id_remision = $1 AND estado = 'ADMITIDO');")
+    @Query("SELECT EXISTS(SELECT * FROM remisiones WHERE id_remision = $1 AND estado = 'ADMITIDO');")
     Mono<Boolean>validarEstadosRemisionToEgreso(String idRemision);
 
-    @Query("UPDATE remision " +
+    @Query("UPDATE remisiones " +
             " SET estado = 'EGRESADO' " +
             " WHERE id_remision = $1;")
     Mono<Boolean> egresarRemisionById(String idRemision);
 
-    @Query("SELECT remision.*, " +
-            "CONCAT(paciente.nombres, ' ', paciente.apellidos) as paciente, "+
+    @Query("SELECT remisiones.*, " +
+            "CONCAT(pacientes.nombres, ' ', pacientes.apellidos) as paciente, "+
             "regionales.nombre as regional "+
-            "FROM public.remision " +
-            "INNER JOIN regionales ON remision.id_regional = regionales.id_regional " +
-            "INNER JOIN paciente ON remision.numero_identificacion_paciente = paciente.numero_identificacion " +
-            "ORDER BY remision.fecha_admision; " )
+            "FROM public.remisiones " +
+            "INNER JOIN regionales ON remisiones.id_regional = regionales.id_regional " +
+            "INNER JOIN pacientes ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
+            "ORDER BY remisiones.fecha_admision; " )
     Flux<Remision> findAllRemision();
 
     @Query("CALL public.delete_remision_data(:idRemision,:numeroIdentificacionPaciente)")
@@ -34,7 +34,7 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
             @Param("numeroIdentificacionPaciente") String numeroIdentificacionPaciente);
 
 
-    @Query("INSERT INTO remision(" +
+    @Query("INSERT INTO remisiones(" +
             "id_remision, " +
             "estado, " +
             "fecha_admision, " +

@@ -38,7 +38,9 @@ public interface AgendaRepository {
     //moviles
     Mono<Movil>         crearMovil(Movil movil);
     Mono<Movil>         actualizarMovil(Movil movil);
-    Flux<Conductor>     consultarMovilIdRegional(String idRegional);
+    Flux<Movil>         consultarMoviles();
+    Flux<Movil>         consultarMovilesSinConductor();
+    Flux<Movil>         consultarMovilesByIdRegional(String idRegional);
 
     //citas
     Flux<Cita>           consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad);

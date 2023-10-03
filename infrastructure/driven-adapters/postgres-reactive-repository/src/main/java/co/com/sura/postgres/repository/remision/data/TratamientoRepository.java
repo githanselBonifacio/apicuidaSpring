@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 public interface TratamientoRepository extends ReactiveCrudRepository<TratamientoData,Integer> {
 
     Flux<TratamientoData> findByIdCita(String idCita);
-    @Query("UPDATE tratamiento " +
+    @Query("UPDATE tratamientos " +
             "SET notificado = true " +
             "WHERE id_tratamiento=$1")
     Mono<Void> updateNotificar(Integer idTratamiento);

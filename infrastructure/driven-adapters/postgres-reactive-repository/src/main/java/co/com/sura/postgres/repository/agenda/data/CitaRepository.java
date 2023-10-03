@@ -15,39 +15,39 @@ import java.util.List;
 
 public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> {
 
-    @Query("SELECT EXISTS(SELECT * FROM cita WHERE id_remision = $1 AND id_estado IN (3, 4));")
+    @Query("SELECT EXISTS(SELECT * FROM citas WHERE id_remision = $1 AND id_estado IN (3, 4));")
     Mono<Boolean>validarEstadosCitasToEgreso(String idRemision);
 
-    @Query("UPDATE cita " +
+    @Query("UPDATE citas " +
             "SET id_estado = 5 " +
             "WHERE id_remision = $1 " +
             "AND id_estado NOT IN (3, 4, 6) "+
             "AND fecha_programada > NOW();")
     Mono<Boolean> cancelarCitasForEgresoRemision(String idRemision);
 
-    @Query("SELECT cita.*, " +
-            "remision.numero_identificacion_paciente," +
-            "CONCAT (paciente.nombres,' ',paciente.apellidos) as paciente," +
-            "paciente.tipo_identificacion as tipo_identificacion_paciente FROM cita " +
-            "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita  and turno_cita.fecha_turno = $1" +
-            "INNER JOIN remision ON cita.id_remision = remision.id_remision " +
-            "INNER JOIN paciente ON paciente.numero_identificacion = remision.numero_identificacion_paciente  " +
+    @Query("SELECT citas.*, " +
+            "remisiones.numero_identificacion_paciente," +
+            "CONCAT (pacientes.nombres,' ',pacientes.apellidos) as paciente," +
+            "pacientes.tipo_identificacion as tipo_identificacion_paciente FROM citas " +
+            "INNER JOIN turno_cita ON citas.id_cita=turno_cita.id_cita  and turno_cita.fecha_turno = $1" +
+            "INNER JOIN remisiones ON citas.id_remision = remisiones.id_remision " +
+            "INNER JOIN pacientes ON pacientes.numero_identificacion = remisiones.numero_identificacion_paciente  " +
             "WHERE turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_regional = $3 " +
-            "AND cita.id_estado != 5;")
+            "AND citas.id_regional = $3 " +
+            "AND citas.id_estado != 5;")
     Flux<Cita> findCitasByTurnoCiudad(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
             String idRegional );
 
-    @Query("SELECT cita.* FROM cita " +
-            "INNER JOIN turno_cita ON cita.id_cita=turno_cita.id_cita " +
+    @Query("SELECT citas.* FROM citas " +
+            "INNER JOIN turno_cita ON citas.id_cita=turno_cita.id_cita " +
             "WHERE turno_cita.fecha_turno = $1 " +
             "AND turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_regional = $3 " +
-            "AND cita.id_estado != 5 " +
-            "AND cita.id_profesional = $4 " +
-            "ORDER BY public.cita.fecha_programada ASC;")
+            "AND citas.id_regional = $3 " +
+            "AND citas.id_estado != 5 " +
+            "AND citas.id_profesional = $4 " +
+            "ORDER BY public.citas.fecha_programada ASC;")
     Flux<CitaData> findCitasByTurnoCiudadProfesional(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
@@ -55,45 +55,45 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             String numeroIdentificacionProfesional);
 
 
-    @Query("UPDATE public.cita " +
+    @Query("UPDATE public.citas " +
             "SET  id_estado=2, id_profesional=$2 " +
             "WHERE id_cita = $1 " +
             "AND " +
-            "(SELECT id_regional from public.profesionales WHERE numero_identificacion= $2)= public.cita.id_regional;")
+            "(SELECT id_regional from public.profesionales WHERE numero_identificacion= $2)= public.citas.id_regional;")
     Mono<Void> agendarToProfesional(String idCita, String idProfesional);
 
 
-    @Query("UPDATE public.cita " +
+    @Query("UPDATE public.citas " +
             "SET  id_estado=1, id_profesional=NULL " +
             "WHERE id_cita = $1;")
     Mono<Void> desagendarToProfesional(String idCita);
 
 
-    @Query("UPDATE public.cita " +
+    @Query("UPDATE public.citas " +
             "SET  fecha_programada= $1 " +
             "WHERE id_cita = $2;")
     Mono<Void> actualizarFechaProgramada(LocalDateTime fechaTurno, String idCita);
 
 
-    @Query("UPDATE cita " +
+    @Query("UPDATE citas " +
             "SET id_estado = 1 , id_profesional=NULL " +
             "FROM turno_cita " +
-            "WHERE cita.id_cita = turno_cita.id_cita " +
+            "WHERE citas.id_cita = turno_cita.id_cita " +
             "AND turno_cita.fecha_turno = $1 " +
             "AND turno_cita.id_horario_turno = $2 " +
-            "AND cita.id_regional = $3;")
+            "AND citas.id_regional = $3;")
     Mono<Void> desagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno,String idRegional);
 
-    @Query("UPDATE cita " +
+    @Query("UPDATE citas " +
             "SET id_estado = 1 , id_profesional=NULL " +
             "FROM turno_cita " +
-            "WHERE cita.id_profesional = $3 " +
+            "WHERE citas.id_profesional = $3 " +
             "AND turno_cita.fecha_turno = $1 " +
             "AND turno_cita.id_horario_turno = $2; ")
     Mono<Void> desagendarAllFromIdProfesional(
             LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional);
 
-    @Query("INSERT INTO cita " +
+    @Query("INSERT INTO citas " +
             "(id_cita, id_remision, duracion, holgura, fecha_inicio, especialidad, id_regional,fecha_programada" +
             ",longitud, latitud)" +
             " VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9, $10);" )

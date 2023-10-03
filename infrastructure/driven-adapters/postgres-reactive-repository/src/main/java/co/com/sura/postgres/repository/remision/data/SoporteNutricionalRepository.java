@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 public interface SoporteNutricionalRepository extends ReactiveCrudRepository<SoporteNutricionalData,Integer> {
     Flux<SoporteNutricionalData> findByIdCita(String idCita);
-    @Query("UPDATE soporte_nutricional " +
+    @Query("UPDATE soporte_nutricionales " +
             "SET notificado = true " +
             "WHERE id_soporte_nutricional=$1")
     Mono<Void> updateNotificar(Integer idSoporteNutricional);

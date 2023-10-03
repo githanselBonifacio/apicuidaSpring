@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "cita")
+@Table(name = "citas")
 public class CitaData {
     @Id
     @Column("id_cita")

@@ -15,7 +15,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "fototerapia")
+@Table(name = "fototerapias")
 public class FototerapiaData {
     @Id
     @Column("id_fototerapia")

@@ -55,9 +55,15 @@ public enum Mensajes {
     SE_CREA_PROFESIONAL("Se ha creado profesional exitoxamente !!"),
     SE_ACTUALIZA_PROFESIONAL("Se ha actualizado profesional exitoxamente !!"),
     ERROR_CREAR_PROFESIONAL("Error al crear al profesional"),
-    ERROR_ACTTUALIZAR_PROFESIONAL("Error al actualizar profesional");
+    ERROR_ACTTUALIZAR_PROFESIONAL("Error al actualizar profesional"),
 
-
+    //conductores
+    CONDUCTOR_YA_EXISTE("Error al crear conductor, ya existe conductor"),
+    CONDUCTOR_NO_EXISTE("Error al actualizar, el conductor no existe conductor"),
+    SE_CREA_CONDUCTOR("Se ha creado conductor exitoxamente !!"),
+    SE_ACTUALIZA_CONDUCTOR("Se ha actualizado conductor exitoxamente !!"),
+    ERROR_CREAR_CONDUCTOR("Error al crear al conductor"),
+    ERROR_ACTTUALIZAR_CONDUCTOR("Error al actualizar conductor");
     private final String value;
 
 

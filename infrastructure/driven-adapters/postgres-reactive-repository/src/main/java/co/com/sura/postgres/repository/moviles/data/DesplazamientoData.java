@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-@Table("desplazamiento")
+@Table("desplazamientos")
 public class DesplazamientoData {
     @Id
     @Column("id_desplazamiento")
