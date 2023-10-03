@@ -2,7 +2,7 @@ package co.com.sura.agenda;
 
 import co.com.sura.entity.agenda.*;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.remision.*;
+import co.com.sura.entity.admin.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,10 +17,6 @@ public class AgendaUseCase implements AgendaFactory {
         this.agendaRepository = agendaRepository;
     }
 
-
-    public Flux<Profesional> consultarProfesionales() {
-        return agendaRepository.consultarProfesionales();
-    }
 
     public Flux<Profesional> consultarProfesionalesByTurnoCiudad(LocalDate fechaTurno, String idRegional) {
         return agendaRepository.consultarProfesionalByTurnoCiudad(fechaTurno,idRegional);
@@ -66,30 +62,6 @@ public class AgendaUseCase implements AgendaFactory {
                 fechaProgramada,idHorarioTurno,idCiudad);
     }
 
-    public Mono<Profesional> crearProfesional(Profesional profesional) {
-        return agendaRepository.crearProfesional(profesional);
-    }
-    public Mono<Profesional> actualizarProfesional(Profesional profesional) {
-        return agendaRepository.actualizarProfesional(profesional);
-    }
-
-    public  Flux<Conductor> consultarConductores(){
-        return agendaRepository.consultarConductores();
-    }
-
-    public Mono<Conductor> crearConductor(Conductor conductor){return agendaRepository.crearConductor(conductor);}
-    public Mono<Conductor> actualizarConductor(Conductor conductor){
-        return agendaRepository.actualizarConductor(conductor);}
-
-    public Flux<Movil> consultarMoviles(){
-        return agendaRepository.consultarMoviles();
-    }
-    public Flux<Movil> consultarMovilesSinConductor(){
-        return agendaRepository.consultarMovilesSinConductor();
-    }
-    public Flux<Movil> consultarMovilesByIdRegional(String idRegional){
-        return agendaRepository.consultarMovilesByIdRegional(idRegional);
-    }
 
     public Flux<Cita> consultarCitasByTurnoCiudad (LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad){
         return agendaRepository.consultarCitasByTurnoCiudad(fechaTurno, idHorarioTurno, idCiudad);

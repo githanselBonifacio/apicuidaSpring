@@ -4,30 +4,30 @@ package co.com.sura.postgres.repository.agenda.adapter;
 import co.com.sura.autoagendador.CitaGenetic;
 import co.com.sura.entity.agenda.*;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.remision.Tratamiento;
-import co.com.sura.entity.remision.Fototerapia;
-import co.com.sura.entity.remision.TomaMuestra;
-import co.com.sura.entity.remision.Sondaje;
-import co.com.sura.entity.remision.Canalizacion;
-import co.com.sura.entity.remision.Cita;
-import co.com.sura.entity.remision.Curacion;
-import co.com.sura.entity.remision.SoporteNutricional;
-import co.com.sura.entity.remision.Secrecion;
-import co.com.sura.entity.remision.Medicamento;
+import co.com.sura.entity.admin.Tratamiento;
+import co.com.sura.entity.admin.Fototerapia;
+import co.com.sura.entity.admin.TomaMuestra;
+import co.com.sura.entity.admin.Sondaje;
+import co.com.sura.entity.admin.Canalizacion;
+import co.com.sura.entity.admin.Cita;
+import co.com.sura.entity.admin.Curacion;
+import co.com.sura.entity.admin.SoporteNutricional;
+import co.com.sura.entity.admin.Secrecion;
+import co.com.sura.entity.admin.Medicamento;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.ConductorData;
 import co.com.sura.postgres.repository.agenda.data.MovilData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
-import co.com.sura.postgres.repository.remision.data.TratamientoData;
-import co.com.sura.postgres.repository.remision.data.CanalizacionData;
-import co.com.sura.postgres.repository.remision.data.CuracionData;
-import co.com.sura.postgres.repository.remision.data.TomaMuestraData;
-import co.com.sura.postgres.repository.remision.data.SondajeData;
-import co.com.sura.postgres.repository.remision.data.SecrecionData;
-import co.com.sura.postgres.repository.remision.data.FototerapiaData;
-import co.com.sura.postgres.repository.remision.data.SoporteNutricionalData;
+import co.com.sura.postgres.repository.admin.data.TratamientoData;
+import co.com.sura.postgres.repository.admin.data.CanalizacionData;
+import co.com.sura.postgres.repository.admin.data.CuracionData;
+import co.com.sura.postgres.repository.admin.data.TomaMuestraData;
+import co.com.sura.postgres.repository.admin.data.SondajeData;
+import co.com.sura.postgres.repository.admin.data.SecrecionData;
+import co.com.sura.postgres.repository.admin.data.FototerapiaData;
+import co.com.sura.postgres.repository.admin.data.SoporteNutricionalData;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneOffset;
@@ -39,32 +39,7 @@ import java.util.stream.Collectors;
 public class ConverterAgenda extends Converter {
 
 
-    public static Profesional convertToProfesional(ProfesionalData profesionalData){
-        return deserializarJson(
-                convertirObjetoAJson(profesionalData), Profesional.class
-        );
-    }
 
-    public static ProfesionalData convertToProfesionalData(Profesional profesional){
-        return deserializarJson(
-                convertirObjetoAJson(profesional), ProfesionalData.class
-        );
-    }
-    public  static Conductor converToConductor(ConductorData conductorData){
-        return     deserializarJson(
-                convertirObjetoAJson(conductorData), Conductor.class
-        );
-    }
-    public  static ConductorData converToConductorData(Conductor conductor){
-        return     deserializarJson(
-                convertirObjetoAJson(conductor), ConductorData.class
-        );
-    }
-    public static  Movil convertToMovil(MovilData movilData){
-        return   deserializarJson(
-                convertirObjetoAJson(movilData), Movil.class
-        );
-    }
     public static Actividad convertToActividad(ProfesionalData profesionalData){
         return new Actividad()
                 .toBuilder()

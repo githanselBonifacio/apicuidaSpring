@@ -1,27 +1,22 @@
-package co.com.sura.dto.remision;
+package co.com.sura.entity.admin;
 
-import co.com.sura.entity.admin.Medicamento;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SoporteNutricionalRequest {
+@Builder(toBuilder = true)
+public class SoporteNutricional {
     private Medicamento medicamento;
     private Integer cantidadDosis;
-    private UnidadDosisRequest unidadDosis;
-    private TipoNutricionRequest tipoNutricion;
+    private String unidadDosis;
     private String tipo;
-    private String idTipo;
-    private String idNutricion;
     private String descripcion;
     private Integer duracion;
     private Integer volumen;
     private boolean noPBS;
-    private List<Object> eventos;
     private String tipoPrestacion;
 }

@@ -8,18 +8,19 @@ import co.com.sura.autoagendador.OrigenRegional;
 import co.com.sura.autoagendador.Resultado;
 import co.com.sura.entity.agenda.*;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.remision.*;
+import co.com.sura.entity.admin.*;
+import co.com.sura.postgres.repository.admin.adapter.ConverterAdmin;
 import co.com.sura.postgres.repository.agenda.data.*;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
-import co.com.sura.postgres.repository.remision.data.TomaMuestraRepository;
-import co.com.sura.postgres.repository.remision.data.CanalizacionRepository;
-import co.com.sura.postgres.repository.remision.data.SoporteNutricionalRepository;
-import co.com.sura.postgres.repository.remision.data.SondajeRepository;
-import co.com.sura.postgres.repository.remision.data.TratamientoRepository;
-import co.com.sura.postgres.repository.remision.data.FototerapiaRepository;
-import co.com.sura.postgres.repository.remision.data.CuracionRepository;
-import co.com.sura.postgres.repository.remision.data.SecrecionRepository;
+import co.com.sura.postgres.repository.admin.data.TomaMuestraRepository;
+import co.com.sura.postgres.repository.admin.data.CanalizacionRepository;
+import co.com.sura.postgres.repository.admin.data.SoporteNutricionalRepository;
+import co.com.sura.postgres.repository.admin.data.SondajeRepository;
+import co.com.sura.postgres.repository.admin.data.TratamientoRepository;
+import co.com.sura.postgres.repository.admin.data.FototerapiaRepository;
+import co.com.sura.postgres.repository.admin.data.CuracionRepository;
+import co.com.sura.postgres.repository.admin.data.SecrecionRepository;
 import co.com.sura.services.mapbox.GeoUbicacion;
 import co.com.sura.services.mapbox.MapboxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static co.com.sura.autoagendador.IdRegional.getByIdCiudad;
-import static co.com.sura.constantes.Mensajes.*;
 import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.crearDesplazamientoData;
 
 @Repository
@@ -91,23 +91,18 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         this.movilRepository = movilRepository;
     }
 
-    @Override
-    public Flux<Profesional> consultarProfesionales() {
-        return profesionalRepository.findAll()
-                .map(ConverterAgenda :: convertToProfesional);
-    }
 
     @Override
     public Flux<Profesional> consultarProfesionalByTurnoCiudad(LocalDate fechaTurno, String idCiudad) {
         return profesionalRepository.findByTurnoRegional(fechaTurno,idCiudad)
-                .map(ConverterAgenda :: convertToProfesional);
+                .map(ConverterAdmin:: convertToProfesional);
     }
 
     @Override
     public Flux<Profesional> consultarProfesionalFromTurnoCiudad(
             LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno) {
         return profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
-                .map(ConverterAgenda :: convertToProfesional);
+                .map(ConverterAdmin :: convertToProfesional);
     }
 
     @Override
@@ -135,7 +130,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     @Override
     public Flux<Profesional> consultarProfesionalesByIdCiudad(String idRegional) {
         return profesionalRepository.findByIdRegional(idRegional)
-                .map(ConverterAgenda :: convertToProfesional);
+                .map(ConverterAdmin :: convertToProfesional);
     }
 
     public Flux<Tarea> consultarTareasTurnoByProfesional(
@@ -182,95 +177,6 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                          .sort(Actividad::compareTo));
     }
 
-    @Override
-    public Mono<Profesional> crearProfesional(Profesional profesional) {
-
-        return profesionalRepository.existsById(profesional.getNumeroIdentificacion())
-                .flatMap(exist ->  {
-                    if (Boolean.TRUE.equals(exist)) {
-                        return Mono.error(new Throwable(PROFESIONAL_YA_EXISTE.getValue()));
-                    }
-                    return profesionalRepository.insertProfesional(profesional);
-                })
-                .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
-                .map(ConverterAgenda::convertToProfesional);
-
-
-    }
-
-    @Override
-    public Mono<Profesional> actualizarProfesional(Profesional profesional) {
-        return Mono.just(profesional)
-                .then(profesionalRepository.existsById(profesional.getNumeroIdentificacion()))
-                .flatMap(exist ->{
-                    if (Boolean.FALSE.equals(exist)) {
-                        return Mono.error(new Throwable(PROFESIONAL_NO_EXISTE.getValue()));
-                    }
-                    return profesionalRepository.save(ConverterAgenda.convertToProfesionalData(profesional));
-                })
-                .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
-                .map(ConverterAgenda::convertToProfesional);
-    }
-
-    @Override
-    public Mono<Conductor> crearConductor(Conductor conductor) {
-
-        return  conductorRepository.existsById(conductor.getNumeroIdentificacion())
-                .flatMap(exist ->  {
-                    if (Boolean.TRUE.equals(exist)) {
-                        return Mono.error(new Throwable(CONDUCTOR_YA_EXISTE.getValue()));
-                    }
-                    return conductorRepository.insertConductor(conductor);
-                })
-                .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
-                .map(ConverterAgenda::converToConductor);
-    }
-
-    @Override
-    public Mono<Conductor> actualizarConductor(Conductor conductor) {
-        System.out.println(conductor.getNumeroIdentificacion());
-        return Mono.just(conductor)
-                .then(conductorRepository.existsById(conductor.getNumeroIdentificacion()))
-                .flatMap(exist ->{
-                    if (Boolean.FALSE.equals(exist)) {
-                        return Mono.error(new Throwable(CONDUCTOR_NO_EXISTE.getValue()));
-                    }
-                    return conductorRepository.save(ConverterAgenda.converToConductorData(conductor));
-                })
-                .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
-                .map(ConverterAgenda::converToConductor);
-    }
-
-    @Override
-    public Flux<Conductor> consultarConductores() {
-        return conductorRepository.findAll()
-                .map(ConverterAgenda::converToConductor);
-    }
-
-    @Override
-    public Mono<Movil> crearMovil(Movil movil) {
-        return null;
-    }
-
-    @Override
-    public Mono<Movil> actualizarMovil(Movil movil) {
-        return null;
-    }
-    @Override
-    public Flux<Movil> consultarMoviles() {
-        return movilRepository.findAll()
-                .map(ConverterAgenda::convertToMovil);
-    }
-    @Override
-    public Flux<Movil> consultarMovilesSinConductor() {
-        return movilRepository.findAllWithoutConductor()
-                .map(ConverterAgenda::convertToMovil);
-    }
-    @Override
-    public Flux<Movil> consultarMovilesByIdRegional(String idRegional) {
-        return movilRepository.findByIdRegional(idRegional)
-                .map(ConverterAgenda::convertToMovil);
-    }
 
     @Override
     public Flux<Cita> consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {

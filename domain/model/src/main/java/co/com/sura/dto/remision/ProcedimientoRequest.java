@@ -1,6 +1,6 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.remision.*;
+import co.com.sura.entity.admin.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

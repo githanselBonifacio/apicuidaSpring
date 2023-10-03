@@ -1,7 +1,7 @@
 package co.com.sura.postgres.repository.agenda.data;
 
 
-import co.com.sura.entity.remision.Cita;
+import co.com.sura.entity.admin.Cita;
 import org.springframework.data.r2dbc.repository.Query;
 
 import org.springframework.data.repository.query.Param;

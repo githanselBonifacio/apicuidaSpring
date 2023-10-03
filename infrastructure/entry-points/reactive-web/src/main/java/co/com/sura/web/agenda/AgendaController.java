@@ -8,13 +8,12 @@ import co.com.sura.entity.agenda.Conductor;
 import co.com.sura.entity.agenda.Movil;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
-import co.com.sura.entity.remision.*;
+import co.com.sura.entity.admin.*;
 import co.com.sura.genericos.Response;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -32,27 +31,7 @@ public class AgendaController {
     @Autowired
     private AgendaUseCase agendaUseCase;
 
-    //profesionales
-    @GetMapping(value = "/profesionales")
-    public Mono<Response<List<Profesional>>> getProfesionales(){
-        return agendaUseCase.consultarProfesionales()
-                .collectList()
-                .map(profesionales -> ResponseFactory.createStatus(
-                        profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-
+    //profesionales en turno
     @GetMapping(value = "/profesionalesByTurnoCiudad")
     public Mono<Response<List<Profesional>>> getProfesionalesbyTurnoCiudad(
              @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -117,45 +96,6 @@ public class AgendaController {
                 )));
     }
 
-    @PostMapping(value = "/crearProfesional")
-    public Mono<Response<Profesional>> crearProfesional(@RequestBody Profesional profesional) {
-        return agendaUseCase.crearProfesional(profesional)
-                .map(profesionalCreado -> ResponseFactory.createStatus(
-                        profesionalCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_CREA_PROFESIONAL.getValue(),
-                        Mensajes.SE_CREA_PROFESIONAL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_CREAR_PROFESIONAL.getValue(),
-                        e.getMessage(),
-                        e.getMessage()
-                )));
-
-    }
-
-    @PutMapping(value = "/actualizarProfesional")
-    public Mono<Response<Profesional>> actualizarProfesional(@RequestBody Profesional profesional) {
-        return agendaUseCase.actualizarProfesional(profesional)
-                .map(profesionalCreado -> ResponseFactory.createStatus(
-                        profesionalCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ACTUALIZA_PROFESIONAL.getValue(),
-                        Mensajes.SE_ACTUALIZA_PROFESIONAL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTTUALIZAR_PROFESIONAL.getValue(),
-                        e.getMessage(),
-                        e.getMessage()
-                )));
-
-    }
 
     @GetMapping(value = "/asignarProfesionalTurno")
     public Mono<Response<Boolean>> asignarProfesionalTurno(
@@ -200,121 +140,7 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
-    //conductores
-    @GetMapping(value = "/conductores")
-    public Mono<Response<List<Conductor>>> getConductores(){
-        return agendaUseCase.consultarConductores()
-                .collectList()
-                .map(profesionales -> ResponseFactory.createStatus(
-                        profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-    @PostMapping(value = "/crearConductor")
-    public Mono<Response<Conductor>> crearProfesional(@RequestBody Conductor conductor) {
-        return agendaUseCase.crearConductor(conductor)
-                .map(conductorCreado -> ResponseFactory.createStatus(
-                        conductorCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_CREA_CONDUCTOR.getValue(),
-                        Mensajes.SE_CREA_CONDUCTOR.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_CREAR_CONDUCTOR.getValue(),
-                        e.getMessage(),
-                        e.getMessage()
-                )));
 
-    }
-
-    @PutMapping(value = "/actualizarConductor")
-    public Mono<Response<Conductor>> actualizarProfesional(@RequestBody Conductor conductor) {
-        return agendaUseCase.actualizarConductor(conductor)
-                .map(conductorCreado -> ResponseFactory.createStatus(
-                        conductorCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ACTUALIZA_CONDUCTOR.getValue(),
-                        Mensajes.SE_ACTUALIZA_CONDUCTOR.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTTUALIZAR_CONDUCTOR.getValue(),
-                        e.getMessage(),
-                        e.getMessage()
-                )));
-
-    }
-
-    //moviles
-    @GetMapping(value = "/moviles")
-    public Mono<Response<List<Movil>>> consultarMoviles(){
-        return agendaUseCase.consultarMoviles()
-                .collectList()
-                .map(movil->ResponseFactory.createStatus(
-                        movil,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-    @GetMapping(value = "movilesSinConductor")
-    public Mono<Response<List<Movil>>> consultarMovilesSinConductor(){
-        return agendaUseCase.consultarMovilesSinConductor()
-                .collectList()
-                .map(movil->ResponseFactory.createStatus(
-                        movil,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-    @GetMapping(value = "/movilesByRegional/{idRegional}")
-    public Mono<Response<List<Movil>>> consultarMovilesByIdRegional(@PathVariable String idRegional){
-        return agendaUseCase.consultarMovilesByIdRegional(idRegional)
-                .collectList()
-                .map(movil->ResponseFactory.createStatus(
-                        movil,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
     //turno
     @GetMapping(value = "/desagendarTurnoCompleto")
     public Mono<Response<Boolean>> desagendarTurnoCompleto(

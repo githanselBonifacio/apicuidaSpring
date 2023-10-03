@@ -4,11 +4,10 @@ import co.com.sura.agenda.AgendaUseCase;
 import co.com.sura.entity.agenda.AgendaRepository;
 import co.com.sura.entity.maestro.MaestroRepository;
 import co.com.sura.entity.moviles.MovilRepository;
-import co.com.sura.entity.remision.RemisionCrudRepository;
+import co.com.sura.entity.admin.RemisionCrudRepository;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.moviles.MovilesUseCase;
-import co.com.sura.remision.RemisionUseCase;
-import co.com.sura.services.mapbox.MapboxService;
+import co.com.sura.admin.AdminUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +27,8 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public RemisionUseCase remisionUseCase (RemisionCrudRepository remisionCrudRepository){
-        return new RemisionUseCase(remisionCrudRepository);
+    public AdminUseCase remisionUseCase (RemisionCrudRepository remisionCrudRepository){
+        return new AdminUseCase(remisionCrudRepository);
     }
 
     @Bean

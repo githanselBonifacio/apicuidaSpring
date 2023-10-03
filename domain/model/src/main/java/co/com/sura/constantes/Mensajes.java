@@ -63,7 +63,15 @@ public enum Mensajes {
     SE_CREA_CONDUCTOR("Se ha creado conductor exitoxamente !!"),
     SE_ACTUALIZA_CONDUCTOR("Se ha actualizado conductor exitoxamente !!"),
     ERROR_CREAR_CONDUCTOR("Error al crear al conductor"),
-    ERROR_ACTTUALIZAR_CONDUCTOR("Error al actualizar conductor");
+    ERROR_ACTUALIZAR_CONDUCTOR("Error al actualizar conductor"),
+
+    //moviles
+    MOVIL_YA_EXISTE("Error al crear movil, ya existe movil"),
+    MOVIL_NO_EXISTE("Error al actualizar, el movil no existe movil"),
+    SE_CREA_MOVIL("Se ha creado movil exitoxamente !!"),
+    SE_ACTUALIZA_MOVIL("Se ha actualizado movil exitoxamente !!"),
+    ERROR_CREAR_MOVIL("Error al crear al movil"),
+    ERROR_ACTUALIZAR_MOVIL("Error al actualizar movil");
     private final String value;
 
 
