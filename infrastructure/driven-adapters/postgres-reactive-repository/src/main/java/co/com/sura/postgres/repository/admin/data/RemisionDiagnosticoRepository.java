@@ -15,9 +15,7 @@ public interface RemisionDiagnosticoRepository extends ReactiveCrudRepository<Re
     @Override
     Mono<Void> deleteById(String idRemision);
 
-    @Query("INSERT INTO remision_diagnostico " +
-            "(codigo, id_remision, nombre_diagnostico)" +
-            " VALUES ($1, $2,$3);" )
+    @Query("INSERT INTO remision_diagnostico (codigo, id_remision, nombre_diagnostico) VALUES ($1, $2,$3);" )
     Mono<Void> insertDiagnosticoQuery(
             @Param("$1") String codigo,
             @Param("$2") String idRemision,
@@ -42,8 +40,7 @@ public interface RemisionDiagnosticoRepository extends ReactiveCrudRepository<Re
         );
     }
 
-    @Query("UPDATE remision_diagnostico " +
-            " SET codigo=$1, id_remision=$2, nombre_diagnostico= $3" +
+    @Query("UPDATE remision_diagnostico SET codigo=$1, id_remision=$2, nombre_diagnostico= $3" +
             " WHERE id_remision=$1  AND codigo=$2;" )
     Mono<Void> updateDiagnosticoQuery(
             @Param("$1") String codigo,

@@ -16,8 +16,10 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     private final TipoIdentificacionRepository tipoIdentificacionRepository;
     private final EstadoCitaRepository estadoCitaRepository;
     private final ProfesionRepository profesionRepository;
+
     @Autowired
-    public MaestroRepositoryAdapter(RegionalesRepository ciudadRepository, HorarioTurnoRepository horarioTurnoRepository,
+    public MaestroRepositoryAdapter(RegionalesRepository ciudadRepository,
+                                    HorarioTurnoRepository horarioTurnoRepository,
                                     TipoIdentificacionRepository tipoIdentificacionRepository,
                                     EstadoCitaRepository estadoCitaRepository, ProfesionRepository profesionRepository){
         this.ciudadRepository = ciudadRepository;

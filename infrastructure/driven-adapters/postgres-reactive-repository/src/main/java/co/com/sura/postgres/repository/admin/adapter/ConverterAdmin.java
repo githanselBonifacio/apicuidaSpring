@@ -237,7 +237,7 @@ public class ConverterAdmin extends Converter {
         return new SondajeData()
                 .toBuilder()
                 .tipoSondaje(sondajeRequest.getSondaje())
-                .tipoSondaje(sondajeRequest.getTipoSondaje())
+                .tipoSonda(sondajeRequest.getTipoSondaje())
                 .totalSesiones(sondajeRequest.getTotalSesiones())
                 .tipoPrestacion(sondajeRequest.getTipoPrestacion())
                 .build();

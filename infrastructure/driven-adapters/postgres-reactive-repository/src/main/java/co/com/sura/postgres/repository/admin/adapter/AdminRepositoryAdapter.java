@@ -129,8 +129,11 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
                             return ubicacionRepository.save(ubicacionData)
                                     .then(Mono.from(pacienteRepository.save(pacienteData))).then();
                         }else{
-                            return  pacienteRepository.insertpaciente(pacienteData)
-                                    .then(Mono.from(ubicacionRepository.insertUbicacion(ubicacionData))).then();
+                            return ubicacionRepository.insertNuevaUbicacion(ubicacionData.getIdUbicacion())
+                                    .then(Mono.from(ubicacionRepository.save(ubicacionData)))
+                                    .then(Mono.from(pacienteRepository
+                                                    .insertNuevoPaciente(pacienteData.getNumeroIdentificacion())))
+                                    .then(Mono.from(pacienteRepository.save(pacienteData))).then();
                         }
                     });
         }
@@ -205,7 +208,8 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
                    .then();
 
        }else {
-           return  Mono.from(Mono.from(remisionRepository.insertRemision(remisionData)))
+           return  Mono.from(Mono.from(remisionRepository.insertNuevaRemision(remisionData.getIdRemision())))
+                   .then(Mono.from(Mono.from(remisionRepository.save(remisionData))))
                    .then(Mono.from(datosAtencionPacienteRepository.save(datosAtencionPacienteData)))
                    .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)))
                    .then();

@@ -14,9 +14,7 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
     @Query("SELECT EXISTS(SELECT * FROM remisiones WHERE id_remision = $1 AND estado = 'ADMITIDO');")
     Mono<Boolean>validarEstadosRemisionToEgreso(String idRemision);
 
-    @Query("UPDATE remisiones " +
-            " SET estado = 'EGRESADO' " +
-            " WHERE id_remision = $1;")
+    @Query("UPDATE remisiones SET estado = 'EGRESADO' WHERE id_remision = $1;")
     Mono<Boolean> egresarRemisionById(String idRemision);
 
     @Query("SELECT remisiones.*, " +
@@ -34,39 +32,8 @@ public interface RemisionRepository extends ReactiveCrudRepository<RemisionData,
             @Param("numeroIdentificacionPaciente") String numeroIdentificacionPaciente);
 
 
-    @Query("INSERT INTO remisiones(" +
-            "id_remision, " +
-            "estado, " +
-            "fecha_admision, " +
-            "programa, " +
-            "tipo_admision, " +
-            "institucion_remite, " +
-            "numero_identificacion_paciente," +
-            "id_regional) " +
-            " VALUES " +
-            "($1, $2, $3, $4, $5, $6, $7,$8)")
-    Mono<Void> insertRemisionQuery(
-            @Param("$1") String idRemision,
-            @Param("$2") String estado,
-            @Param("$3") LocalDate fechaAdmision,
-            @Param("$4") String programa,
-            @Param("$5") String tipoAdmision,
-            @Param("$6") String institucionRemite,
-            @Param("$7") String numeroIdentificacionPaciente,
-            @Param("$8") String idRegional
-    );
-    default Mono<Void> insertRemision(RemisionData remisionData){
-        return insertRemisionQuery(
-                remisionData.getIdRemision(),
-                remisionData.getEstado(),
-                remisionData.getFechaAdmision(),
-                remisionData.getPrograma(),
-                remisionData.getTipoAdmision(),
-                remisionData.getInstitucionRemite(),
-                remisionData.getNumeroIdentificacionPaciente(),
-                remisionData.getIdRegional()
-        );
-    }
-
+    @Query("INSERT INTO remisiones(id_remision) VALUES ($1)")
+    Mono<Boolean> insertNuevaRemision(
+            @Param("$1") String idRemision);
 
 }
