@@ -31,4 +31,7 @@ public class TurnoProfesionalesData {
     @Column("id_profesional")
     private String idProfesional;
 
+    @Column("id_regional")
+    private  String idRegional;
+
 }

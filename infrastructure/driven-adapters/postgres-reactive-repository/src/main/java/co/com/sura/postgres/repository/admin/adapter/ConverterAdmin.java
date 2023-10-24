@@ -3,28 +3,30 @@ package co.com.sura.postgres.repository.admin.adapter;
 
 import co.com.sura.dto.remision.*;
 import co.com.sura.entity.admin.*;
-import co.com.sura.entity.agenda.Conductor;
-import co.com.sura.entity.agenda.Movil;
-import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.entity.agenda.*;
+import co.com.sura.entity.maestro.HorarioTurno;
 import co.com.sura.postgres.Converter;
-import co.com.sura.postgres.repository.agenda.data.CitaData;
+import co.com.sura.postgres.repository.agenda.data.*;
 import co.com.sura.postgres.repository.admin.data.*;
-import co.com.sura.postgres.repository.agenda.data.ConductorData;
-import co.com.sura.postgres.repository.agenda.data.MovilData;
-import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
 import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class ConverterAdmin extends Converter {
     protected static Object convertToJsonObject (Json jsonByteArrayInput ){
-        byte[] byteArray = jsonByteArrayInput.asArray();
-        var jsonString = new String(byteArray);
-        return  Converter.deserializarJson(jsonString, Object.class);
+        if(jsonByteArrayInput!=null){
+            byte[] byteArray = jsonByteArrayInput.asArray();
+            var jsonString = new String(byteArray);
+            return  Converter.deserializarJson(jsonString, Object.class);
+        }else{
+            return null;
+        }
+
     }
     public static RemisionData convertToRemisionRequest(RemisionRequest remisionRequest){
         return new RemisionData()
@@ -338,6 +340,7 @@ public class ConverterAdmin extends Converter {
 
     public static  RegistroHistorialRemision convertToRegistroHistoriaRemision(
             RegistroHistorialRemisionData registroHistorialRemisionData){
+
         var builder = new RegistroHistorialRemision().toBuilder()
                 .idRemision(registroHistorialRemisionData.getIdRemision())
                 .fechaAplicacionNovedad(registroHistorialRemisionData.getFechaAplicacionNovedad())
@@ -350,11 +353,12 @@ public class ConverterAdmin extends Converter {
                 .paciente(convertToJsonObject(registroHistorialRemisionData.getPaciente()))
                 .datosAtencion(convertToJsonObject(registroHistorialRemisionData.getDatosAtencion()))
                 .ubicacionPaciente(convertToJsonObject(registroHistorialRemisionData.getUbicacionPaciente()))
-                .diagnosticos(convertToJsonObject(registroHistorialRemisionData.getDiagnosticos()));
+               .diagnosticos(convertToJsonObject(registroHistorialRemisionData.getDiagnosticos()));
 
         if (registroHistorialRemisionData.getCitas() != null) {
             builder.citas(convertToJsonObject(registroHistorialRemisionData.getCitas()));
         }
+
         return builder.build();
     }
 
@@ -363,7 +367,21 @@ public class ConverterAdmin extends Converter {
                 convertirObjetoAJson(profesionalData), Profesional.class
         );
     }
-
+    public static ProfesionalWithTurno convertToProfesionalTurno(ProfesionalData profesionalData){
+        return deserializarJson(
+                convertirObjetoAJson(profesionalData), ProfesionalWithTurno.class
+        );
+    }
+    public static TurnoProfesional convertToTurnoProfesional(TurnoProfesionalesData turnoProfesionalesData){
+        return deserializarJson(
+                convertirObjetoAJson(turnoProfesionalesData), TurnoProfesional.class
+        );
+    }
+    public static TurnoProfesionalesData convertToTurnoProfesionalData(TurnoProfesional turnoProfesional){
+        return deserializarJson(
+                convertirObjetoAJson(turnoProfesional), TurnoProfesionalesData.class
+        );
+    }
     public static ProfesionalData convertToProfesionalData(Profesional profesional){
         return deserializarJson(
                 convertirObjetoAJson(profesional), ProfesionalData.class
@@ -388,5 +406,17 @@ public class ConverterAdmin extends Converter {
         return   deserializarJson(
                 convertirObjetoAJson(movil), MovilData.class
         );
+    }
+
+    public static ItemSecuenciaTurno convertToSecuenciaTurno(ItemSecuenciaTurnoData secuenciaTurnoData){
+        return ItemSecuenciaTurno
+                .builder()
+                .nombreSecuencia(secuenciaTurnoData.getNombreSecuencia())
+                .descripcion(secuenciaTurnoData.getDescripcion())
+                .numeroDia(secuenciaTurnoData.getNumeroDia())
+                .nombreDia(secuenciaTurnoData.getNombreDia())
+                .horariosTurno(Collections.singletonList(
+                        HorarioTurno.builder().id(secuenciaTurnoData.getIdHorarioTurno()).build()))
+                .build();
     }
 }

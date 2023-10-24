@@ -28,4 +28,5 @@ public class Profesional {
     private LocalDate fechaNacimiento;
     private String idRegional;
     private boolean activo;
+
 }

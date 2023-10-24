@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import java.util.Comparator;
 
 
 @Repository
@@ -44,7 +45,13 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     @Override
     public Flux<HorarioTurno> consultarHorarioTurno() {
         return horarioTurnoRepository.findAll()
-                .map(ConverterMaestros :: convertToHorarioTurno);
+                .map(ConverterMaestros :: convertToHorarioTurno)
+                .collectList()
+                .map(horarioTurnos -> {
+                    horarioTurnos.sort(Comparator.comparing(HorarioTurno::getId));
+                    return horarioTurnos;
+                })
+                .flatMapMany(Flux::fromIterable);
     }
 
     @Override

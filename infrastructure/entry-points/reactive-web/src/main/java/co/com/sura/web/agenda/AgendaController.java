@@ -4,8 +4,6 @@ import co.com.sura.agenda.AgendaUseCase;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
 import co.com.sura.entity.agenda.Actividad;
-import co.com.sura.entity.agenda.Conductor;
-import co.com.sura.entity.agenda.Movil;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.admin.*;
@@ -101,8 +99,9 @@ public class AgendaController {
     public Mono<Response<Boolean>> asignarProfesionalTurno(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
-            @RequestParam String idProfesional){
-        return agendaUseCase.asignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional)
+            @RequestParam String idProfesional,
+            @RequestParam String idRegional){
+        return agendaUseCase.asignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional, idRegional)
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
                         StatusCode.STATUS_200.getValue(),

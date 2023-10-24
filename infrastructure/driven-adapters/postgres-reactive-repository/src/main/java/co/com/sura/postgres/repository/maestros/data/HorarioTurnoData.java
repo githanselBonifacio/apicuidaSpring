@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.persistence.Entity;
@@ -30,4 +31,15 @@ public class HorarioTurnoData {
 
     @Temporal(TemporalType.TIME)
     private LocalTime horaFin;
+
+    @Column("color_hex_referencia")
+    private String colorHexReferencia;
+
+    @Column("es_horario_base")
+    private Boolean esHorarioBase;
+
+    private String descripcion;
+
+    @Column("duracion_horas")
+    private Integer duracionHoras;
 }

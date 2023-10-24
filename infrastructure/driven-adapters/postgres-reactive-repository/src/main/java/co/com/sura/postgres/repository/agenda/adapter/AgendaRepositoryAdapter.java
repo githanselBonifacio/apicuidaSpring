@@ -60,8 +60,6 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private final SondajeRepository sondajeRepository;
     private final SoporteNutricionalRepository soporteNutricionalRepository;
     private final TomaMuestraRepository tomaMuestraRepository;
-    private final ConductorRepository conductorRepository;
-    private final MovilRepository movilRepository;
 
     @Autowired
     public AgendaRepositoryAdapter(
@@ -71,8 +69,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             CuracionRepository curacionRepository, CanalizacionRepository canalizacionRepository,
             FototerapiaRepository fototerapiaRepository, SecrecionRepository secrecionRepository,
             SondajeRepository sondajeRepository, SoporteNutricionalRepository soporteNutricionalRepository,
-            TomaMuestraRepository tomaMuestraRepository, ConductorRepository conductorRepository,
-            MovilRepository movilRepository) {
+            TomaMuestraRepository tomaMuestraRepository) {
 
         this.mapboxService = mapboxService;
         this.turnoProfesionalesRepository = turnoProfesionalesRepository;
@@ -87,8 +84,6 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         this.sondajeRepository = sondajeRepository;
         this.soporteNutricionalRepository = soporteNutricionalRepository;
         this.tomaMuestraRepository = tomaMuestraRepository;
-        this.conductorRepository = conductorRepository;
-        this.movilRepository = movilRepository;
     }
 
 
@@ -107,13 +102,15 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Mono<Boolean> asignarProfesionalTurno(
-            LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional) {
+            LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional,String idRegional) {
+
         return turnoProfesionalesRepository.save(
                 new TurnoProfesionalesData()
                         .toBuilder()
                         .fechaTurno(fechaTurno)
                         .idHorarioTurno(idHorarioTurno)
                         .idProfesional(idProfesional)
+                        .idRegional(idRegional)
                         .build()
         ).then(Mono.just(Boolean.TRUE));
     }

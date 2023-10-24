@@ -71,7 +71,13 @@ public enum Mensajes {
     SE_CREA_MOVIL("Se ha creado movil exitoxamente !!"),
     SE_ACTUALIZA_MOVIL("Se ha actualizado movil exitoxamente !!"),
     ERROR_CREAR_MOVIL("Error al crear al movil"),
-    ERROR_ACTUALIZAR_MOVIL("Error al actualizar movil");
+    ERROR_ACTUALIZAR_MOVIL("Error al actualizar movil"),
+
+    //turnos profesional;
+    SE_ACTUALIZA_TURNO_PROFESIONAL("Se ha actualizado el  turno del profesional"),
+    ERROR_ACTUALIZAR_TURNO_PROFESIONAL("Error al actualizar el turno del profesional");
+
+
     private final String value;
 
 

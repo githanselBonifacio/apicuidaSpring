@@ -16,4 +16,8 @@ public class HorarioTurno {
     private String nombre;
     private LocalTime horaInicio;
     private LocalTime horaFin;
+    private String colorHexReferencia;
+    private Boolean esHorarioBase;
+    private String descripcion;
+    private Integer duracionHoras;
 }

@@ -4,48 +4,21 @@ import co.com.sura.constantes.Mensajes;
 import co.com.sura.dto.remision.CitaRequest;
 import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
-import co.com.sura.entity.agenda.Conductor;
-import co.com.sura.entity.agenda.Movil;
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.admin.Remision;
-import co.com.sura.entity.admin.RemisionCrudRepository;
-import co.com.sura.entity.admin.Paciente;
-import co.com.sura.entity.admin.DatosAtencionPaciente;
-import co.com.sura.entity.admin.RegistroHistorialRemision;
-import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
+import co.com.sura.entity.admin.*;
+import co.com.sura.entity.agenda.*;
+import co.com.sura.postgres.repository.admin.data.*;
 import co.com.sura.postgres.repository.agenda.data.*;
-import co.com.sura.postgres.repository.admin.data.RegistroHistorialRepository;
-import co.com.sura.postgres.repository.admin.data.SoporteNutricionalRepository;
-import co.com.sura.postgres.repository.admin.data.RemisionRepository;
-import co.com.sura.postgres.repository.admin.data.UbicacionRepository;
-import co.com.sura.postgres.repository.admin.data.PacienteRepository;
-import co.com.sura.postgres.repository.admin.data.DatosAtencionPacienteRepository;
-import co.com.sura.postgres.repository.admin.data.RemisionDiagnosticoRepository;
-import co.com.sura.postgres.repository.admin.data.TratamientoRepository;
-import co.com.sura.postgres.repository.admin.data.CanalizacionRepository;
-import co.com.sura.postgres.repository.admin.data.SecrecionRepository;
-import co.com.sura.postgres.repository.admin.data.CuracionRepository;
-import co.com.sura.postgres.repository.admin.data.FototerapiaRepository;
-import co.com.sura.postgres.repository.admin.data.SondajeRepository;
-import co.com.sura.postgres.repository.admin.data.TomaMuestraRepository;
-import co.com.sura.postgres.repository.admin.data.SoporteNutricionalData;
-import co.com.sura.postgres.repository.admin.data.SondajeData;
-import co.com.sura.postgres.repository.admin.data.SecrecionData;
-import co.com.sura.postgres.repository.admin.data.FototerapiaData;
-import co.com.sura.postgres.repository.admin.data.CanalizacionData;
-import co.com.sura.postgres.repository.admin.data.TratamientoData;
-import co.com.sura.postgres.repository.admin.data.CuracionData;
-import co.com.sura.postgres.repository.admin.data.TomaMuestraData;
-import co.com.sura.postgres.repository.admin.data.RegistroHistorialRemisionData;
-import co.com.sura.postgres.repository.admin.data.RemisionDiagnosticoData;
+import co.com.sura.postgres.repository.maestros.adapter.ConverterMaestros;
+import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static co.com.sura.constantes.Mensajes.*;
@@ -74,6 +47,9 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
     private final ProfesionalRepository profesionalRepository;
     private final MovilRepository movilRepository;
     private final ConductorRepository conductorRepository;
+    private final TurnoProfesionalesRepository turnoProfesionalesRepository;
+    private final ItemSecuenciaTurnoRepository secuenciaTurnoRepository;
+    private final HorarioTurnoRepository horarioTurnoRepository;
     @Autowired
     public AdminRepositoryAdapter(
             RemisionRepository remisionRepository, UbicacionRepository ubicacionRepository,
@@ -85,7 +61,8 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
             TomaMuestraRepository tomaMuestraRepository, SoporteNutricionalRepository soporteNutricionalRepository,
             RegistroHistorialRepository registroHistorialRemisionRepository,
             ProfesionalRepository profesionalRepository, MovilRepository movilRepository,
-            ConductorRepository conductorRepository) {
+            ConductorRepository conductorRepository, TurnoProfesionalesRepository turnoProfesionalesRepository,
+            ItemSecuenciaTurnoRepository secuenciaTurnoRepository, HorarioTurnoRepository horarioTurnoRepository) {
 
         this.remisionRepository = remisionRepository;
         this.ubicacionRepository = ubicacionRepository;
@@ -105,6 +82,9 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
         this.profesionalRepository = profesionalRepository;
         this.movilRepository = movilRepository;
         this.conductorRepository = conductorRepository;
+        this.turnoProfesionalesRepository = turnoProfesionalesRepository;
+        this.secuenciaTurnoRepository = secuenciaTurnoRepository;
+        this.horarioTurnoRepository = horarioTurnoRepository;
     }
 
     @Override
@@ -259,6 +239,7 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
         var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
         registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
         registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
+        registroRemisionData.setFechaRegistro(LocalDateTime.now());
 
         if (citasRequest == null) {
             registroRemisionData.setCitas(null);
@@ -366,9 +347,6 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
                 .then(Mono.just(Boolean.TRUE));
     }
 
-
-
-
     //historial remision
     @Override
     public Flux<RegistroHistorialRemision> consultarHistoricoRemision(String idRemision) {
@@ -388,6 +366,14 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
         return profesionalRepository.findAll()
             .map(ConverterAdmin:: convertToProfesional);
         }
+
+    @Override
+    public Flux<Profesional> consultarProfesionalesByRegional(String idRegional) {
+        return profesionalRepository.findByIdRegional(idRegional)
+                .map(ConverterAdmin::convertToProfesional)
+                .sort(Comparator.comparing(Profesional::getNombres));
+    }
+
     @Override
     public Mono<Profesional> crearProfesional(Profesional profesional) {
         return profesionalRepository.existsById(profesional.getNumeroIdentificacion())
@@ -494,4 +480,81 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
                 .map(ConverterAdmin::converToConductor);
     }
 
+    //turnos del personal
+    @Override
+    public Flux<ProfesionalWithTurno> consultarHorariosProfesionales(String fechaTurno, String idRegional) {
+        return profesionalRepository.findByIdRegional(idRegional)
+                .map(ConverterAdmin::convertToProfesionalTurno)
+                .flatMap(profesional -> turnoProfesionalesRepository
+                        .findTurnoProfesionalByFechaRegional(
+                                fechaTurno,profesional.getNumeroIdentificacion(), profesional.getIdRegional())
+                        .map(ConverterAdmin::convertToTurnoProfesional)
+                        .collectList()
+                        .flatMap(turnos -> {
+                            profesional.setTurnos(turnos);
+                            return Mono.just(profesional);
+                        }))
+                .sort(Comparator.comparing(Profesional::getNombres));
+    }
+
+    @Override
+    public Mono<Boolean> eliminarTurnosProfesionalesAccionMasiva(List<EliminarTurnoProfesionalRequest> turnoRequest) {
+        return Flux.fromIterable(turnoRequest)
+                .flatMap(turnoProfesional -> turnoProfesionalesRepository.eliminarByIdProfesionalFechaTurno(
+                        turnoProfesional.getFechaTurno(),turnoProfesional.getIdProfesional()))
+                .all(success->success);
+
+    }
+
+
+    @Override
+    public Mono<Boolean> actualizarHorarioTurnoProfesionales(List<TurnoProfesional> turnos) {
+
+        return turnoProfesionalesRepository.eliminarByIdProfesionalFechaTurno(
+                turnos.get(0).getFechaTurno(),turnos.get(0).getIdProfesional())
+                .thenMany(Flux.fromIterable(turnos)
+                        .map(ConverterAdmin::convertToTurnoProfesionalData)
+                        .collectList()
+                        .flatMapMany(turnoProfesionalesRepository::saveAll))
+                .then(Mono.just(true));
+    }
+    @Override
+    public Flux<Conductor> consultarHorariosConductores(LocalDate fechaTurno, String idRegional) {
+        return null;
+    }
+
+    //secuencias turnos
+    @Override
+    public Flux<SecuenciaTurno> consultarSecuencias() {
+        var horarioTurno  = horarioTurnoRepository.findAll()
+                .map(ConverterMaestros::convertToHorarioTurno);
+        return secuenciaTurnoRepository.findAll()
+                .map(ConverterAdmin::convertToSecuenciaTurno)
+                .flatMap(st -> {
+                    var horariosTurnosFlux = horarioTurno
+                            .filter(h -> h.getId().equals(st.getHorariosTurno().get(0).getId()))
+                            .collectList();
+                    return horariosTurnosFlux
+                            .doOnNext(st::setHorariosTurno)
+                            .thenReturn(st)
+                            .map(SecuenciaTurno::crearSecuenciaTurnoFromItemsSecuencia);
+                })
+                .groupBy(SecuenciaTurno::getNombre)
+                .flatMap(secuenciasTurnosAgrupados -> secuenciasTurnosAgrupados
+                        .collectList()
+                        .map(SecuenciaTurno::agruparItemsDiaTurno));
+
+    }
+
+    public Mono<Boolean> configurarSecuenciaTurno(SecuenciaTurno secuenciaTurno) {
+        return secuenciaTurnoRepository.deleteByNombreSecuencia(secuenciaTurno.getNombre())
+                        .thenMany(Flux.fromIterable(secuenciaTurno.getItemsDiaTurno())
+                                .map(ItemDiaTurno::inicializarListaHorarioTurnoVacio)
+                                .flatMap(itemDiaTurno -> Flux.fromIterable(itemDiaTurno.getHorariosTurno())
+                                        .map(horarioTurno ->AdminDataFactory.crearItemDiaTurnoData(
+                                                secuenciaTurno,itemDiaTurno,horarioTurno)))
+                                .collectList()
+                                .flatMapMany(secuenciaTurnoRepository::saveAll))
+                .then(Mono.just(true));
+    }
 }

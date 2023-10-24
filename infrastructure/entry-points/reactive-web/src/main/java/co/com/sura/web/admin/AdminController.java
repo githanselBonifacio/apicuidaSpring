@@ -4,14 +4,9 @@ package co.com.sura.web.admin;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
 import co.com.sura.dto.remision.CrearRemisionCitasRequest;
-import co.com.sura.entity.agenda.Conductor;
-import co.com.sura.entity.agenda.Movil;
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.admin.DatosAtencionPaciente;
-import co.com.sura.entity.admin.Paciente;
-import co.com.sura.entity.admin.RegistroHistorialRemision;
-import co.com.sura.entity.admin.Remision;
-import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
+import co.com.sura.entity.admin.*;
+import co.com.sura.entity.agenda.*;
 import co.com.sura.genericos.Response;
 import co.com.sura.admin.AdminUseCase;
 import co.com.sura.web.factory.ResponseFactory;
@@ -36,6 +31,25 @@ public class AdminController {
     @GetMapping(value = "/profesionales")
     public Mono<Response<List<Profesional>>> getProfesionales(){
         return adminUseCase.consultarProfesional()
+                .collectList()
+                .map(profesionales -> ResponseFactory.createStatus(
+                        profesionales,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
+    @GetMapping(value = "/profesionales/{idRegional}")
+    public Mono<Response<List<Profesional>>> getProfesionalesByRegional(@PathVariable String idRegional){
+        return adminUseCase.consultarProfesionalByRegional(idRegional)
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
@@ -391,7 +405,49 @@ public class AdminController {
                         e.getMessage()
                 )));
     }
+    //horarios de profesionales
+    @GetMapping(value = "horarioTurno")
+    public Mono<Response<List<ProfesionalWithTurno>>> consultarProfesionalesTurnos(
+            @RequestParam("fechaTurno") String fechaTurno,
+            @RequestParam String idRegional){
+        return adminUseCase.consultarProfesionalesTurnoByFechaTurnoIdRegional(fechaTurno,idRegional)
+                .collectList()
+                .map(historial -> ResponseFactory.createStatus(
+                        historial,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
 
+    @PutMapping(value = "/actualizarTurnoProfesional")
+    public Mono<Response<Boolean>> actualizarTurnoProfesional( @RequestBody List<TurnoProfesional> turnosProfesional){
+        return adminUseCase.actualizarTurnosByProfesional(turnosProfesional)
+                .map(turnosCreado-> ResponseFactory.createStatus(
+                        turnosCreado,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.SE_ACTUALIZA_TURNO_PROFESIONAL.getValue(),
+                        Mensajes.SE_ACTUALIZA_TURNO_PROFESIONAL.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.ERROR_ACTUALIZAR_TURNO_PROFESIONAL.getValue(),
+                        Mensajes.ERROR_ACTUALIZAR_TURNO_PROFESIONAL.getValue(),
+                        e.getMessage()
+                )));
+    }
+
+    //remisiones
     @GetMapping(value = "historial/{idRemision}")
     public Mono<Response<List<RegistroHistorialRemision>>> consultarHistorialRemisionById(
             @PathVariable String idRemision){
@@ -413,7 +469,7 @@ public class AdminController {
                 )));
     }
 
-    @GetMapping(value = "/{idRemision}")
+    @GetMapping(value = "remision/{idRemision}")
     public Mono<Response<RegistroHistorialRemision>> consultarAllDataRemisionById(@PathVariable String idRemision){
         return adminUseCase.consultarDataActualRemision(idRemision)
                 .map(registroHistorial -> ResponseFactory.createStatus(
@@ -427,7 +483,7 @@ public class AdminController {
                         null,
                         StatusCode.STATUS_500.getValue(),
                         Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
                         e.getMessage()
                 )));
     }
@@ -467,6 +523,66 @@ public class AdminController {
                         null,
                         StatusCode.STATUS_500.getValue(),
                         Mensajes.ERROR_EGRESAR_REMISION.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
+
+    //secuencia de turnos
+    @GetMapping("secuenciasTurno")
+    public  Mono<Response<List<SecuenciaTurno>>> consultarSecuenciasTurno(){
+        return adminUseCase.consultarSecuenciasTurno()
+                .collectList()
+                .map(secuenciaTurno -> ResponseFactory.createStatus(
+                        secuenciaTurno,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
+                        e.getMessage()
+                )));
+    }
+
+    @PostMapping("eliminarTurnosProfesionalesAccionMasiva")
+    public Mono<Response<Boolean>> eliminarTurnosProfesionalesAccionMasiva(
+            @RequestBody List<EliminarTurnoProfesionalRequest> request){
+        return adminUseCase.eliminarTurnosProfesionalAccionMasiva(request)
+                .map(fueEliminada -> ResponseFactory.createStatus(
+                        fueEliminada,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
+
+    @PostMapping("secuenciasTurno")
+    public Mono<Response<Boolean>> configurarSecuenciaTurno(@RequestBody SecuenciaTurno secuenciaTurno){
+        return adminUseCase.configurarSecuenciaTurno(secuenciaTurno)
+                .map(secuenciaCreada -> ResponseFactory.createStatus(
+                        secuenciaCreada,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
                         Mensajes.PETICION_FALLIDA.getValue(),
                         e.getMessage()
                 )));

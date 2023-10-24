@@ -7,7 +7,10 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
-public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<TurnoProfesionalesData,String> {
+public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<TurnoProfesionalesData,Integer> {
+
+    @Query("DELETE FROM public.turno_profesional WHERE fecha_turno=$1 and id_profesional=$2;")
+    Mono<Boolean> eliminarByIdProfesionalFechaTurno(LocalDate fechaTurno, String idProfesional);
 
     @Query("SELECT public.profesionales.* " +
             "FROM public.turno_profesional " +
@@ -32,4 +35,11 @@ public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<Tu
             Integer idHorarioTurno,
             String idRegional
     );
+    @Query("SELECT *" +
+            "FROM public.turno_profesional " +
+            "WHERE  public.turno_profesional.id_regional=$3 " +
+            "AND public.turno_profesional.id_profesional = $2 "+
+            "AND to_char( public.turno_profesional.fecha_turno,'YYYY-MM')= $1;")
+    Flux<TurnoProfesionalesData> findTurnoProfesionalByFechaRegional(
+            String fechaTurno, String idProfesional, String idRegional);
 }

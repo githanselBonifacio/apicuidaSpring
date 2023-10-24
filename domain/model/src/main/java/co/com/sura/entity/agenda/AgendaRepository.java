@@ -15,7 +15,8 @@ public interface AgendaRepository {
     Flux<Profesional>   consultarProfesionalFromTurnoCiudad(
                             LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno);
 
-    Mono<Boolean>       asignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
+    Mono<Boolean>       asignarProfesionalTurno (
+                               LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional, String idRegional);
     Mono<Boolean>       desasignarProfesionalTurno (LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional);
 
     Flux<Profesional>   consultarProfesionalesByIdCiudad(String idRegional);

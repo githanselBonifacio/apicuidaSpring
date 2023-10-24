@@ -27,8 +27,9 @@ public class AgendaUseCase implements AgendaFactory {
         return agendaRepository.consultarProfesionalFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno);
     }
 
-    public Mono<Boolean> asignarProfesionalTurno(LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional){
-        return agendaRepository.asignarProfesionalTurno(fechaTurno,idHorarioTurno,idProfesional);
+    public Mono<Boolean> asignarProfesionalTurno(
+            LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional, String idRegional){
+        return agendaRepository.asignarProfesionalTurno(fechaTurno,idHorarioTurno,idProfesional, idRegional);
     }
 
     public Mono<Boolean> desasignarProfesionalTurno(LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional){

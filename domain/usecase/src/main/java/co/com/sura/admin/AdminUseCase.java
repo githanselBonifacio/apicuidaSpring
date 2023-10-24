@@ -3,18 +3,16 @@ package co.com.sura.admin;
 import co.com.sura.dto.remision.CitaRequest;
 import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
-import co.com.sura.entity.agenda.Conductor;
-import co.com.sura.entity.agenda.Movil;
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
+import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
+import co.com.sura.entity.agenda.*;
 import co.com.sura.entity.admin.*;
-import co.com.sura.entity.agenda.Profesional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class AdminUseCase implements RemisionFactory {
+public class AdminUseCase implements AdminFactory {
 
    private final RemisionCrudRepository remisionCrudRepository;
 
@@ -79,6 +77,9 @@ public class AdminUseCase implements RemisionFactory {
     public Flux<Profesional> consultarProfesional() {
         return remisionCrudRepository.consultarProfesionales();
     }
+    public Flux<Profesional> consultarProfesionalByRegional(String idRegional){
+        return remisionCrudRepository.consultarProfesionalesByRegional(idRegional);
+    }
     public Mono<Profesional> crearProfesional(Profesional profesional) {
         return remisionCrudRepository.crearProfesional(profesional);
     }
@@ -93,13 +94,15 @@ public class AdminUseCase implements RemisionFactory {
     //conductor
     public Mono<Conductor> crearConductor(Conductor conductor){return remisionCrudRepository.crearConductor(conductor);}
     public Mono<Conductor> actualizarConductor(Conductor conductor){
-        return remisionCrudRepository.actualizarConductor(conductor);}
+        return remisionCrudRepository.actualizarConductor(conductor);
+    }
 
     //moviles
    public Mono<Movil> crearMovil(Movil movil){return remisionCrudRepository.crearMovil(movil);}
 
     public Mono<Movil> actualizarMovil(Movil movil){
-          return remisionCrudRepository.actualizarMovil(movil);}
+          return remisionCrudRepository.actualizarMovil(movil);
+    }
 
     public Flux<Movil> consultarMoviles(){
         return remisionCrudRepository.consultarMoviles();
@@ -111,4 +114,23 @@ public class AdminUseCase implements RemisionFactory {
         return remisionCrudRepository.consultarMovilesByIdRegional(idRegional);
     }
 
+    //turnos de profesionales
+    public Flux<ProfesionalWithTurno> consultarProfesionalesTurnoByFechaTurnoIdRegional(
+            String fechaTurno, String idRegional){
+        return remisionCrudRepository.consultarHorariosProfesionales(fechaTurno,idRegional);
+    }
+    public Mono<Boolean> eliminarTurnosProfesionalAccionMasiva(List<EliminarTurnoProfesionalRequest>requests){
+        return remisionCrudRepository.eliminarTurnosProfesionalesAccionMasiva(requests);
+    }
+    public Mono<Boolean> actualizarTurnosByProfesional(List<TurnoProfesional> turnos){
+        return remisionCrudRepository.actualizarHorarioTurnoProfesionales(turnos);
+    }
+
+    //secuencias de turno
+    public Flux<SecuenciaTurno> consultarSecuenciasTurno(){
+        return remisionCrudRepository.consultarSecuencias();
+
+    } public Mono<Boolean> configurarSecuenciaTurno(SecuenciaTurno secuenciaTurno){
+        return remisionCrudRepository.configurarSecuenciaTurno(secuenciaTurno);
+    }
 }
