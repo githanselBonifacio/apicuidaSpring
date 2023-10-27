@@ -5,12 +5,15 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
 import java.time.LocalDate;
+
 
 public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<TurnoProfesionalesData,Integer> {
 
     @Query("DELETE FROM public.turno_profesional WHERE fecha_turno=$1 and id_profesional=$2;")
     Mono<Boolean> eliminarByIdProfesionalFechaTurno(LocalDate fechaTurno, String idProfesional);
+
 
     @Query("SELECT public.profesionales.* " +
             "FROM public.turno_profesional " +

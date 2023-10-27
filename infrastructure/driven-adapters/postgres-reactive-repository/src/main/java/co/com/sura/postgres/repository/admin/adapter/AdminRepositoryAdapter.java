@@ -7,6 +7,8 @@ import co.com.sura.dto.remision.RemisionRequest;
 import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
 import co.com.sura.entity.admin.*;
 import co.com.sura.entity.agenda.*;
+import co.com.sura.genericos.GenericosFactory;
+import co.com.sura.genericos.Resultado;
 import co.com.sura.postgres.repository.admin.data.*;
 import co.com.sura.postgres.repository.agenda.data.*;
 import co.com.sura.postgres.repository.maestros.adapter.ConverterMaestros;
@@ -498,11 +500,40 @@ public class AdminRepositoryAdapter implements RemisionCrudRepository {
     }
 
     @Override
-    public Mono<Boolean> eliminarTurnosProfesionalesAccionMasiva(List<EliminarTurnoProfesionalRequest> turnoRequest) {
+    public Flux<Resultado> eliminarTurnosProfesionalesAccionMasiva(List<EliminarTurnoProfesionalRequest> turnoRequest) {
         return Flux.fromIterable(turnoRequest)
-                .flatMap(turnoProfesional -> turnoProfesionalesRepository.eliminarByIdProfesionalFechaTurno(
-                        turnoProfesional.getFechaTurno(),turnoProfesional.getIdProfesional()))
-                .all(success->success);
+           .flatMap(turno ->citaRepository.findCitasByTurnoProfesional(turno.getFechaTurno(),turno.getIdProfesional())
+               .hasElements()
+               .flatMap(hasElment ->{
+                  if(Boolean.FALSE.equals(hasElment)){
+                    return turnoProfesionalesRepository
+                             .eliminarByIdProfesionalFechaTurno(turno.getFechaTurno(),turno.getIdProfesional())
+                             .then(Mono.just(Resultado.builder().build()));
+                    }
+                   return  Mono.just(GenericosFactory.crearResultado(
+                            String.format(RESPUESTA_TURNO.getValue(),turno.getIdProfesional()), turno.getFechaTurno()));
+                        })
+                )
+                .filter(Resultado::isNotNull);
+
+    }
+
+
+    @Override
+    public Flux<Resultado> asignarTurnosProfesionalesAccionMasiva(List<TurnoProfesional> turnos) {
+        return Flux.fromIterable(turnos)
+                .flatMap(turno-> citaRepository.findCitasByTurnoProfesional(
+                  turno.getFechaTurno(),turno.getIdProfesional())
+                   .hasElements()
+                   .flatMap(hasElment ->{
+                    if(Boolean.FALSE.equals(hasElment)){
+                       return turnoProfesionalesRepository.save(ConverterAdmin.convertToTurnoProfesionalData(turno))
+                                 .then(Mono.just(Resultado.builder().build()));
+                      }
+                       return Mono.just(GenericosFactory.crearResultado(
+                            String.format(RESPUESTA_TURNO.getValue(),turno.getIdProfesional()), turno.getFechaTurno()));
+                   }))
+                .filter(Resultado::isNotNull);
 
     }
 

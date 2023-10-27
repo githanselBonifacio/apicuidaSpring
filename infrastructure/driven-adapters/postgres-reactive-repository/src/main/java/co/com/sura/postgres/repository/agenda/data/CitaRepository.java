@@ -54,6 +54,14 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             String idRegional,
             String numeroIdentificacionProfesional);
 
+    @Query("SELECT citas.* FROM citas " +
+            "INNER JOIN turno_cita ON citas.id_cita=turno_cita.id_cita " +
+            "WHERE turno_cita.fecha_turno = $1 " +
+            "AND citas.id_profesional = $2 " +
+            "ORDER BY public.citas.fecha_programada ASC;")
+    Flux<CitaData> findCitasByTurnoProfesional(
+            LocalDate fechaTurno,
+            String numeroIdentificacionProfesional);
 
     @Query("UPDATE public.citas " +
             "SET  id_estado=2, id_profesional=$2 " +

@@ -9,6 +9,7 @@ import co.com.sura.entity.admin.*;
 import co.com.sura.entity.agenda.*;
 import co.com.sura.genericos.Response;
 import co.com.sura.admin.AdminUseCase;
+import co.com.sura.genericos.Resultado;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -550,11 +551,12 @@ public class AdminController {
     }
 
     @PostMapping("eliminarTurnosProfesionalesAccionMasiva")
-    public Mono<Response<Boolean>> eliminarTurnosProfesionalesAccionMasiva(
+    public Mono<Response<List<Resultado>>> eliminarTurnosProfesionalesAccionMasiva(
             @RequestBody List<EliminarTurnoProfesionalRequest> request){
         return adminUseCase.eliminarTurnosProfesionalAccionMasiva(request)
-                .map(fueEliminada -> ResponseFactory.createStatus(
-                        fueEliminada,
+                .collectList()
+                .map(resultado -> ResponseFactory.createStatus(
+                        resultado,
                         StatusCode.STATUS_200.getValue(),
                         Mensajes.PETICION_EXITOSA.getValue(),
                         Mensajes.PETICION_EXITOSA.getValue(),
@@ -568,7 +570,26 @@ public class AdminController {
                         e.getMessage()
                 )));
     }
-
+    @PostMapping("asignarTurnosProfesionalesAccionMasiva")
+    public Mono<Response<List<Resultado>>> asignarTurnosProfesionalesAccionMasiva(
+            @RequestBody List<TurnoProfesional> request){
+        return adminUseCase.asignarTurnosProfesionalAccionMasiva(request)
+                .collectList()
+                .map(resultado -> ResponseFactory.createStatus(
+                        resultado,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
     @PostMapping("secuenciasTurno")
     public Mono<Response<Boolean>> configurarSecuenciaTurno(@RequestBody SecuenciaTurno secuenciaTurno){
         return adminUseCase.configurarSecuenciaTurno(secuenciaTurno)

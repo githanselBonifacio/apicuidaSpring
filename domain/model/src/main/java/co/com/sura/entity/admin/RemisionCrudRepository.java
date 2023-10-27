@@ -5,6 +5,7 @@ import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
 import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
 import co.com.sura.entity.agenda.*;
+import co.com.sura.genericos.Resultado;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -56,8 +57,10 @@ public interface RemisionCrudRepository {
 
     //turnos personal
     Flux<ProfesionalWithTurno>       consultarHorariosProfesionales(String fechaTurno, String idRegional);
-    Mono<Boolean>                    eliminarTurnosProfesionalesAccionMasiva(
+    Flux<Resultado>                  eliminarTurnosProfesionalesAccionMasiva(
                                                  List<EliminarTurnoProfesionalRequest> request);
+
+    Flux<Resultado>                   asignarTurnosProfesionalesAccionMasiva(List<TurnoProfesional> request);
     Flux<Conductor>                  consultarHorariosConductores( LocalDate fechaTurno, String idRegional);
     Mono<Boolean>                    actualizarHorarioTurnoProfesionales(List<TurnoProfesional> turnos);
 
