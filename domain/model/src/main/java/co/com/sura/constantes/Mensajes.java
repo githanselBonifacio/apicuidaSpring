@@ -77,7 +77,7 @@ public enum Mensajes {
     SE_ACTUALIZA_TURNO_PROFESIONAL("Se ha actualizado el  turno del profesional"),
     ERROR_ACTUALIZAR_TURNO_PROFESIONAL("Error al actualizar el turno del profesional"),
 
-    RESPUESTA_TURNO("El profesional con identificacíon número %s tiene citas asignadas");
+    RESPUESTA_TURNO("El profesional tiene citas asignadas");
 
 
     private final String value;

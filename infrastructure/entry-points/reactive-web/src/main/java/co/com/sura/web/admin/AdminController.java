@@ -9,7 +9,7 @@ import co.com.sura.entity.admin.*;
 import co.com.sura.entity.agenda.*;
 import co.com.sura.genericos.Response;
 import co.com.sura.admin.AdminUseCase;
-import co.com.sura.genericos.Resultado;
+import co.com.sura.genericos.ResultadoActualizacionTurno;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -551,7 +551,7 @@ public class AdminController {
     }
 
     @PostMapping("eliminarTurnosProfesionalesAccionMasiva")
-    public Mono<Response<List<Resultado>>> eliminarTurnosProfesionalesAccionMasiva(
+    public Mono<Response<List<ResultadoActualizacionTurno>>> eliminarTurnosProfesionalesAccionMasiva(
             @RequestBody List<EliminarTurnoProfesionalRequest> request){
         return adminUseCase.eliminarTurnosProfesionalAccionMasiva(request)
                 .collectList()
@@ -571,7 +571,7 @@ public class AdminController {
                 )));
     }
     @PostMapping("asignarTurnosProfesionalesAccionMasiva")
-    public Mono<Response<List<Resultado>>> asignarTurnosProfesionalesAccionMasiva(
+    public Mono<Response<List<ResultadoActualizacionTurno>>> asignarTurnosProfesionalesAccionMasiva(
             @RequestBody List<TurnoProfesional> request){
         return adminUseCase.asignarTurnosProfesionalAccionMasiva(request)
                 .collectList()

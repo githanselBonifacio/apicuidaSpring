@@ -6,7 +6,7 @@ import co.com.sura.dto.remision.RemisionRequest;
 import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
 import co.com.sura.entity.agenda.*;
 import co.com.sura.entity.admin.*;
-import co.com.sura.genericos.Resultado;
+import co.com.sura.genericos.ResultadoActualizacionTurno;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -120,11 +120,11 @@ public class AdminUseCase implements AdminFactory {
             String fechaTurno, String idRegional){
         return remisionCrudRepository.consultarHorariosProfesionales(fechaTurno,idRegional);
     }
-    public Flux<Resultado> eliminarTurnosProfesionalAccionMasiva(List<EliminarTurnoProfesionalRequest>requests){
+    public Flux<ResultadoActualizacionTurno> eliminarTurnosProfesionalAccionMasiva(List<EliminarTurnoProfesionalRequest>requests){
         return remisionCrudRepository.eliminarTurnosProfesionalesAccionMasiva(requests);
     }
 
-    public  Flux<Resultado> asignarTurnosProfesionalAccionMasiva(List<TurnoProfesional>requests){
+    public  Flux<ResultadoActualizacionTurno> asignarTurnosProfesionalAccionMasiva(List<TurnoProfesional>requests){
         return remisionCrudRepository.asignarTurnosProfesionalesAccionMasiva(requests);
     }
     public Mono<Boolean> actualizarTurnosByProfesional(List<TurnoProfesional> turnos){
