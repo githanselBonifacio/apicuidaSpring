@@ -1,10 +1,15 @@
 package co.com.sura.maestro;
 
-import co.com.sura.entity.maestro.*;
+import co.com.sura.entity.maestro.EstadoCita;
+import co.com.sura.entity.maestro.HorarioTurno;
+import co.com.sura.entity.maestro.MaestroRepository;
+import co.com.sura.entity.maestro.Profesion;
+import co.com.sura.entity.maestro.Regional;
+import co.com.sura.entity.maestro.TipoIdentificacion;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class CrudMaestroUseCase implements MaestroFactory {
+public class CrudMaestroUseCase {
 
     private final MaestroRepository maestroRepository;
 

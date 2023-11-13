@@ -1,9 +1,8 @@
 package co.com.sura.moviles;
 
-import co.com.sura.entity.maestro.MaestroFactory;
 import co.com.sura.entity.moviles.MovilRepository;
 
-public class MovilesUseCase implements MaestroFactory {
+public class MovilesUseCase {
 
     private final MovilRepository movilRepository;
 

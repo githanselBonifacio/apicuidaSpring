@@ -1,15 +1,19 @@
 package co.com.sura.agenda;
 
-import co.com.sura.entity.agenda.*;
+import co.com.sura.entity.admin.Cita;
+import co.com.sura.entity.admin.Procedimientos;
+import co.com.sura.entity.admin.Tratamiento;
+import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.AgendaRepository;
+import co.com.sura.entity.agenda.Profesional;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.admin.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class AgendaUseCase implements AgendaFactory {
+public class AgendaUseCase  {
 
     private final AgendaRepository agendaRepository;
 
