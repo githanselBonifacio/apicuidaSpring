@@ -11,5 +11,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class RegistroCancelacionCita {
     private String descripcion;
-    private int cantidad;
+    private Integer cantidad;
 }
