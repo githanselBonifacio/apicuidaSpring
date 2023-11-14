@@ -9,7 +9,7 @@ import co.com.sura.entity.reportes.ReportesRepository;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.moviles.MovilesUseCase;
 import co.com.sura.admin.AdminUseCase;
-import co.com.sura.moviles.reportes.ReportesUseCase;
+import co.com.sura.reportes.ReportesUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

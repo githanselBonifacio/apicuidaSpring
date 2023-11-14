@@ -31,8 +31,14 @@ public class ReporteTurnoData {
     @Column("id_horario_turno")
     private Integer idHorarioTurno;
 
-    @Column("numero_profesionales")
-    private Integer numeroProfesionales;
+    @Column("total_profesionales")
+    private Integer totalRemisiones;
+
+    @Column("total_remisiones")
+    private Integer totalProfesionales;
+
+    @Column("total_novedades")
+    private Integer totalNovedadess;
 
     @Column("horas_profesionales")
     private Double horasProfesionales;

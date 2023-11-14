@@ -1,4 +1,4 @@
-package co.com.sura.entity.reportes;
+package co.com.sura.entity.reportes.turnos;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package co.com.sura.entity.reportes;
+package co.com.sura.entity.reportes.turnos;
 
 import co.com.sura.entity.maestro.Regional;
 import lombok.Getter;

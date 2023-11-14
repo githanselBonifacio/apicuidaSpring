@@ -4,7 +4,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-r2dbc:${springBootVersion}"
     implementation group: 'io.r2dbc', name: 'r2dbc-postgresql', version: '0.8.13.RELEASE'
     implementation group: 'io.r2dbc', name: 'r2dbc-spi', version: '0.8.3.RELEASE'
-
+    implementation "org.javatuples:javatuples:${javatuplesVersion}"
     implementation 'javax.persistence:persistence-api:1.0.2'
 
     // JSON and object mapping libraries

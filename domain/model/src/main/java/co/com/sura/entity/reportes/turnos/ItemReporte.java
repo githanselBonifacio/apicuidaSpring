@@ -1,4 +1,4 @@
-package co.com.sura.entity.reportes;
+package co.com.sura.entity.reportes.turnos;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +15,7 @@ public class ItemReporte {
     private Double totalHorasAtencionesCompletadas;
     private Integer totalCitasCompletadas;
     private Integer totalCitasCanceladas;
+    private Integer totalRemisiones;
+    private Integer totalNovedades;
     private Double cumplimientoCitasPromedio;
 }

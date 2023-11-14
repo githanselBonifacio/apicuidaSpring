@@ -1,14 +1,18 @@
 package co.com.sura.postgres.repository.reportes.adapter;
 
 import co.com.sura.entity.maestro.Regional;
-import co.com.sura.entity.reportes.ItemReporteAnual;
-import co.com.sura.entity.reportes.ItemReporteMensual;
-import co.com.sura.entity.reportes.ReporteTurnoAnual;
-import co.com.sura.entity.reportes.ReporteTurnoMes;
 import co.com.sura.entity.reportes.ReportesRepository;
+import co.com.sura.entity.reportes.cancelacioncitas.RegistroCancelacionCitaAnual;
+import co.com.sura.entity.reportes.cancelacioncitas.RegistroCancelacionCitaMensual;
+import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaAnual;
+import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaMensual;
+import co.com.sura.entity.reportes.turnos.ItemReporteAnual;
+import co.com.sura.entity.reportes.turnos.ItemReporteMensual;
+import co.com.sura.entity.reportes.turnos.ReporteTurnoAnual;
+import co.com.sura.entity.reportes.turnos.ReporteTurnoMensual;
 import co.com.sura.postgres.repository.maestros.adapter.ConverterMaestros;
 import co.com.sura.postgres.repository.maestros.data.RegionalesRepository;
-import co.com.sura.postgres.repository.reportes.QueryReportes;
+import co.com.sura.postgres.repository.reportes.querys.QueryReportes;
 import co.com.sura.postgres.repository.reportes.data.ReporteTurnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -27,16 +31,16 @@ public class ReportesAdapter implements ReportesRepository {
 
     private final RegionalesRepository regionalesRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private final ReactiveTransactionManager transactionManager;
+    private final TransactionalOperator transactionalOperator;
 
     @Autowired
     public ReportesAdapter(ReporteTurnoRepository reportesTurnoRepository,
-                           RegionalesRepository regionalesRepository, DatabaseClient databaseClient,
+                           RegionalesRepository regionalesRepository, DatabaseClient transactionalOperator,
                            R2dbcEntityTemplate r2dbcEntityTemplate, ReactiveTransactionManager transactionManager) {
 
         this.regionalesRepository = regionalesRepository;
         this.r2dbcEntityTemplate = r2dbcEntityTemplate;
-        this.transactionManager = transactionManager;
+        this.transactionalOperator = TransactionalOperator.create(transactionManager);
     }
 
 
@@ -54,28 +58,67 @@ public class ReportesAdapter implements ReportesRepository {
                         .regional(tuple.getT1())
                         .reportes(tuple.getT2())
                         .build())
-                .map(ReporteTurnoAnual::setNombreMes)
-                .map(ReporteTurnoAnual::calcularResumen);
+                .flatMap(ReporteTurnoAnual::setNombreMes)
+                .flatMap(ReporteTurnoAnual::calcularResumen);
     }
 
     @Override
-    public Mono<ReporteTurnoMes> consultarReporteMensual(Integer anio, Integer numeroMes, String idRegional) {
+    public Mono<ReporteTurnoMensual> consultarReporteMensual(Integer anio, Integer numeroMes, String idRegional) {
         Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
                 .map(ConverterMaestros::convertToCiudad);
 
         Mono<List<ItemReporteMensual>> itemsReporteMensual = consultarItemsReporteMensual(anio,numeroMes, idRegional)
                 .collectList();
         return Mono.zip(regionalResult, itemsReporteMensual)
-                .map(tuple -> ReporteTurnoMes
+                .map(tuple -> ReporteTurnoMensual
                         .builder()
                         .regional(tuple.getT1())
                         .reportes(tuple.getT2())
                         .build())
-                .map(ReporteTurnoMes::calcularResumen);
+                .flatMap(ReporteTurnoMensual::calcularResumen);
     }
 
+    @Override
+    public Mono<ReporteCancelacionCitaAnual> consultaReporteCancelacionCitasAnual(Integer anio, String idRegional) {
+        Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
+                .map(ConverterMaestros::convertToCiudad);
+
+      Mono<List<RegistroCancelacionCitaAnual>> registroCancelacion =
+                               consultarRegistroCancelacionCitaAnual(anio, idRegional).collectList();
+
+        return Mono.zip(regionalResult,registroCancelacion)
+                .map(tuple->ReporteCancelacionCitaAnual
+                        .builder()
+                        .regional(tuple.getT1())
+                        .reportes(tuple.getT2())
+                        .build())
+                .flatMap(ReporteCancelacionCitaAnual::setNombreMes)
+                .flatMap(ReporteCancelacionCitaAnual::calcularResumen);
+    }
+
+    @Override
+    public Mono<ReporteCancelacionCitaMensual> consultaReporteCancelacionCitasMensual(
+            Integer anio, Integer numeroMes, String idRegional) {
+           Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
+                .map(ConverterMaestros::convertToCiudad);
+
+        Mono<List<RegistroCancelacionCitaMensual>> registroCancelacion =
+                consultarRegistroCancelacionCitaMensual(anio,numeroMes, idRegional).collectList();
+
+        return Mono.zip(regionalResult,registroCancelacion)
+                .map(tuple->ReporteCancelacionCitaMensual
+                        .builder()
+                        .regional(tuple.getT1())
+                        .reportes(tuple.getT2())
+                        .build())
+                .flatMap(ReporteCancelacionCitaMensual::calcularResumen);
+    }
+
+
+    //querys
+    //reporte turno
     private Flux<ItemReporteAnual> consultarItemsReporteAnual(Integer anio, String idRegional){
-        return TransactionalOperator.create(transactionManager)
+        return transactionalOperator
                 .execute(status -> r2dbcEntityTemplate.getDatabaseClient()
                         .sql(QueryReportes.FIND_REPORTE_ANUAL_BY_YEAR_REGIONAL.getQuery())
                         .bind("$1",anio)
@@ -85,13 +128,36 @@ public class ReportesAdapter implements ReportesRepository {
     }
 
     private Flux<ItemReporteMensual> consultarItemsReporteMensual(Integer anio,Integer mes, String idRegional){
-        return TransactionalOperator.create(transactionManager)
+        return transactionalOperator
                 .execute(status -> r2dbcEntityTemplate.getDatabaseClient()
                         .sql(QueryReportes.FIND_REPORTE_MENSUAL_BY_YEAR_REGIONAL.getQuery())
                         .bind("$1",mes)
                         .bind("$2",anio)
                         .bind("$3",idRegional)
                         .map(ConvertReporte::buildItemReporteMensualFromRow)
+                        .all());
+    }
+
+    //reporte cancelacion citas
+    private Flux<RegistroCancelacionCitaAnual> consultarRegistroCancelacionCitaAnual(Integer anio, String idRegional){
+        return transactionalOperator
+                .execute(status  ->r2dbcEntityTemplate.getDatabaseClient()
+                .sql(QueryReportes.FIND_MOTIVOS_CANCELACION_ANUAL.getQuery())
+                .bind("$1",idRegional)
+                .bind("$2",anio)
+                .map(ConvertReporte::buildRegistroCancelacionCitaAnualFromRow)
+                .all());
+    }
+
+    private Flux<RegistroCancelacionCitaMensual> consultarRegistroCancelacionCitaMensual(
+            Integer anio,Integer numeroMes, String idRegional){
+        return transactionalOperator
+                .execute(status  ->r2dbcEntityTemplate.getDatabaseClient()
+                        .sql(QueryReportes.FIND_MOTIVOS_CANCELACION_MENSUAL.getQuery())
+                        .bind("$1",idRegional)
+                        .bind("$2",numeroMes)
+                        .bind("$3",anio)
+                        .map(ConvertReporte::buildRegistroCancelacionCitaMensualFromRow)
                         .all());
     }
 }
