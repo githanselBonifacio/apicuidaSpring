@@ -40,7 +40,7 @@ public class PostgresqlConnectionPool {
                 .build());
     }
     @Bean
-    ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
+    public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
         return new R2dbcTransactionManager(connectionFactory);
     }
 }

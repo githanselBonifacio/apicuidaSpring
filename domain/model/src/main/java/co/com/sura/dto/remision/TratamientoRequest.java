@@ -1,6 +1,6 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.admin.Medicamento;
+import co.com.sura.entity.remision.Medicamento;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

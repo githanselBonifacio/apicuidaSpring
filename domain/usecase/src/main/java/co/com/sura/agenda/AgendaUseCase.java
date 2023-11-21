@@ -1,11 +1,12 @@
 package co.com.sura.agenda;
 
-import co.com.sura.entity.admin.Cita;
-import co.com.sura.entity.admin.Procedimientos;
-import co.com.sura.entity.admin.Tratamiento;
+import co.com.sura.entity.agenda.Cita;
+import co.com.sura.entity.personal.TurnoProfesional;
+import co.com.sura.entity.remision.Procedimientos;
+import co.com.sura.entity.remision.Tratamiento;
 import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.AgendaRepository;
-import co.com.sura.entity.agenda.Profesional;
+import co.com.sura.entity.personal.Profesional;
 import co.com.sura.entity.moviles.Desplazamiento;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,33 +23,32 @@ public class AgendaUseCase  {
     }
 
 
-    public Flux<Profesional> consultarProfesionalesByTurnoCiudad(LocalDate fechaTurno, String idRegional) {
-        return agendaRepository.consultarProfesionalByTurnoCiudad(fechaTurno,idRegional);
+    public Flux<Profesional> consultarProfesionalesByTurnoRegional(LocalDate fechaTurno, String idRegional) {
+        return agendaRepository.consultarProfesionalByTurnoRegional(fechaTurno,idRegional);
     }
 
-    public Flux<Profesional> consultarProfesionalesFromTurnoCiudad(
+    public Flux<Profesional> consultarProfesionalesFromTurnoRegional(
             LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno) {
-        return agendaRepository.consultarProfesionalFromTurnoCiudad(fechaTurno,idCiudad,idHorarioTurno);
+        return agendaRepository.consultarProfesionalFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno);
     }
 
-    public Mono<Boolean> asignarProfesionalTurno(
-            LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional, String idRegional){
-        return agendaRepository.asignarProfesionalTurno(fechaTurno,idHorarioTurno,idProfesional, idRegional);
+    public Mono<Boolean> asignarProfesionalTurno(TurnoProfesional turnoProfesional){
+        return agendaRepository.asignarProfesionalTurno(turnoProfesional);
     }
 
-    public Mono<Boolean> desasignarProfesionalTurno(LocalDate fechaTurno,Integer idHorarioTurno,String idProfesional){
-        return agendaRepository.desasignarProfesionalTurno(fechaTurno,idHorarioTurno,idProfesional);
+    public Mono<Boolean> desasignarProfesionalTurno(TurnoProfesional turnoProfesional){
+        return agendaRepository.desasignarProfesionalTurno(turnoProfesional);
     }
 
     public Mono<Boolean> desagendarTurnoCompleto(LocalDate fechaTurno,Integer idHorarioTurno,String idRegional){
-        return agendaRepository.desagendarTurnocompleto(fechaTurno,idHorarioTurno,idRegional);
+        return agendaRepository.desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idRegional);
     }
 
-    public Flux<Profesional> consultarProfesionalesByCiudad(String idRegional) {
-        return agendaRepository.consultarProfesionalesByIdCiudad(idRegional);
+    public Flux<Profesional> consultarProfesionalesByRegional(String idRegional) {
+        return agendaRepository.consultarProfesionalesByIdRegional(idRegional);
     }
 
-    public Flux<Actividad> consultarActividadesProfesionalesCiudadHorario(
+    public Flux<Actividad> consultarActividadesProfesionalesRegionalHorario(
           LocalDate fechaTurno,
           Integer idHorarioTurno,
           String idRegional) {
@@ -68,8 +68,8 @@ public class AgendaUseCase  {
     }
 
 
-    public Flux<Cita> consultarCitasByTurnoCiudad (LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad){
-        return agendaRepository.consultarCitasByTurnoCiudad(fechaTurno, idHorarioTurno, idCiudad);
+    public Flux<Cita> consultarCitasByTurnoRegional(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad){
+        return agendaRepository.consultarCitasByTurnoRegional(fechaTurno, idHorarioTurno, idCiudad);
     }
     public Mono<Boolean> reprogramarCitaById (
             LocalDateTime fechaProgramada,
@@ -83,8 +83,12 @@ public class AgendaUseCase  {
     }
 
     public Mono<Boolean> asignarProfesionaCita (
-            String idCita, String idProfesional, LocalDate fechaTurno,Integer idHorarioTurno,String idRegional){
-        return agendaRepository.agendarToProfesional( idCita, idProfesional, fechaTurno, idHorarioTurno, idRegional);
+            String idCita,
+            String idProfesional,
+            LocalDate fechaTurno,
+            Integer idHorarioTurno,
+            String idRegional){
+        return agendaRepository.agendarToProfesional( idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional);
     }
 
     public Mono<Boolean> desasignarProfesionaCita (

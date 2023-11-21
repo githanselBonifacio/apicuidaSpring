@@ -1,27 +1,28 @@
 package co.com.sura.postgres;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.List;
 import java.util.Objects;
 
 public abstract class RepositoryOperations<M, E, PK, R extends CrudRepository<E, PK>> {
     public final R repository;
-    //private final ModelMapper mapper;
+    private final ModelMapper mapper;
     private final ObjectMapper objectMapper;
     private final CacheManager cacheManager;
     Class<M> modelClass;
     Class<E> entityClass;
 
-    protected RepositoryOperations(ObjectMapper objectMapper, Class<M> modelClass, Class<E> entityClass, R repository, CacheManager cacheManager) {
-        //this.mapper = mapper;
+    protected RepositoryOperations(
+            ModelMapper mapper, ObjectMapper objectMapper, Class<M> modelClass,
+            Class<E> entityClass, R repository, CacheManager cacheManager) {
+        this.mapper = mapper;
         this.modelClass = modelClass;
         this.entityClass = entityClass;
         this.repository = repository;
@@ -83,8 +84,8 @@ public abstract class RepositoryOperations<M, E, PK, R extends CrudRepository<E,
                 .map(this::toModel);
     }
 
-    protected Disposable clearCache() {
-        return Flux.fromIterable(cacheManager.getCacheNames())
+    protected void clearCache() {
+        Flux.fromIterable(cacheManager.getCacheNames())
                 .map(cacheName -> {
                     Objects.requireNonNull(cacheManager.getCache(cacheName)).clear();
                     return cacheName;

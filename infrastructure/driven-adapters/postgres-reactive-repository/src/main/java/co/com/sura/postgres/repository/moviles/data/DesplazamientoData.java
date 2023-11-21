@@ -1,5 +1,6 @@
 package co.com.sura.postgres.repository.moviles.data;
 
+import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -57,5 +60,11 @@ public class DesplazamientoData {
                 .fechaProgramada(citaPartida.getFechaProgramada()
                         .plus(citaPartida.getDuracion(), ChronoUnit.SECONDS))
                 .build();
+    }
+    public static Mono<Integer> calcularHorasTotalesDesplazamientoTurno(Flux<DesplazamientoData> desplazamientos){
+        return desplazamientos
+                .map(DesplazamientoData::getDuracion)
+                .reduce(0,Integer::sum)
+                .map(duracionTotal-> (duracionTotal/ Numeros.SEGUNDOS_EN_HORAS.getValue()));
     }
 }

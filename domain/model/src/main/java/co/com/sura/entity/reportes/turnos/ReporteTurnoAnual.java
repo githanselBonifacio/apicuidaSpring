@@ -32,12 +32,14 @@ public class ReporteTurnoAnual extends ReporteTurno {
                     resumen.setCitasCanceladas(resumen.getCitasCanceladas() + item.getTotalCitasCanceladas());
                     resumen.setTotalRemisiones(resumen.getTotalRemisiones() + item.getTotalRemisiones());
                     resumen.setTotalNovedades(resumen.getTotalNovedades() + item.getTotalNovedades());
-                    resumen.setCumplimineto(resumen.getCumplimineto() + item.getCumplimientoCitasPromedio());
+                    resumen.setCumplimiento(resumen.getCumplimiento() + item.getCumplimientoCitasPromedio());
                     return resumen;
                 })
                 .map(resumen -> {
-                    resumen.setCapacidad(resumen.getCapacidad() / sizeReporte);
-                    resumen.setCumplimineto(resumen.getCumplimineto() / sizeReporte);
+                    if(sizeReporte>0){
+                        resumen.setCapacidad(resumen.getCapacidad() / sizeReporte);
+                        resumen.setCumplimiento(resumen.getCumplimiento() / sizeReporte);
+                    }
                     return resumen;
                 })
                 .doOnNext(reporte::setResumen)

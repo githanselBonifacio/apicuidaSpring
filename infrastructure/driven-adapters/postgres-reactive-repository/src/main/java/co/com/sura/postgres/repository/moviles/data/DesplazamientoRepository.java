@@ -1,6 +1,5 @@
 package co.com.sura.postgres.repository.moviles.data;
 
-import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
@@ -9,6 +8,13 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 
 public interface DesplazamientoRepository extends ReactiveCrudRepository<DesplazamientoData,Integer> {
+
+    @Query("SELECT * FROM public.desplazamientos " +
+            "INNER JOIN public.citas ON public.citas.id_cita = public.desplazamientos.id_cita_partida AND " +
+            "public.citas.id_regional = $2 AND " +
+            "public.citas.id_horario_turno = $3 " +
+            "WHERE public.desplazamientos.fecha_programada::date = $1")
+    Flux<DesplazamientoData> findByFechaProgramada(LocalDate fechaProgramada, String idRegional,Integer idHorarioTurno);
 
     @Query("SELECT * " +
             "FROM public.desplazamiento " +

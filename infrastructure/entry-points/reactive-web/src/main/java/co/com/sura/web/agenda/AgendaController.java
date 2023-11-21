@@ -4,16 +4,25 @@ import co.com.sura.agenda.AgendaUseCase;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
 import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.Cita;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.agenda.Profesional;
-import co.com.sura.entity.admin.*;
+import co.com.sura.entity.personal.Profesional;
+import co.com.sura.entity.personal.TurnoProfesional;
+import co.com.sura.entity.remision.Procedimientos;
+import co.com.sura.entity.remision.Tratamiento;
 import co.com.sura.genericos.Response;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,7 +43,7 @@ public class AgendaController {
     public Mono<Response<List<Profesional>>> getProfesionalesbyTurnoCiudad(
              @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
              @RequestParam String idRegional){
-        return agendaUseCase.consultarProfesionalesByTurnoCiudad(fechaTurno, idRegional)
+        return agendaUseCase.consultarProfesionalesByTurnoRegional(fechaTurno, idRegional)
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
@@ -57,7 +66,7 @@ public class AgendaController {
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam String idRegional,
             @RequestParam Integer idHorarioTurno){
-        return agendaUseCase.consultarProfesionalesFromTurnoCiudad(fechaTurno, idRegional, idHorarioTurno)
+        return agendaUseCase.consultarProfesionalesFromTurnoRegional(fechaTurno, idRegional, idHorarioTurno)
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
@@ -74,9 +83,9 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
-    @GetMapping(value = "/profesionales/{idCiudad}")
+    @GetMapping(value = "/profesionales/{idRegional}")
     public Mono<Response<List<Profesional>>> getProfesionalesByCiudad(@PathVariable String idRegional){
-        return agendaUseCase.consultarProfesionalesByCiudad(idRegional)
+        return agendaUseCase.consultarProfesionalesByRegional(idRegional)
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
@@ -95,18 +104,16 @@ public class AgendaController {
     }
 
 
-    @GetMapping(value = "/asignarProfesionalTurno")
-    public Mono<Response<Boolean>> asignarProfesionalTurno(
-            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam Integer idHorarioTurno,
-            @RequestParam String idProfesional,
-            @RequestParam String idRegional){
-        return agendaUseCase.asignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional, idRegional)
+    @PostMapping(value = "/asignarProfesionalTurno")
+    public Mono<Response<Boolean>> asignarProfesionalTurno(@RequestBody TurnoProfesional turnoProfesional){
+        return agendaUseCase.asignarProfesionalTurno(turnoProfesional)
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
                         StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.getValue().replace("?",fechaTurno.toString()),
-                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.getValue().replace("?",fechaTurno.toString()),
+                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                                .getFechaTurno().toString()),
+                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                                .getFechaTurno().toString()),
                         Mensajes.PETICION_EXITOSA.getValue()
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
@@ -118,24 +125,23 @@ public class AgendaController {
                 )));
     }
 
-    @GetMapping(value = "/desasignarProfesionalTurno")
-    public Mono<Response<Boolean>> desasignarProfesionalTurno(
-            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam Integer idHorarioTurno,
-            @RequestParam String idProfesional){
-        return agendaUseCase.desasignarProfesionalTurno(fechaTurno, idHorarioTurno,idProfesional)
+    @PostMapping(value = "/desasignarProfesionalTurno")
+    public Mono<Response<Boolean>> desasignarProfesionalTurno(@RequestBody TurnoProfesional turnoProfesional){
+        return agendaUseCase.desasignarProfesionalTurno(turnoProfesional)
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
                         StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.getValue().replace("?",fechaTurno.toString()),
-                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.getValue().replace("?",fechaTurno.toString()),
+                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                                .getFechaTurno().toString()),
+                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                                .getFechaTurno().toString()),
                         Mensajes.PETICION_EXITOSA.getValue()
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
                         StatusCode.STATUS_500.getValue(),
                         Mensajes.NO_DESASIGNO_PROFESIONAL_TURNO.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
                         e.getMessage()
                 )));
     }
@@ -189,7 +195,7 @@ public class AgendaController {
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idRegional){
-        return agendaUseCase.consultarActividadesProfesionalesCiudadHorario(fechaTurno,idHorarioTurno,idRegional)
+        return agendaUseCase.consultarActividadesProfesionalesRegionalHorario(fechaTurno,idHorarioTurno,idRegional)
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
@@ -234,7 +240,7 @@ public class AgendaController {
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idRegional) {
-        return agendaUseCase.consultarCitasByTurnoCiudad(fechaTurno,idHorarioTurno, idRegional)
+        return agendaUseCase.consultarCitasByTurnoRegional(fechaTurno,idHorarioTurno, idRegional)
                 .collectList()
                 .map(citas -> ResponseFactory.createStatus(
                         citas,

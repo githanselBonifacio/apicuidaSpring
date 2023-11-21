@@ -1,10 +1,14 @@
 package co.com.sura.web.reportes;
 
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaAnual;
 import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaMensual;
 import co.com.sura.entity.reportes.turnos.ReporteTurnoAnual;
 import co.com.sura.entity.reportes.turnos.ReporteTurnoMensual;
+import co.com.sura.genericos.Response;
 import co.com.sura.reportes.ReportesUseCase;
+import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,31 +27,88 @@ public class ReportesController {
     private ReportesUseCase reportesUseCase;
 
     @GetMapping("/turno/anual")
-    public Mono<ReporteTurnoAnual> consultarReporteAnual(
+    public Mono<Response<ReporteTurnoAnual>> consultarReporteAnual(
             @RequestParam Integer anio,
             @RequestParam  String idRegional){
-        return  reportesUseCase.consultarReporteAnual(anio,idRegional);
+        return  reportesUseCase.consultarReporteAnual(anio,idRegional)
+                .map(reporte -> ResponseFactory.createStatus(
+                        reporte,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping("/turno/mensual")
-    public Mono<ReporteTurnoMensual> consultarReporteMensual(
+    public Mono<Response<ReporteTurnoMensual>> consultarReporteMensual(
             @RequestParam Integer anio,
             @RequestParam Integer numeroMes,
             @RequestParam  String idRegional){
-        return  reportesUseCase.consultarReporteMes(anio,numeroMes,idRegional);
+        return  reportesUseCase.consultarReporteMes(anio,numeroMes,idRegional)
+                .map(reporte -> ResponseFactory.createStatus(
+                        reporte,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
     @GetMapping("/cancelacionCitas/anual")
-    public Mono<ReporteCancelacionCitaAnual> consultarReporteCancelacionCitaAnual(
+    public Mono<Response<ReporteCancelacionCitaAnual>> consultarReporteCancelacionCitaAnual(
             @RequestParam Integer anio,
             @RequestParam  String idRegional){
-        return  reportesUseCase.consultaReporteCancelacionCitasAnual(anio,idRegional);
+        return  reportesUseCase.consultaReporteCancelacionCitasAnual(anio,idRegional)
+         .map(reporte -> ResponseFactory.createStatus(
+                 reporte,
+                StatusCode.STATUS_200.getValue(),
+                Mensajes.PETICION_EXITOSA.getValue(),
+                Mensajes.PETICION_EXITOSA.getValue(),
+                Mensajes.PETICION_EXITOSA.getValue()
+        ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
 
     @GetMapping("/cancelacionCitas/mensual")
-    public Mono<ReporteCancelacionCitaMensual> consultarReporteCancelacionCitaMensual(
+    public Mono<Response<ReporteCancelacionCitaMensual>> consultarReporteCancelacionCitaMensual(
             @RequestParam Integer anio,
             @RequestParam Integer numeroMes,
             @RequestParam  String idRegional){
-        return  reportesUseCase.consultaReporteCancelacionCitasMensual(anio,numeroMes,idRegional);
+        return  reportesUseCase.consultaReporteCancelacionCitasMensual(anio,numeroMes,idRegional)
+                .map(reporte -> ResponseFactory.createStatus(
+                        reporte,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
     }
+
 }

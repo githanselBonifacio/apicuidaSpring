@@ -26,6 +26,6 @@ public class ResumenReporteTurno {
     private int totalRemisiones;
     private int totalNovedades;
 
-    @JsonProperty("cumpliminetoCitasPromedio")
-    private double cumplimineto;
+    @JsonProperty("cumplimientoCitasPromedio")
+    private double cumplimiento;
  }

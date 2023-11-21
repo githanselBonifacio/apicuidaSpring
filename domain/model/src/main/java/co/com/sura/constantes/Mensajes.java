@@ -22,6 +22,8 @@ public enum Mensajes {
     //agenda
     TURNO_DESAGENDADO("Se desagendó el turno completo"),
     ERROR_TURNO_DESAGENDADO("Error al desagendar turno completo"),
+    ERROR_TURNO_DESAGENDADO_ESTADOS_CITAS("No es posible desagendar el profesional porque tiene citas asignadas "+
+            "en estado confirmada, en progreso o finalizada, por favor verifique la agenda"),
 
     TURNO_AUTOAGENDADO("Se programó el turno exitosamente,  validar si aún quedan citas pendientes por agendar"),
     ERROR_AUTOAGENDADO("Error al autoagendar turno"),

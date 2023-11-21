@@ -1,26 +1,29 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
-
-
 import co.com.sura.autoagendador.AutoAgendador;
-
 import co.com.sura.autoagendador.OrigenRegional;
 import co.com.sura.autoagendador.Resultado;
-import co.com.sura.entity.agenda.*;
+import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.AgendaRepository;
+import co.com.sura.entity.agenda.Cita;
+import co.com.sura.entity.agenda.ProcedimientosCitaRepository;
+import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.admin.*;
-import co.com.sura.postgres.repository.admin.adapter.ConverterAdmin;
-import co.com.sura.postgres.repository.agenda.data.*;
+import co.com.sura.entity.personal.Profesional;
+import co.com.sura.entity.personal.TurnoProfesional;
+import co.com.sura.entity.remision.Procedimientos;
+import co.com.sura.entity.remision.Tratamiento;
+import co.com.sura.exception.ErrorEstadoNoValidoDesagendarCita;
+import co.com.sura.genericos.EstadosCita;
+import co.com.sura.postgres.repository.agenda.data.CitaData;
+import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.remision.adapter.ConverterRemision;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
-import co.com.sura.postgres.repository.admin.data.TomaMuestraRepository;
-import co.com.sura.postgres.repository.admin.data.CanalizacionRepository;
-import co.com.sura.postgres.repository.admin.data.SoporteNutricionalRepository;
-import co.com.sura.postgres.repository.admin.data.SondajeRepository;
-import co.com.sura.postgres.repository.admin.data.TratamientoRepository;
-import co.com.sura.postgres.repository.admin.data.FototerapiaRepository;
-import co.com.sura.postgres.repository.admin.data.CuracionRepository;
-import co.com.sura.postgres.repository.admin.data.SecrecionRepository;
+import co.com.sura.postgres.repository.remision.data.TratamientoRepository;
+import co.com.sura.postgres.repository.personal.data.ProfesionalData;
+import co.com.sura.postgres.repository.personal.data.ProfesionalRepository;
+import co.com.sura.postgres.repository.personal.data.TurnoProfesionalesRepository;
 import co.com.sura.services.mapbox.GeoUbicacion;
 import co.com.sura.services.mapbox.MapboxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static co.com.sura.autoagendador.IdRegional.getByIdCiudad;
+import static co.com.sura.constantes.Mensajes.ERROR_TURNO_DESAGENDADO_ESTADOS_CITAS;
 import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.crearDesplazamientoData;
 
 @Repository
@@ -46,30 +50,20 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private static final double  PENALIZACION_HOLGURA_NEGATIVA = 1e6;
     private static final String DESPLAZAMIENTO_VISITA          = "dvisita";
     private static final String TIPO_TAREA_VISITA              = "visita";
-
     private final MapboxService mapboxService;
     private final TurnoProfesionalesRepository turnoProfesionalesRepository;
     private final ProfesionalRepository profesionalRepository;
     private final CitaRepository citaRepository;
     private final DesplazamientoRepository desplazamientoRepository;
     private final TratamientoRepository tratamientoRepository;
-    private final CuracionRepository curacionRepository;
-    private final CanalizacionRepository canalizacionRepository;
-    private final FototerapiaRepository fototerapiaRepository;
-    private final SecrecionRepository secrecionRepository;
-    private final SondajeRepository sondajeRepository;
-    private final SoporteNutricionalRepository soporteNutricionalRepository;
-    private final TomaMuestraRepository tomaMuestraRepository;
+    private final ProcedimientosCitaRepository procedimientosCitaRepository;
 
     @Autowired
     public AgendaRepositoryAdapter(
             MapboxService mapboxService, TurnoProfesionalesRepository turnoProfesionalesRepository,
             ProfesionalRepository profesionalRepository, CitaRepository citaRepository,
             DesplazamientoRepository desplazamientoRepository, TratamientoRepository tratamientoRepository,
-            CuracionRepository curacionRepository, CanalizacionRepository canalizacionRepository,
-            FototerapiaRepository fototerapiaRepository, SecrecionRepository secrecionRepository,
-            SondajeRepository sondajeRepository, SoporteNutricionalRepository soporteNutricionalRepository,
-            TomaMuestraRepository tomaMuestraRepository) {
+            ProcedimientosCitaRepository procedimientosCitaRepository) {
 
         this.mapboxService = mapboxService;
         this.turnoProfesionalesRepository = turnoProfesionalesRepository;
@@ -77,57 +71,62 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         this.citaRepository = citaRepository;
         this.desplazamientoRepository = desplazamientoRepository;
         this.tratamientoRepository = tratamientoRepository;
-        this.curacionRepository = curacionRepository;
-        this.canalizacionRepository = canalizacionRepository;
-        this.fototerapiaRepository = fototerapiaRepository;
-        this.secrecionRepository = secrecionRepository;
-        this.sondajeRepository = sondajeRepository;
-        this.soporteNutricionalRepository = soporteNutricionalRepository;
-        this.tomaMuestraRepository = tomaMuestraRepository;
+        this.procedimientosCitaRepository = procedimientosCitaRepository;
     }
 
 
     @Override
-    public Flux<Profesional> consultarProfesionalByTurnoCiudad(LocalDate fechaTurno, String idCiudad) {
+    public Flux<Profesional> consultarProfesionalByTurnoRegional(LocalDate fechaTurno, String idCiudad) {
         return profesionalRepository.findByTurnoRegional(fechaTurno,idCiudad)
-                .map(ConverterAdmin:: convertToProfesional);
+                .map(ConverterRemision:: convertToProfesional);
     }
 
     @Override
-    public Flux<Profesional> consultarProfesionalFromTurnoCiudad(
+    public Flux<Profesional> consultarProfesionalFromTurnoRegional(
             LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno) {
         return profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
-                .map(ConverterAdmin :: convertToProfesional);
+                .map(ConverterRemision:: convertToProfesional);
     }
 
     @Override
-    public Mono<Boolean> asignarProfesionalTurno(
-            LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional,String idRegional) {
-
-        return turnoProfesionalesRepository.save(
-                new TurnoProfesionalesData()
-                        .toBuilder()
-                        .fechaTurno(fechaTurno)
-                        .idHorarioTurno(idHorarioTurno)
-                        .idProfesional(idProfesional)
-                        .idRegional(idRegional)
-                        .build()
-        ).then(Mono.just(Boolean.TRUE));
-    }
-
-    @Override
-    public Mono<Boolean> desasignarProfesionalTurno(
-            LocalDate fechaTurno, Integer idHorarioTurno, String idProfesional) {
-        return  citaRepository.desagendarAllFromIdProfesional( fechaTurno,  idHorarioTurno, idProfesional)
-                .then(Mono.from(turnoProfesionalesRepository.deleteByFechaTurnoIdHorarioProfesional(
-                        fechaTurno,idHorarioTurno,idProfesional)))
+    public Mono<Boolean> asignarProfesionalTurno(TurnoProfesional turnoProfesional) {
+        return  turnoProfesionalesRepository.save(ConverterAgenda.converToTurnoProfesionalData(turnoProfesional))
                 .then(Mono.just(Boolean.TRUE));
     }
 
     @Override
-    public Flux<Profesional> consultarProfesionalesByIdCiudad(String idRegional) {
+    public Mono<Boolean> desasignarProfesionalTurno(TurnoProfesional turnoProfesional) {
+        return citaRepository.findCitasByTurnoProfesional(
+                turnoProfesional.getFechaTurno(),turnoProfesional.getIdProfesional())
+                .collectList()
+                .map(citasData -> !citasData.stream()
+                            .allMatch(cita -> cita.getIdEstado() == EstadosCita.AGENDADA.getEstado() ||
+                            cita.getIdEstado() == EstadosCita.SIN_AGENDAR.getEstado()))
+                .flatMap(validacion -> {
+                    if(Boolean.TRUE.equals(validacion)){
+                        return Mono.error(new ErrorEstadoNoValidoDesagendarCita(
+                                ERROR_TURNO_DESAGENDADO_ESTADOS_CITAS.getValue()));
+                    }else{
+                        return Mono.just(true);
+                    }
+                })
+                .then(citaRepository.desagendarAllFromIdProfesional(
+                        turnoProfesional.getFechaTurno(),
+                        turnoProfesional.getIdHorarioTurno(),
+                        turnoProfesional.getIdProfesional()))
+
+                .then(Mono.from(turnoProfesionalesRepository.deleteByFechaTurnoIdHorarioProfesional(
+                        turnoProfesional.getFechaTurno(),
+                        turnoProfesional.getIdHorarioTurno(),
+                        turnoProfesional.getIdProfesional())))
+                .then(Mono.just(Boolean.TRUE))
+                .onErrorResume(Mono::error);
+    }
+
+    @Override
+    public Flux<Profesional> consultarProfesionalesByIdRegional(String idRegional) {
         return profesionalRepository.findByIdRegional(idRegional)
-                .map(ConverterAdmin :: convertToProfesional);
+                .map(ConverterRemision:: convertToProfesional);
     }
 
     public Flux<Tarea> consultarTareasTurnoByProfesional(
@@ -137,7 +136,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             String idRegional){
 
         return citaRepository
-                .findCitasByTurnoCiudadProfesional(fechaTurno, idHorarioTurno, idRegional,
+                .findCitasByTurnoRegionalProfesional(fechaTurno, idHorarioTurno, idRegional,
                         profesionalData.getNumeroIdentificacion())
                 .map(ConverterAgenda :: convertToTarea)
                 .map(tarea -> {
@@ -176,20 +175,13 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
 
     @Override
-    public Flux<Cita> consultarCitasByTurnoCiudad(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
-        return citaRepository.findCitasByTurnoCiudad(
-               fechaTurno,
-                idHorarioTurno,
-                idCiudad);
+    public Flux<Cita> consultarCitasByTurnoRegional(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
+        return citaRepository.findCitasByTurnoRegionalHorario(fechaTurno, idHorarioTurno, idCiudad);
     }
 
     @Override
-    public Mono<Boolean> reprogramarCita(LocalDateTime fechaProgramada,
-                                         String idCita,
-                                         String idProfesional,
-                                         LocalDate fechaTurno,
-                                         Integer idHorarioTurno,
-                                         String idRegional) {
+    public Mono<Boolean> reprogramarCita(LocalDateTime fechaProgramada, String idCita, String idProfesional,
+                                         LocalDate fechaTurno, Integer idHorarioTurno, String idRegional) {
         return citaRepository.actualizarFechaProgramada(fechaProgramada,idCita)
                 .then(calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional));
     }
@@ -209,7 +201,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Mono<Boolean> desagendarTurnocompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
+    public Mono<Boolean> desagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
         return desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idCiudad)
                 .then(citaRepository.desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idCiudad))
                 .then(Mono.just(Boolean.TRUE));
@@ -246,7 +238,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     @Override
     public Mono<Boolean> autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
       return desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idCiudad)
-         .then(citaRepository.findCitasByTurnoCiudad(fechaTurno,idHorarioTurno,idCiudad)
+         .then(citaRepository.findCitasByTurnoRegionalHorario(fechaTurno,idHorarioTurno,idCiudad)
          .collectList()
          .flatMap(citaDataList -> profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
              .collectList().flatMap(profesionalesDataList -> {
@@ -276,12 +268,12 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             LocalDate fechaTurno, Integer idHorarioTurno,String idRegional, String idProfesional) {
 
         return desplazamientoRepository.deleteByFechaTurnoProfesional(fechaTurno,idHorarioTurno,idProfesional)
-              .then(citaRepository.findCitasByTurnoCiudadProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional)
-              .collectList()
-              .flatMapMany(Flux::fromIterable)
-              .buffer(MAXSIZE,1)
-              .filter(citas -> citas.size() == MAXSIZE)
-              .flatMap(
+            .then(citaRepository.findCitasByTurnoRegionalProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional)
+            .collectList()
+            .flatMapMany(Flux::fromIterable)
+            .buffer(MAXSIZE,1)
+            .filter(citas -> citas.size() == MAXSIZE)
+            .flatMap(
                    citas ->{
                       List<DesplazamientoData> desplazamientosList = new ArrayList<>();
                       CitaData citaPartida = citas.get(0);
@@ -311,67 +303,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Mono<Procedimientos> consultarProcedimientosByIdCita(String idCita) {
-        return Mono.zip(
-                        consultarCanalizacionesByCitas(idCita).collectList(),
-                        consultarCuracionesByCitas(idCita).collectList(),
-                        consultarFototerapiasByCitas(idCita).collectList(),
-                        consultarSecrecionesByCitas(idCita).collectList(),
-                        consultarSondajesByCitas(idCita).collectList(),
-                        consultarTomaMuestrasByCitas(idCita).collectList(),
-                        consultarSoporteNutricionalesByCitas(idCita).collectList())
-                .map(tuple->Procedimientos.builder()
-                                .canalizaciones(tuple.getT1())
-                                .curaciones(tuple.getT2())
-                                .fototerapias(tuple.getT3())
-                                .secreciones(tuple.getT4())
-                                .sondajes(tuple.getT5())
-                                .tomaMuestras(tuple.getT6())
-                                .soporteNutricionales(tuple.getT7())
-                                .build()
+        return procedimientosCitaRepository.consultarProcedimientosByIdCita(idCita);
 
-        );
-    }
-
-    @Override
-    public Flux<Curacion> consultarCuracionesByCitas(String idCita) {
-        return curacionRepository.findByIdCita(idCita)
-                .map(ConverterAgenda :: convertToCuracion);
-    }
-
-    @Override
-    public Flux<Canalizacion> consultarCanalizacionesByCitas(String idCita) {
-        return canalizacionRepository.findByIdCita(idCita)
-                .map(ConverterAgenda ::convertToCanalizacion);
-    }
-
-    @Override
-    public Flux<Fototerapia> consultarFototerapiasByCitas(String idCita) {
-        return fototerapiaRepository.findByIdCita(idCita)
-                .map(ConverterAgenda :: convertToFototerapia);
-    }
-
-    @Override
-    public Flux<Secrecion> consultarSecrecionesByCitas(String idCita) {
-        return secrecionRepository.findByIdCita(idCita)
-                .map(ConverterAgenda :: convertToSecrecionData);
-    }
-
-    @Override
-    public Flux<Sondaje> consultarSondajesByCitas(String idCita) {
-        return sondajeRepository.findByIdCita(idCita)
-                .map(ConverterAgenda :: convertToSondajeData);
-    }
-
-    @Override
-    public Flux<TomaMuestra> consultarTomaMuestrasByCitas(String idCita) {
-        return tomaMuestraRepository.findByIdCita(idCita)
-                .map(ConverterAgenda :: convertToTomaMuestraData);
-    }
-
-    @Override
-    public Flux<SoporteNutricional> consultarSoporteNutricionalesByCitas(String idCita) {
-        return soporteNutricionalRepository.findByIdCita(idCita)
-                .map(ConverterAgenda::convertToSoporteNutricionalData);
     }
 
 }

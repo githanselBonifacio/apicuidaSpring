@@ -2,43 +2,43 @@ package co.com.sura.postgres.repository.agenda.adapter;
 
 
 import co.com.sura.autoagendador.CitaGenetic;
-import co.com.sura.entity.agenda.*;
+import co.com.sura.entity.agenda.Actividad;
+import co.com.sura.entity.agenda.Cita;
+import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.admin.Tratamiento;
-import co.com.sura.entity.admin.Fototerapia;
-import co.com.sura.entity.admin.TomaMuestra;
-import co.com.sura.entity.admin.Sondaje;
-import co.com.sura.entity.admin.Canalizacion;
-import co.com.sura.entity.admin.Cita;
-import co.com.sura.entity.admin.Curacion;
-import co.com.sura.entity.admin.SoporteNutricional;
-import co.com.sura.entity.admin.Secrecion;
-import co.com.sura.entity.admin.Medicamento;
+import co.com.sura.entity.personal.TurnoProfesional;
+import co.com.sura.entity.remision.Tratamiento;
+import co.com.sura.entity.remision.Fototerapia;
+import co.com.sura.entity.remision.TomaMuestra;
+import co.com.sura.entity.remision.Sondaje;
+import co.com.sura.entity.remision.Canalizacion;
+import co.com.sura.entity.remision.Curacion;
+import co.com.sura.entity.remision.SoporteNutricional;
+import co.com.sura.entity.remision.Secrecion;
+import co.com.sura.entity.remision.Medicamento;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.agenda.data.ConductorData;
-import co.com.sura.postgres.repository.agenda.data.MovilData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
-import co.com.sura.postgres.repository.agenda.data.ProfesionalData;
-import co.com.sura.postgres.repository.admin.data.TratamientoData;
-import co.com.sura.postgres.repository.admin.data.CanalizacionData;
-import co.com.sura.postgres.repository.admin.data.CuracionData;
-import co.com.sura.postgres.repository.admin.data.TomaMuestraData;
-import co.com.sura.postgres.repository.admin.data.SondajeData;
-import co.com.sura.postgres.repository.admin.data.SecrecionData;
-import co.com.sura.postgres.repository.admin.data.FototerapiaData;
-import co.com.sura.postgres.repository.admin.data.SoporteNutricionalData;
+import co.com.sura.postgres.repository.personal.data.ProfesionalData;
+import co.com.sura.postgres.repository.personal.data.TurnoProfesionalesData;
+import co.com.sura.postgres.repository.remision.data.TratamientoData;
+import co.com.sura.postgres.repository.remision.data.CanalizacionData;
+import co.com.sura.postgres.repository.remision.data.CuracionData;
+import co.com.sura.postgres.repository.remision.data.TomaMuestraData;
+import co.com.sura.postgres.repository.remision.data.SondajeData;
+import co.com.sura.postgres.repository.remision.data.SecrecionData;
+import co.com.sura.postgres.repository.remision.data.FototerapiaData;
+import co.com.sura.postgres.repository.remision.data.SoporteNutricionalData;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class ConverterAgenda extends Converter {
-
-
 
     public static Actividad convertToActividad(ProfesionalData profesionalData){
         return new Actividad()
@@ -81,7 +81,7 @@ public class ConverterAgenda extends Converter {
         cita.setIdCita(citaData.getIdCita());
         return cita;
     }
-    public static  List<CitaGenetic> convertToListCitaGenetic(List<Cita> citas){
+    public static  List<CitaGenetic> convertToListCitaGenetic(Collection<Cita> citas){
         return citas
                 .stream()
                 .map(ConverterAgenda::convertToCitaGenetic)
@@ -99,9 +99,7 @@ public class ConverterAgenda extends Converter {
                 .build();
     }
     public static Desplazamiento converToDesplazamiento(DesplazamientoData desplazamientoData){
-        return deserializarJson(
-                convertirObjetoAJson(desplazamientoData), Desplazamiento.class
-        );
+        return converToEntity(desplazamientoData, Desplazamiento.class);
     }
     public static Tratamiento convertToTratamiento(TratamientoData tratamientoData){
         return new Tratamiento()
@@ -127,39 +125,27 @@ public class ConverterAgenda extends Converter {
     }
 
     public static Curacion convertToCuracion(CuracionData curacionData){
-        return deserializarJson(
-                convertirObjetoAJson(curacionData), Curacion.class
-        );
+        return converToEntity(curacionData, Curacion.class);
 
     }
 
     public static Canalizacion convertToCanalizacion(CanalizacionData canalizacionData){
-        return deserializarJson(
-                convertirObjetoAJson(canalizacionData), Canalizacion.class
-        );
+        return converToEntity(canalizacionData, Canalizacion.class);
     }
 
     public static Fototerapia convertToFototerapia(FototerapiaData fototerapiaData){
-        return deserializarJson(
-                convertirObjetoAJson(fototerapiaData), Fototerapia.class
-        );
+        return converToEntity(fototerapiaData, Fototerapia.class);
     }
 
     public static Secrecion convertToSecrecionData(SecrecionData secrecionData){
-        return deserializarJson(
-                convertirObjetoAJson(secrecionData), Secrecion.class
-        );
+        return converToEntity(secrecionData, Secrecion.class);
     }
 
     public static Sondaje convertToSondajeData(SondajeData sondajeData){
-        return deserializarJson(
-                convertirObjetoAJson(sondajeData), Sondaje.class
-        );
+        return converToEntity(sondajeData, Sondaje.class);
     }
     public static TomaMuestra convertToTomaMuestraData(TomaMuestraData tomaMuestraData){
-        return deserializarJson(
-                convertirObjetoAJson(tomaMuestraData), TomaMuestra.class
-        );
+        return converToEntity(tomaMuestraData, TomaMuestra.class);
     }
     public static SoporteNutricional convertToSoporteNutricionalData(SoporteNutricionalData soporteNutricionalData){
         return new SoporteNutricional()
@@ -182,5 +168,9 @@ public class ConverterAgenda extends Converter {
                 .noPBS(soporteNutricionalData.getNoPBS())
                 .tipoPrestacion(soporteNutricionalData.getTipoPrestacion())
                 .build();
+    }
+
+    public static TurnoProfesionalesData converToTurnoProfesionalData(TurnoProfesional turnoProfesional){
+        return converToEntity(turnoProfesional, TurnoProfesionalesData.class);
     }
 }

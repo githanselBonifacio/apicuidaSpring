@@ -38,7 +38,7 @@ public class ReporteTurnoData {
     private Integer totalProfesionales;
 
     @Column("total_novedades")
-    private Integer totalNovedadess;
+    private Integer totalNovedades;
 
     @Column("horas_profesionales")
     private Double horasProfesionales;

@@ -3,8 +3,9 @@ package co.com.sura.postgres;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class Converter {
 
     public static <T> T deserializarJson (String json, Class<T> clazz){
@@ -44,5 +45,7 @@ public class Converter {
 
         return builder.toString();
     }
-
+   public static <T> T converToEntity(Object entity,Class<T> clazz ){
+       return deserializarJson(convertirObjetoAJson(entity), clazz);
+   }
 }

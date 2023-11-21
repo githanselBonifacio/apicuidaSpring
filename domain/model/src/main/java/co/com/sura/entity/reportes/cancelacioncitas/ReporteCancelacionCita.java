@@ -13,6 +13,4 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class ReporteCancelacionCita {
     private Regional regional;
-    private ResumenCancelacionCita resumen;
-
 }
