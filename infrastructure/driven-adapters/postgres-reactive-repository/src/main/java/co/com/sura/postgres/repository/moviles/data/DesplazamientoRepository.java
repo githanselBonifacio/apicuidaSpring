@@ -9,6 +9,9 @@ import java.time.LocalDate;
 
 public interface DesplazamientoRepository extends ReactiveCrudRepository<DesplazamientoData,Integer> {
 
+    @Query("SELECT * FROM desplazamientos WHERE id_cita_partida = $1;")
+    Mono<DesplazamientoData> findByIdCitaPartida(String idCitaPartida);
+
     @Query("SELECT * FROM public.desplazamientos " +
             "INNER JOIN public.citas ON public.citas.id_cita = public.desplazamientos.id_cita_partida AND " +
             "public.citas.id_regional = $2 AND " +
@@ -22,7 +25,7 @@ public interface DesplazamientoRepository extends ReactiveCrudRepository<Desplaz
             "WHERE public.desplazamiento.fecha_programada::date = $1 " +
             "AND public.desplazamiento.id_horario_turno = $2 " +
             "AND public.cita.id_regional = $3;")
-    Flux<DesplazamientoData> findByIdCitaPartida(
+    Flux<DesplazamientoData> findAllByturno(
             LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional);
 
 
@@ -33,7 +36,7 @@ public interface DesplazamientoRepository extends ReactiveCrudRepository<Desplaz
             "WHERE public.desplazamientos.fecha_programada::date = $1 " +
             "AND public.desplazamientos.id_horario_turno = $2 " +
             "AND public.citas.id_regional = $3;")
-    Flux<DesplazamientoData> findByIdCitaPartidaByProfesional(
+    Flux<DesplazamientoData> findAllByTurnoProfesional(
             LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional, String idProfesional);
 
     @Query("DELETE FROM public.desplazamientos " +

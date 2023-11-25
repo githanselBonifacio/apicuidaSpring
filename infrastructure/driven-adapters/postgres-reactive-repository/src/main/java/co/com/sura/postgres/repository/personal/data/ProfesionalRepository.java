@@ -1,7 +1,6 @@
 package co.com.sura.postgres.repository.personal.data;
 
 
-import co.com.sura.entity.personal.Profesional;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -43,47 +42,8 @@ public interface ProfesionalRepository extends ReactiveCrudRepository<Profesiona
             @Param("$3") Integer idHorarioTurno
     );
 
-    @Query("INSERT INTO public.profesionales( " +
-            " numero_identificacion, " +
-            " id_tipo_identificacion, " +
-            " nombres, apellidos, " +
-            " fecha_nacimiento, " +
-            " id_regional, activo, " +
-            " genero, direccion, " +
-            " email, celular, " +
-            " telefono, id_profesion) " +
-            " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);")
-    Mono<Void> insertQueryProfesional(
-            @Param("$1") String numeroIdentificacion,
-            @Param("$2") Integer idTipoIdentificacion,
-            @Param("$3") String nombres,
-            @Param("$4") String apellidos,
-            @Param("$5") LocalDate fechaNacimiento,
-            @Param("$6") String idRegional,
-            @Param("$7") boolean activo,
-            @Param("$8") String genero,
-            @Param("$9") String direccion,
-            @Param("$10") String email,
-            @Param("$11") String celular,
-            @Param("$12") String telefono,
-            @Param("$13") Integer idProfesional);
+    @Query("INSERT INTO public.profesionales (numero_identificacion) VALUES ($1);")
+    Mono<Void> insertProfesional(@Param("$1") String numeroIdentificacion);
 
-  default Mono<Void> insertProfesional (Profesional profesional){
-      return insertQueryProfesional(
-                profesional.getNumeroIdentificacion(),
-                profesional.getIdTipoIdentificacion(),
-                profesional.getNombres(),
-                profesional.getApellidos(),
-                profesional.getFechaNacimiento(),
-                profesional.getIdRegional(),
-                profesional.isActivo(),
-                profesional.getGenero(),
-                profesional.getDireccion(),
-                profesional.getEmail(),
-                profesional.getCelular(),
-                profesional.getTelefono(),
-                profesional.getIdProfesion()
-        );
-    }
 
 }

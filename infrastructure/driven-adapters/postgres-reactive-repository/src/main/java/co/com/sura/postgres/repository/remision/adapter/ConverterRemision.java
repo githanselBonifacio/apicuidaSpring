@@ -10,28 +10,16 @@ import co.com.sura.dto.remision.SondajeRequest;
 import co.com.sura.dto.remision.SoporteNutricionalRequest;
 import co.com.sura.dto.remision.TomaMuestraRequest;
 import co.com.sura.dto.remision.TratamientoRequest;
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.personal.Conductor;
-import co.com.sura.entity.personal.Movil;
-import co.com.sura.entity.personal.Profesional;
-import co.com.sura.entity.personal.ProfesionalWithTurno;
-import co.com.sura.entity.personal.TurnoProfesional;
 import co.com.sura.entity.remision.Canalizacion;
 import co.com.sura.entity.remision.DatosAtencionPaciente;
 import co.com.sura.entity.remision.Diagnostico;
 import co.com.sura.entity.remision.Fototerapia;
-import co.com.sura.entity.remision.ItemSecuenciaTurno;
 import co.com.sura.entity.remision.Paciente;
 import co.com.sura.entity.remision.RegistroHistorialRemision;
 import co.com.sura.entity.remision.Ubicacion;
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.personal.data.ConductorData;
-import co.com.sura.postgres.repository.personal.data.ItemSecuenciaTurnoData;
-import co.com.sura.postgres.repository.personal.data.MovilData;
-import co.com.sura.postgres.repository.personal.data.ProfesionalData;
-import co.com.sura.postgres.repository.personal.data.TurnoProfesionalesData;
 import co.com.sura.postgres.repository.remision.data.CanalizacionData;
 import co.com.sura.postgres.repository.remision.data.CuracionData;
 import co.com.sura.postgres.repository.remision.data.DatosAtencionPacienteData;
@@ -48,9 +36,7 @@ import co.com.sura.postgres.repository.remision.data.TratamientoData;
 import co.com.sura.postgres.repository.remision.data.UbicacionData;
 import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
-
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -403,61 +389,4 @@ public class ConverterRemision extends Converter {
         return builder.build();
     }
 
-    public static Profesional convertToProfesional(ProfesionalData profesionalData){
-        return deserializarJson(
-                convertirObjetoAJson(profesionalData), Profesional.class
-        );
-    }
-    public static ProfesionalWithTurno convertToProfesionalTurno(ProfesionalData profesionalData){
-        return deserializarJson(
-                convertirObjetoAJson(profesionalData), ProfesionalWithTurno.class
-        );
-    }
-    public static TurnoProfesional convertToTurnoProfesional(TurnoProfesionalesData turnoProfesionalesData){
-        return deserializarJson(
-                convertirObjetoAJson(turnoProfesionalesData), TurnoProfesional.class
-        );
-    }
-    public static TurnoProfesionalesData convertToTurnoProfesionalData(TurnoProfesional turnoProfesional){
-        return deserializarJson(
-                convertirObjetoAJson(turnoProfesional), TurnoProfesionalesData.class
-        );
-    }
-    public static ProfesionalData convertToProfesionalData(Profesional profesional){
-        return deserializarJson(
-                convertirObjetoAJson(profesional), ProfesionalData.class
-        );
-    }
-    public  static Conductor converToConductor(ConductorData conductorData){
-        return     deserializarJson(
-                convertirObjetoAJson(conductorData), Conductor.class
-        );
-    }
-    public  static ConductorData converToConductorData(Conductor conductor){
-        return     deserializarJson(
-                convertirObjetoAJson(conductor), ConductorData.class
-        );
-    }
-    public static Movil convertToMovil(MovilData movilData){
-        return   deserializarJson(
-                convertirObjetoAJson(movilData), Movil.class
-        );
-    }
-    public static MovilData convertToMovilData(Movil movil){
-        return   deserializarJson(
-                convertirObjetoAJson(movil), MovilData.class
-        );
-    }
-
-    public static ItemSecuenciaTurno convertToSecuenciaTurno(ItemSecuenciaTurnoData secuenciaTurnoData){
-        return ItemSecuenciaTurno
-                .builder()
-                .nombreSecuencia(secuenciaTurnoData.getNombreSecuencia())
-                .descripcion(secuenciaTurnoData.getDescripcion())
-                .numeroDia(secuenciaTurnoData.getNumeroDia())
-                .nombreDia(secuenciaTurnoData.getNombreDia())
-                .horariosTurno(Collections.singletonList(
-                        HorarioTurno.builder().id(secuenciaTurnoData.getIdHorarioTurno()).build()))
-                .build();
-    }
 }

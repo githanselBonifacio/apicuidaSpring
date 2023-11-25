@@ -3,9 +3,10 @@ package co.com.sura.personal;
 import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
 import co.com.sura.entity.personal.Conductor;
 import co.com.sura.entity.personal.Movil;
-import co.com.sura.entity.personal.PersonalRepository;
+import co.com.sura.entity.personal.PersonalCrudRepository;
 import co.com.sura.entity.personal.Profesional;
 import co.com.sura.entity.personal.ProfesionalWithTurno;
+import co.com.sura.entity.personal.SecuenciasHorarioRepository;
 import co.com.sura.entity.personal.TurnoProfesional;
 import co.com.sura.entity.remision.SecuenciaTurno;
 import co.com.sura.genericos.ResultadoActualizacionTurno;
@@ -16,10 +17,13 @@ import java.util.List;
 
 public class PersonalUseCase {
 
-    private final PersonalRepository personalRepository;
+    private final PersonalCrudRepository personalRepository;
+    private final SecuenciasHorarioRepository secuenciasHorarioRepository;
 
-    public PersonalUseCase(PersonalRepository personalRepository) {
+    public PersonalUseCase(PersonalCrudRepository personalRepository,
+                           SecuenciasHorarioRepository secuenciasHorarioRepository) {
         this.personalRepository = personalRepository;
+        this.secuenciasHorarioRepository = secuenciasHorarioRepository;
     }
 
     //profesionales
@@ -66,25 +70,25 @@ public class PersonalUseCase {
     //turnos de profesionales
     public Flux<ProfesionalWithTurno> consultarProfesionalesTurnoByFechaTurnoIdRegional(
             String fechaTurno, String idRegional){
-        return personalRepository.consultarHorariosProfesionales(fechaTurno,idRegional);
+        return secuenciasHorarioRepository.consultarHorariosProfesionales(fechaTurno,idRegional);
     }
     public Flux<ResultadoActualizacionTurno> eliminarTurnosProfesionalAccionMasiva(
             List<EliminarTurnoProfesionalRequest> requests){
-        return personalRepository.eliminarTurnosProfesionalesAccionMasiva(requests);
+        return secuenciasHorarioRepository.eliminarTurnosProfesionalesAccionMasiva(requests);
     }
 
     public  Flux<ResultadoActualizacionTurno> asignarTurnosProfesionalAccionMasiva(List<TurnoProfesional>requests){
-        return personalRepository.asignarTurnosProfesionalesAccionMasiva(requests);
+        return secuenciasHorarioRepository.asignarTurnosProfesionalesAccionMasiva(requests);
     }
     public Mono<Boolean> actualizarTurnosByProfesional(List<TurnoProfesional> turnos){
-        return personalRepository.actualizarHorarioTurnoProfesionales(turnos);
+        return secuenciasHorarioRepository.actualizarHorarioTurnoProfesionales(turnos);
     }
 
     //secuencias de turno
     public Flux<SecuenciaTurno> consultarSecuenciasTurno(){
-        return personalRepository.consultarSecuencias();
+        return secuenciasHorarioRepository.consultarSecuencias();
 
     } public Mono<Boolean> configurarSecuenciaTurno(SecuenciaTurno secuenciaTurno){
-        return personalRepository.configurarSecuenciaTurno(secuenciaTurno);
+        return secuenciasHorarioRepository.configurarSecuenciaTurno(secuenciaTurno);
     }
 }

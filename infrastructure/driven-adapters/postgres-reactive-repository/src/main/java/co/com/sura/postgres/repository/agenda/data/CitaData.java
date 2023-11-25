@@ -2,6 +2,7 @@ package co.com.sura.postgres.repository.agenda.data;
 
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.genericos.Numeros;
+import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -90,5 +91,45 @@ public class CitaData {
             return  (horasAsigandas) /
                     (horasDisponibles) * Numeros.CIEN.getValue();
         }
+    }
+
+    public static Boolean validarDisponibilidadFechasToReprogramar(CitaData citaFechaInferior,
+                                                                   CitaData citaFechaSuperior,
+                                                                   CitaData citaAsignada,
+                                                                   DesplazamientoData desplazamientoCitaInferior,
+                                                                   DesplazamientoData desplazamientoCitaAsignada,
+                                                                   LocalDateTime fechaProgramada){
+
+        boolean validacionFechaAnterior = citaFechaInferior.getFechaProgramada() == null ||
+                citaFechaInferior.getFechaProgramada().plusSeconds(citaFechaInferior.getDuracion())
+                        .plusSeconds(desplazamientoCitaInferior.getDuracion())
+                        .isBefore(fechaProgramada);
+
+        boolean validacionFechaPosterior = citaFechaSuperior.getFechaProgramada() == null ||
+                citaFechaSuperior.getFechaProgramada()
+                        .isAfter(fechaProgramada.plusSeconds(citaAsignada.getDuracion())
+                                .plusSeconds(desplazamientoCitaAsignada.getDuracion()));
+
+        return validacionFechaAnterior && validacionFechaPosterior;
+    }
+    public static Boolean validarDisponibilidadFechasToAgendar(CitaData citaFechaInferior, CitaData citaFechaSuperior,
+                                                               CitaData citaAgendada,
+                                                               DesplazamientoData desplazamientoCitaInferior,
+                                                               DesplazamientoData desplazamientoCitaAsignada
+
+    ){
+        boolean validacionFechaAnterior = citaFechaInferior.getFechaProgramada() == null ||
+                citaFechaInferior.getFechaProgramada()
+                        .plusSeconds(citaFechaInferior.getDuracion())
+                        .plusSeconds(desplazamientoCitaInferior.getDuracion())
+                        .isBefore(citaAgendada.getFechaProgramada());
+
+        boolean validacionFechaPosterior = citaFechaSuperior.getFechaProgramada() == null ||
+                citaFechaSuperior.getFechaProgramada()
+                        .isAfter(citaAgendada.getFechaProgramada()
+                                .plusSeconds(citaAgendada.getDuracion())
+                                .plusSeconds(desplazamientoCitaAsignada.getDuracion()));
+
+        return validacionFechaAnterior && validacionFechaPosterior;
     }
 }

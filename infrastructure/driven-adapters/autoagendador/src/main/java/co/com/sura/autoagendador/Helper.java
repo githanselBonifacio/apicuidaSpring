@@ -1,16 +1,11 @@
 package co.com.sura.autoagendador;
 
-import co.com.sura.mapbox.repository.map.services.MapboxServicesImpl;
-import co.com.sura.services.mapbox.GeoUbicacion;
-import co.com.sura.services.mapbox.MapboxService;
 import org.javatuples.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 public class Helper {
@@ -56,7 +51,7 @@ public class Helper {
     public static List<Integer> encontrarSumandos(int numero, int numerosSumandos) {
         List<Integer> sumandos = new ArrayList<>();
         var suma = 0;
-        var random = new Random();
+        var random = new SecureRandom();
 
         for (var i = 0; i < numerosSumandos; i++) {
             if (i < numerosSumandos - 1) {

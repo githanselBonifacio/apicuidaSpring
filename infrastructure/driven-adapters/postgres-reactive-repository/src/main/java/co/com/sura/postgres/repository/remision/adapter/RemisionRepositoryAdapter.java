@@ -12,6 +12,7 @@ import co.com.sura.entity.remision.Remision;
 import co.com.sura.entity.remision.RemisionCrudRepository;
 import co.com.sura.exception.ErrorCitaProgreso;
 import co.com.sura.exception.ErrorValidacionIngresoRemision;
+import co.com.sura.genericos.EstadosCita;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
 import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
@@ -162,28 +163,17 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         List<TomaMuestraData> tomaMuestraData = ConverterRemision.extraerSoporteTomaMuestraData(citasRequest);
         List<CuracionData> curacionesData = ConverterRemision.extraerCuracionData(citasRequest);
 
-        Flux<TratamientoData> tratamientosFlux         = tratamientoRepository.saveAll(tratamientosData);
-        Flux<CanalizacionData> canalizacionDataFlux    = canalizacionRepository.saveAll(canalizacionesData);
-        Flux<FototerapiaData> fototerapiaDataFlux      = fototerapiaRepository.saveAll(fototerapiaData);
-        Flux<SecrecionData> secrecionDataFlux          = secrecionRepository.saveAll(secrecionData);
-        Flux<SondajeData> sondajeDataFlux              = sondajeRepository.saveAll(sondajeData);
-        Flux<SoporteNutricionalData> soporteNutricionalDataFlux = soporteNutricionalRepository
-                .saveAll(soporteNutricionalData);
-
-        Flux<TomaMuestraData> tomaMuestraDataFlux = tomaMuestraRepository.saveAll(tomaMuestraData);
-        Flux<CuracionData> curacionDataFlux = curacionRepository.saveAll(curacionesData);
-
         return  Mono.from(citaRepository.insertMultiplescitas(citasData))
                 .thenMany(this.asignarTurnoCitas(Flux.fromIterable(citasData))
                                 .flatMap(citaRepository::save))
-                .then(tratamientosFlux.collectList())
-                .then(canalizacionDataFlux.collectList())
-                .then(fototerapiaDataFlux.collectList())
-                .then(secrecionDataFlux.collectList())
-                .then(sondajeDataFlux.collectList())
-                .then(soporteNutricionalDataFlux.collectList())
-                .then(tomaMuestraDataFlux.collectList())
-                .then(curacionDataFlux.collectList())
+                .thenMany(tratamientoRepository.saveAll(tratamientosData))
+                .thenMany(canalizacionRepository.saveAll(canalizacionesData))
+                .thenMany(fototerapiaRepository.saveAll(fototerapiaData))
+                .thenMany(secrecionRepository.saveAll(secrecionData))
+                .thenMany(sondajeRepository.saveAll(sondajeData))
+                .thenMany(soporteNutricionalRepository.saveAll(soporteNutricionalData))
+                .thenMany(tomaMuestraRepository.saveAll(tomaMuestraData))
+                .thenMany(curacionRepository.saveAll(curacionesData))
                 .then();
 
     }
@@ -305,7 +295,8 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                    return Mono.just(true);
                }
            })
-           .then(citaRepository.validarEstadosCitasToEgreso(idRemision)
+           .then(citaRepository.validarEstadosCitasToEgreso(
+                   idRemision,EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado())
                 .flatMap(valid -> {
                                if (Boolean.TRUE.equals(valid)) {
                                    return Mono.error(new ErrorCitaProgreso(
@@ -315,7 +306,9 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                                }
                    })
            )
-           .then(citaRepository.cancelarCitasForEgresoRemision(idRemision))
+           .then(citaRepository.cancelarCitasForEgreso(
+                   idRemision,EstadosCita.CANCELADA.getEstado(),
+                   EstadosCita.SIN_AGENDAR.getEstado(),EstadosCita.AGENDADA.getEstado()))
            .then(remisionRepository.egresarRemisionById(idRemision))
            .then(Mono.just(true))
            .onErrorResume(Mono::error);

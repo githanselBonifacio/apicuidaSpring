@@ -1,6 +1,6 @@
 package co.com.sura.mapbox.repository.map.services;
 
-import co.com.sura.services.mapbox.MapboxService;
+import co.com.sura.services.mapbox.MapboxServiceRepository;
 import co.com.sura.services.mapbox.GeoUbicacion;
 
 import co.com.sura.response.mapbox.DireccionResponse;
@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Mono;
 
 @Service
-public class MapboxServicesImpl implements MapboxService {
+public class MapboxServicesImpl implements MapboxServiceRepository {
     private static final int DURACION_MINIMA = 900;
     private final RestTemplate restTemplate;
     private final MapboxDirections mapboxDirections;

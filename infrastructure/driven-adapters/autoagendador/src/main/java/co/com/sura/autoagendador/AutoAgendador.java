@@ -1,11 +1,19 @@
 package co.com.sura.autoagendador;
 
 import co.com.sura.services.mapbox.GeoUbicacion;
-import co.com.sura.services.mapbox.MapboxService;
+import co.com.sura.services.mapbox.MapboxServiceRepository;
 import lombok.Data;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static co.com.sura.autoagendador.Helper.*;
@@ -14,7 +22,7 @@ import static co.com.sura.autoagendador.Helper.*;
 public class AutoAgendador {
     private static final Integer DOS = 2;
     private static final Double UMBRAL = 0.5;
-    private MapboxService mapboxService;
+    private MapboxServiceRepository mapboxService;
     private Helper helper;
     private CitaGenetic origen;
     private List<CitaGenetic> citas;
@@ -41,7 +49,7 @@ public class AutoAgendador {
             Integer sizePoblacionInicial,
             Integer numeroPadresEnparejados,
             Double penalizacionHolgura,
-            MapboxService mapboxService) {
+            MapboxServiceRepository mapboxService) {
 
         this.origen = origen;
         this.citas = new ArrayList<>(citas);
@@ -194,13 +202,9 @@ public class AutoAgendador {
         this.resultadoActual = this.resultadoActual
                 .entrySet()
                 .stream()
-                .sorted(
-                        Map.Entry
-                                .comparingByValue(
-                                        Comparator.comparingDouble(Resultado::getPuntajeAptitudGlobalIndividuo
-                                                )
-                                                .reversed())
-                )
+                .sorted(Map.Entry.comparingByValue(Comparator
+                        .comparingDouble(Resultado::getPuntajeAptitudGlobalIndividuo)
+                        .reversed()))
                 .limit(this.numeroPadresEnparejados)
                 .collect(
                         Collectors.toMap(
@@ -256,16 +260,11 @@ public class AutoAgendador {
     }
 
     public Resultado mejorSolucion() {
-        var mejorResultado = Collections.max(
-                this.resultadoActual
-                        .values(),Comparator.comparing(Resultado::getPuntajeAptitudGlobalIndividuo)
-        );
-        List<Pair<Integer,Integer>> coordenadasHolguraNegativa = encontrarHorguraNegativa(
-                mejorResultado.getPuntajeAptitudIndividuo(),1
-        );
+        var mejorResultado = Collections.max(this.resultadoActual.values(),
+                                                   Comparator.comparing(Resultado::getPuntajeAptitudGlobalIndividuo));
+        var coordenadasHolguraNegativa = encontrarHorguraNegativa(mejorResultado.getPuntajeAptitudIndividuo(),0);
         var individuo = mejorResultado.getIndividuo();
         List<List<CitaGenetic>> nuevalistaCitasGen = new ArrayList<>();
-
         for(var i = 0;i<individuo.getCitaGen().size();i++){
             List<CitaGenetic> itemIndividuo = new ArrayList<>();
             for(var  j = 0; j<individuo.getCitaGen().get(i).size();j++){
@@ -276,7 +275,6 @@ public class AutoAgendador {
             }
             nuevalistaCitasGen.add(itemIndividuo);
         }
-
         mejorResultado.setIndividuo( new Individuo(nuevalistaCitasGen));
         return mejorResultado;
     }

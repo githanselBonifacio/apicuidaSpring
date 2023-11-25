@@ -17,9 +17,7 @@ public interface MovilRepository extends ReactiveCrudRepository<MovilData,String
            "WHERE public.conductores.numero_identificacion is null;")
    Flux<MovilData> findAllWithoutConductor();
 
-   @Query("INSERT INTO public.moviles( " +
-           " matricula, id_Regional, Marca, modelo) " +
-           " VALUES ($1, $2, $3, $4);")
+   @Query("INSERT INTO public.moviles (matricula, id_Regional, Marca, modelo) VALUES ($1, $2, $3, $4);")
     Mono<Void> insertQueryMovil(
            @Param("$1") String matricula,
            @Param("$2") String idRegional,

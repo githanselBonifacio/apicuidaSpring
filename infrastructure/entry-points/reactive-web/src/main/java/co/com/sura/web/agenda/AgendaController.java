@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -258,7 +259,7 @@ public class AgendaController {
                 )));
 
     }
-    @GetMapping(value = "/reprogramarCita")
+    @PutMapping(value = "/reprogramarCita")
     public Mono<Response<Boolean>> reprogramarCita(
             @RequestParam("fechaProgramada")  String fechaProgramada,
             @RequestParam String idCita,
@@ -287,23 +288,75 @@ public class AgendaController {
                         null,
                         StatusCode.STATUS_500.getValue(),
                         Mensajes.NO_REPROGRAMO_HORA_CITA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
                         e.getMessage()
                 )));
 
     }
-
-    @GetMapping(value = "/asignarProfesionalCita")
+    @PutMapping(value = "/confirmarCita")
+    public Mono<Response<Boolean>> confirmarCita(@RequestParam String idCita){
+        return agendaUseCase.confirmarCita(idCita)
+                .map(confirmada->ResponseFactory.createStatus(
+                        confirmada,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
+                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
+                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
+                        e.getMessage()
+                )));
+    }
+    @PutMapping(value = "/iniciarAtencionCita")
+    public Mono<Response<Boolean>> iniciarAtencionCita(@RequestParam String idCita){
+        return agendaUseCase.iniciarAtencionCita(idCita)
+                .map(confirmada->ResponseFactory.createStatus(
+                        confirmada,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
+                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
+                        e.getMessage()
+                )));
+    }
+    @PutMapping(value = "/finalizarAtencionCita")
+    public Mono<Response<Boolean>> finalizarAtencionCita(@RequestParam String idCita){
+        return agendaUseCase.finalizarAtencionCita(idCita)
+                .map(confirmada->ResponseFactory.createStatus(
+                        confirmada,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
+                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
+                        e.getMessage()
+                )));
+    }
+    @PutMapping(value = "/asignarProfesionalCita")
     public Mono<Response<Boolean>> asignarProfesionalCita(
-            @RequestParam String idCita,
-            @RequestParam String idProfesional,
-            @RequestParam ("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam Integer idHorarioTurno,
-            @RequestParam String idRegional
-    ) {
-        return agendaUseCase.asignarProfesionaCita(idCita, idProfesional, fechaTurno, idHorarioTurno, idRegional)
-                .map(actividades -> ResponseFactory.createStatus(
-                        actividades,
+          @RequestParam String idCita,
+          @RequestParam String idProfesional,
+          @RequestParam ("fechaProgramada") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime fechaProgramada,
+          @RequestParam Integer idHorarioTurno,
+          @RequestParam String idRegional) {
+        return agendaUseCase.asignarProfesionaCita(idCita, idProfesional, fechaProgramada, idHorarioTurno, idRegional)
+               .map(asignado -> ResponseFactory.createStatus(
+                        asignado,
                         StatusCode.STATUS_200.getValue(),
                         Mensajes.SE_ASIGNO_PROFESIONAL_CITA.getValue(),
                         Mensajes.SE_ASIGNO_PROFESIONAL_CITA.getValue(),
@@ -313,12 +366,12 @@ public class AgendaController {
                         null,
                         StatusCode.STATUS_500.getValue(),
                         Mensajes.NO_ASIGNO_PROFESIONAL_CITA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage(),
                         e.getMessage()
                 )));
 
     }
-    @GetMapping(value = "/desasignarProfesionalCita")
+    @PutMapping(value = "/desasignarProfesionalCita")
     public Mono<Response<Boolean>> desasignarProfesionalCita(
             @RequestParam String idCita,
             @RequestParam String idProfesional,
@@ -342,6 +395,7 @@ public class AgendaController {
                 )));
 
     }
+    //tratamientos
     @GetMapping(value = "/tratamientos")
     public Mono<Response<List<Tratamiento>>> consultarTratamientosByCita(@RequestParam String idCita) {
         return agendaUseCase.consultarTratamientosByCita(idCita)

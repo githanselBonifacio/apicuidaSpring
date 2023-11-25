@@ -2,10 +2,13 @@ package co.com.sura.config;
 
 import co.com.sura.agenda.AgendaUseCase;
 import co.com.sura.entity.agenda.AgendaRepository;
+import co.com.sura.entity.agenda.AgendamientoAutomaticoRepository;
+import co.com.sura.entity.agenda.GestionEstadosCitasRepository;
 import co.com.sura.entity.maestro.MaestroRepository;
 import co.com.sura.entity.moviles.MovilRepository;
+import co.com.sura.entity.personal.SecuenciasHorarioRepository;
 import co.com.sura.entity.remision.RemisionCrudRepository;
-import co.com.sura.entity.personal.PersonalRepository;
+import co.com.sura.entity.personal.PersonalCrudRepository;
 import co.com.sura.entity.reportes.ReportesRepository;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.moviles.MovilesUseCase;
@@ -29,8 +32,13 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public AgendaUseCase agendaUseCase (AgendaRepository agendaRepository){
-        return new AgendaUseCase(agendaRepository);
+    public AgendaUseCase agendaUseCase (AgendaRepository agendaRepository,
+                                        PersonalCrudRepository personalCrudRepository,
+                                        GestionEstadosCitasRepository gestionEstadosCitasRepository,
+                                        AgendamientoAutomaticoRepository agendamientoAutomaticoRepository){
+
+        return new AgendaUseCase(agendaRepository, personalCrudRepository,
+                                 gestionEstadosCitasRepository, agendamientoAutomaticoRepository);
     }
 
     @Bean
@@ -49,8 +57,9 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public PersonalUseCase personalesUseCase (PersonalRepository personalRepository){
-        return new PersonalUseCase(personalRepository);
+    public PersonalUseCase personalesUseCase (PersonalCrudRepository personalRepository,
+                                              SecuenciasHorarioRepository secuenciasHorarioRepository){
+        return new PersonalUseCase(personalRepository, secuenciasHorarioRepository);
     }
 
 }
