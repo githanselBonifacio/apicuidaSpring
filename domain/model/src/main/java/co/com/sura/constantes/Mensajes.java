@@ -34,6 +34,8 @@ public enum Mensajes {
     SE_ASIGNO_PROFESIONAL_CITA("Se ha agendado la cita  al profesional exitosamente"),
     NO_ASIGNO_PROFESIONAL_CITA("Se presentó un error y no se pudo agendar la cita"),
     ERROR_FECHA_CITA("Cita no se puede agendar, la fecha ya esta ocupada"),
+    ERROR_FECHA_CITA_HORARIO("Cita no se puede agendar, la fecha esta por fuera del horario del turno"),
+
 
     CITA_NO_EXISTE ("La cita no existe"),
     SE_DESASIGNO_PROFESIONAL_CITA("Se ha desagendado la cita  al profesional exitosamente"),

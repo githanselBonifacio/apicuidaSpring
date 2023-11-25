@@ -8,6 +8,8 @@ import co.com.sura.genericos.EstadosCita;
 import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
+import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,38 +24,55 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
     private final CitaRepository citaRepository;
     private final AgendamientoAutomaticoAdapter agendamientoAutomaticoAdapter;
     private final DesplazamientoRepository desplazamientoRepository;
-
+    private final HorarioTurnoRepository horarioTurnoRepository;
 
     @Autowired
     public GestionEstadosCitaAdapter(CitaRepository citaRepository,
                                      AgendamientoAutomaticoAdapter agendamientoAutomaticoAdapter,
-                                     DesplazamientoRepository desplazamientoRepository) {
+                                     DesplazamientoRepository desplazamientoRepository,
+                                     HorarioTurnoRepository horarioTurnoRepository) {
         this.citaRepository = citaRepository;
         this.agendamientoAutomaticoAdapter = agendamientoAutomaticoAdapter;
         this.desplazamientoRepository = desplazamientoRepository;
 
+        this.horarioTurnoRepository = horarioTurnoRepository;
     }
-
+    private Mono<Boolean> validarReprogramacionCitaEnHorarioTurno(CitaData cita){
+        return Mono.just(cita)
+                .flatMap(citaData -> horarioTurnoRepository.findById(cita.getIdHorarioTurno())
+                   .map(horarioTurnoData ->
+                          HorarioTurnoData
+                                 .validarHorarioCita(cita.getFechaProgramada(),horarioTurnoData, cita.getDuracion())));
+    }
     @Override
     public Mono<Boolean> agendarToProfesional(
             String idCita, String idProfesional, LocalDateTime fechaProgramada,
             Integer idHorarioTurno, String idRegional) {
 
-       return validarDisponibilidadFechaCita(idCita,idProfesional)
-               .onErrorResume(Mono::error)
-               .flatMap(vadacion->{
-               if (Boolean.TRUE.equals(vadacion)){
-                 return citaRepository.updateEstadoAndProfesional(idCita,EstadosCita.AGENDADA.getEstado(),idProfesional)
-                              .then(agendamientoAutomaticoAdapter.calcularDesplazamientoCitaByProfesional(
-                                   fechaProgramada.toLocalDate(), idHorarioTurno, idRegional, idProfesional));
-               }else{
-                  return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
-               }
+       return citaRepository.findById(idCita)
+            .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
+            .flatMap(citaData -> Mono.zip(
+                               validarDisponibilidadFechaCita(citaData,idProfesional),
+                               validarReprogramacionCitaEnHorarioTurno(citaData)))
+
+            .flatMap(tupleValidacion ->{
+                 if(Boolean.FALSE.equals(tupleValidacion.getT1())){
+                     return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
+
+                 }else if(Boolean.FALSE.equals(tupleValidacion.getT2())) {
+                     return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA_HORARIO.getValue()));
+
+                 }else{
+                    return citaRepository
+                            .updateEstadoAndProfesional(idCita,EstadosCita.AGENDADA.getEstado(),idProfesional)
+                                       .then(agendamientoAutomaticoAdapter.calcularDesplazamientoCitaByProfesional(
+                                           fechaProgramada.toLocalDate(), idHorarioTurno, idRegional, idProfesional));
+                 }
             });
+
     }
-    public Mono<Boolean> validarDisponibilidadFechaCita( String idCita,String idProfesional){
-        return citaRepository.findById(idCita)
-                .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
+    private Mono<Boolean> validarDisponibilidadFechaCita(CitaData cita,String idProfesional){
+        return Mono.just(cita)
                 .flatMap(citaData -> Mono.zip(
                         citaRepository.findCitaMasCercanaAnterior(
                                 citaData.getFechaProgramada(),citaData.getIdCita(),

@@ -1,5 +1,6 @@
 package co.com.sura.postgres.repository.maestros.data;
 
+import co.com.sura.postgres.repository.agenda.data.CitaData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
@@ -42,4 +44,9 @@ public class HorarioTurnoData {
 
     @Column("duracion_horas")
     private Integer duracionHoras;
+
+    public static Boolean validarHorarioCita(LocalDateTime fechaCita, HorarioTurnoData horario, Integer duracionCita){
+        return fechaCita.toLocalTime().isAfter(horario.getHoraInicio()) &&
+                fechaCita.toLocalTime().plusSeconds(duracionCita).isBefore(horario.getHoraFin());
+    }
 }

@@ -17,6 +17,8 @@ import co.com.sura.genericos.EstadosCita;
 import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
+import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.repository.remision.data.TratamientoRepository;
@@ -42,14 +44,14 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     private final DesplazamientoRepository desplazamientoRepository;
     private final TratamientoRepository tratamientoRepository;
     private final ProcedimientosCitaRepository procedimientosCitaRepository;
-
-    private final AgendamientoAutomaticoAdapter agendamientoAutomaticoAdapter;
+    private final HorarioTurnoRepository horarioTurnoRepository;
+    private final AgendamientoAutomaticoAdapter agendamientoAdapter;
     @Autowired
     public AgendaRepositoryAdapter(
             TurnoProfesionalesRepository turnoProfesionalesRepository, CitaRepository citaRepository,
             DesplazamientoRepository desplazamientoRepository, TratamientoRepository tratamientoRepository,
             ProcedimientosCitaRepository procedimientosCitaRepository,
-            AgendamientoAutomaticoAdapter agendamientoAutomaticoAdapter) {
+            HorarioTurnoRepository horarioTurnoRepository, AgendamientoAutomaticoAdapter agendamientoAdapter) {
 
 
         this.turnoProfesionalesRepository = turnoProfesionalesRepository;
@@ -57,7 +59,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         this.desplazamientoRepository = desplazamientoRepository;
         this.tratamientoRepository = tratamientoRepository;
         this.procedimientosCitaRepository = procedimientosCitaRepository;
-        this.agendamientoAutomaticoAdapter = agendamientoAutomaticoAdapter;
+        this.horarioTurnoRepository = horarioTurnoRepository;
+        this.agendamientoAdapter = agendamientoAdapter;
     }
 
 
@@ -148,9 +151,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 fechaTurno, idHorarioTurno, idCiudad,EstadosCita.CANCELADA.getEstado());
     }
 
-    public Mono<Boolean> validarDisponibilidadFechaCita(LocalDateTime fechaProgramada, String idCita){
-        return citaRepository.findById(idCita)
-                .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
+    private Mono<Boolean> validarDisponibilidadFechaCita(CitaData cita , LocalDateTime fechaProgramada){
+        return Mono.just(cita)
                 .flatMap(citaData -> Mono.zip(
                             citaRepository.findCitaMasCercanaAnterior(
                                citaData.getFechaProgramada(),citaData.getIdCita(),
@@ -174,19 +176,35 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                                 citasTuple.getT1(),citasTuple.getT2(),citasTuple.getT3(),
                                 despTuple.getT1(),despTuple.getT2(),fechaProgramada)));
     }
+    private Mono<Boolean> validarReprogramacionCitaEnHorarioTurno(CitaData cita, LocalDateTime fechaReprogramada){
+        return Mono.just(cita)
+                .flatMap(citaData -> horarioTurnoRepository.findById(cita.getIdHorarioTurno())
+                   .map(horarioTurnoData ->
+                            HorarioTurnoData
+                                 .validarHorarioCita(fechaReprogramada,horarioTurnoData,cita.getDuracion())));
+    }
     @Override
     public Mono<Boolean> reprogramarCitaFromProfesional(LocalDateTime fechaProgramada, String idCita,
                                                         String idProfesional, LocalDate fechaTurno,
                                                         Integer idHorarioTurno, String idRegional) {
-        return validarDisponibilidadFechaCita (fechaProgramada,idCita)
-            .flatMap(validacion -> {
-               if(Boolean.TRUE.equals(validacion)){
-                  return citaRepository.updateFechaProgramada(fechaProgramada,idCita)
-                         .then(agendamientoAutomaticoAdapter
-                         .calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional));
-               }else{
-                  return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
-               }
+        return citaRepository.findById(idCita)
+                .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
+                .flatMap(citaData -> Mono.zip(
+                        validarDisponibilidadFechaCita (citaData,fechaProgramada),
+                        validarReprogramacionCitaEnHorarioTurno(citaData,fechaProgramada)
+                ))
+                .flatMap(tupleValidacion -> {
+                   if(Boolean.FALSE.equals(tupleValidacion.getT1())){
+                       return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
+
+                   }else if(Boolean.FALSE.equals(tupleValidacion.getT2())) {
+                       return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA_HORARIO.getValue()));
+
+                   }else{
+                       return citaRepository.updateFechaProgramada(fechaProgramada,idCita)
+                               .then(agendamientoAdapter.calcularDesplazamientoCitaByProfesional(
+                                       fechaTurno,idHorarioTurno,idRegional,idProfesional));
+                   }
                 });
     }
 
