@@ -2,12 +2,20 @@ package co.com.sura.web.maestro;
 
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
-import co.com.sura.entity.maestro.*;
+import co.com.sura.entity.maestro.EstadoCita;
+import co.com.sura.entity.maestro.HorarioTurno;
+import co.com.sura.entity.maestro.Profesion;
+import co.com.sura.entity.maestro.Regional;
+import co.com.sura.entity.maestro.TipoIdentificacion;
 import co.com.sura.genericos.Response;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

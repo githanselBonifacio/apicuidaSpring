@@ -176,7 +176,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                                 citasTuple.getT1(),citasTuple.getT2(),citasTuple.getT3(),
                                 despTuple.getT1(),despTuple.getT2(),fechaProgramada)));
     }
-    private Mono<Boolean> validarReprogramacionCitaEnHorarioTurno(CitaData cita, LocalDateTime fechaReprogramada){
+    private Mono<Boolean> validarAgendamientoCitaEnHorarioTurno(CitaData cita, LocalDateTime fechaReprogramada){
         return Mono.just(cita)
                 .flatMap(citaData -> horarioTurnoRepository.findById(cita.getIdHorarioTurno())
                    .map(horarioTurnoData ->
@@ -191,10 +191,10 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
                 .flatMap(citaData -> Mono.zip(
                         validarDisponibilidadFechaCita (citaData,fechaProgramada),
-                        validarReprogramacionCitaEnHorarioTurno(citaData,fechaProgramada)
+                        validarAgendamientoCitaEnHorarioTurno(citaData,fechaProgramada)
                 ))
                 .flatMap(tupleValidacion -> {
-                   if(Boolean.FALSE.equals(tupleValidacion.getT1())){
+                    if(Boolean.FALSE.equals(tupleValidacion.getT1())){
                        return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
 
                    }else if(Boolean.FALSE.equals(tupleValidacion.getT2())) {

@@ -1,4 +1,4 @@
-package co.com.sura.autoagendador;
+package co.com.sura.autoagendador.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static co.com.sura.autoagendador.Helper.encontrarSumandos;
+import static co.com.sura.autoagendador.models.Helper.encontrarSumandos;
 
 
 @Data

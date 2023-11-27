@@ -1,4 +1,4 @@
-package co.com.sura.autoagendador;
+package co.com.sura.autoagendador.models;
 
 import org.javatuples.Pair;
 

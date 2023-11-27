@@ -44,31 +44,31 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
                           HorarioTurnoData
                                  .validarHorarioCita(cita.getFechaProgramada(),horarioTurnoData, cita.getDuracion())));
     }
+
     @Override
     public Mono<Boolean> agendarToProfesional(
             String idCita, String idProfesional, LocalDateTime fechaProgramada,
             Integer idHorarioTurno, String idRegional) {
 
        return citaRepository.findById(idCita)
-            .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
-            .flatMap(citaData -> Mono.zip(
+          .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
+          .flatMap(citaData -> Mono.zip(
                                validarDisponibilidadFechaCita(citaData,idProfesional),
                                validarReprogramacionCitaEnHorarioTurno(citaData)))
 
-            .flatMap(tupleValidacion ->{
-                 if(Boolean.FALSE.equals(tupleValidacion.getT1())){
-                     return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
+          .flatMap(tupleValidacion ->{
+             if(Boolean.FALSE.equals(tupleValidacion.getT1())){
+                 return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
 
-                 }else if(Boolean.FALSE.equals(tupleValidacion.getT2())) {
-                     return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA_HORARIO.getValue()));
+             }else if(Boolean.FALSE.equals(tupleValidacion.getT2())) {
+                 return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA_HORARIO.getValue()));
 
-                 }else{
-                    return citaRepository
-                            .updateEstadoAndProfesional(idCita,EstadosCita.AGENDADA.getEstado(),idProfesional)
-                                       .then(agendamientoAutomaticoAdapter.calcularDesplazamientoCitaByProfesional(
+             }else{
+                return citaRepository.updateEstadoAndProfesional(idCita,EstadosCita.AGENDADA.getEstado(),idProfesional)
+                       .then(agendamientoAutomaticoAdapter.calcularDesplazamientoCitaByProfesional(
                                            fechaProgramada.toLocalDate(), idHorarioTurno, idRegional, idProfesional));
-                 }
-            });
+             }
+          });
 
     }
     private Mono<Boolean> validarDisponibilidadFechaCita(CitaData cita,String idProfesional){

@@ -1,15 +1,17 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
-import co.com.sura.autoagendador.AutoAgendador;
-import co.com.sura.autoagendador.OrigenRegional;
-import co.com.sura.autoagendador.Resultado;
+import co.com.sura.autoagendador.models.AutoAgendador;
+import co.com.sura.autoagendador.models.CitaGenetic;
+import co.com.sura.autoagendador.models.Resultado;
 import co.com.sura.entity.agenda.AgendamientoAutomaticoRepository;
 import co.com.sura.entity.agenda.TiposDesplazamientos;
+import co.com.sura.entity.maestro.HorarioTurno;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.genericos.EstadosCita;
-import co.com.sura.mapbox.repository.map.config.ConfigMapBox;
-import co.com.sura.postgres.repository.agenda.data.CitaData;
+import co.com.sura.autoagendador.config.Config;
+import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.maestros.adapter.MaestroRepositoryAdapter;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.repository.personal.data.ProfesionalData;
 import co.com.sura.postgres.repository.personal.data.ProfesionalRepository;
@@ -21,9 +23,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
-import static co.com.sura.autoagendador.IdRegional.getByIdCiudad;
 import static co.com.sura.genericos.EstadosCita.AGENDADA;
 import static co.com.sura.postgres.repository.moviles.data.DesplazamientoData.crearDesplazamientoData;
 
@@ -33,43 +36,88 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
     private final CitaRepository citaRepository;
     private final ProfesionalRepository profesionalRepository;
     private final DesplazamientoRepository desplazamientoRepository;
+    private final MaestroRepositoryAdapter maestroRepositoryAdapter;
     private final MapboxServiceRepository mapboxService;
-
+    private final AutoAgendador autoAgendador;
     @Autowired
     public AgendamientoAutomaticoAdapter(CitaRepository citaRepository, ProfesionalRepository profesionalRepository,
                                          DesplazamientoRepository desplazamientoRepository,
-                                         MapboxServiceRepository mapboxService) {
+                                         MaestroRepositoryAdapter maestroRepositoryAdapter,
+                                         MapboxServiceRepository mapboxService, AutoAgendador autoAgendador) {
         this.citaRepository = citaRepository;
         this.profesionalRepository = profesionalRepository;
         this.desplazamientoRepository = desplazamientoRepository;
+        this.maestroRepositoryAdapter = maestroRepositoryAdapter;
         this.mapboxService = mapboxService;
+        this.autoAgendador = autoAgendador;
     }
-
     @Override
-    public Mono<Boolean> autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad) {
-        return desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idCiudad)
-           .then(citaRepository
-              .findCitasByTurnoRegionalHorario(fechaTurno,idHorarioTurno,idCiudad, EstadosCita.CANCELADA.getEstado())
-              .collectList()
-              .flatMap(citaDataList -> profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
-                .collectList().flatMap(profesionalesDataList -> {
-                   var autoAgendador = new AutoAgendador(
-                   OrigenRegional.getOrigenCiudadById(getByIdCiudad(idCiudad)).getCitaGenetic(),
-                   ConverterAgenda.convertToListCitaGenetic(citaDataList), profesionalesDataList.size(),
-                   ConfigMapBox.NUMERO_GENERACIONES, ConfigMapBox.SIZE_POBLACION_INICIAL,
-                   ConfigMapBox.NUMERO_PADRES_EMPAREJADOS, ConfigMapBox.PENALIZACION_HOLGURA_NEGATIVA, mapboxService);
+    public Mono<Boolean> autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idRegional) {
+        return desagendarTurnoCompleto(fechaTurno, idHorarioTurno, idRegional)
+                .then(
+                   Mono.zip(
+                      citaRepository.findCitasByTurnoRegionalHorario(
+                              fechaTurno,idHorarioTurno,idRegional, EstadosCita.CANCELADA.getEstado()).collectList(),
 
-                   autoAgendador.run();
-                   return asignarListaCitaToProfesionalAutoagendar(profesionalesDataList,autoAgendador.mejorSolucion());
-                })))
-           .then(insertDesplazamientosAllCitasByProfesional(fechaTurno,idCiudad,idHorarioTurno))
-           .then(Mono.just(Boolean.TRUE));
+                      profesionalRepository.findFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno).collectList(),
+
+                      buildCitaOrigen(fechaTurno,idRegional,idHorarioTurno))
+
+                   .flatMap(tuple->{
+                       autoAgendador.withCitas(ConverterAgenda.convertToListCitaGenetic(tuple.getT1()))
+                               .andOrigen(tuple.getT3())
+                               .andNumeroMoviles(tuple.getT2().size())
+                               .run();
+                       var mejorSolucion = autoAgendador.mejorSolucion();
+                       autoAgendador.resetData();
+                       return asignarListaCitaToProfesionalAutoagendar(tuple.getT2(),mejorSolucion);
+                   }))
+                .then(insertDesplazamientosAllCitasByProfesional(fechaTurno, idRegional, idHorarioTurno))
+                .then(Mono.just(Boolean.TRUE));
     }
 
+    private Mono<CitaGenetic> buildCitaOrigen(LocalDate fechaTurno,String idRegional, Integer idHorarioTurno){
+        return Mono.zip(
+           maestroRepositoryAdapter.consultarCiudadById(idRegional),
+           maestroRepositoryAdapter.consultarHorarioTurnoById(idHorarioTurno)
+                        .filter(HorarioTurno::getEsHorarioBase))
+           .map(tuple-> CitaGenetic.builder()
+                   .idCita(tuple.getT1().getId())
+                   .latitud(tuple.getT1().getLatitud())
+                   .longitud(tuple.getT1().getLongitud())
+                   .duracion(0)
+                   .holgura(Numeros.NOVECIENTOS_SEGUNDOS.getValue())
+                  .fechaInicioIso(LocalDateTime.of(fechaTurno,tuple.getT2().getHoraInicio())
+                           .toEpochSecond(ZoneOffset.UTC))
+                   .build());
+
+    }
+    private Mono<Void> asignarListaCitaToProfesionalAutoagendar (
+            List<ProfesionalData> profesionalesDataList, Resultado mejoResultado){
+        return Flux.zip(
+                        Flux.fromIterable(profesionalesDataList),
+                        Flux.fromIterable(mejoResultado.getIndividuo().getCitaGen()))
+                .flatMap(tuple-> Flux.fromIterable(tuple.getT2())
+                        .flatMap(cita-> citaRepository
+                                .updateEstadoAndProfesional(cita.getIdCita(),
+                                        AGENDADA.getEstado(),
+                                        tuple.getT1().getNumeroIdentificacion())))
+                .then();
+    }
+    private Mono<Void> insertDesplazamientosAllCitasByProfesional(
+            LocalDate fechaTurno, String idRegional,Integer idHorarioTurno){
+
+        return profesionalRepository.findFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno)
+                .collectList()
+                .flatMap(profesionalListData -> Flux.fromIterable(profesionalListData)
+                        .flatMap(profesionalData -> calcularDesplazamientoCitaByProfesional(
+                                fechaTurno, idHorarioTurno, idRegional, profesionalData.getNumeroIdentificacion()))
+                        .then());
+    }
     @Override
     public Flux<Desplazamiento> consultarDesplazamientoByCitaPartida(
-            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad){
-        return desplazamientoRepository.findAllByturno(fechaProgramada,idHorarioTurno,idCiudad)
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional){
+        return desplazamientoRepository.findAllByturno(fechaProgramada,idHorarioTurno,idRegional)
                 .map(ConverterAgenda :: converToDesplazamiento);
     }
 
@@ -81,28 +129,6 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
                .then(Mono.just(Boolean.TRUE));
     }
 
-    private Mono<Void> asignarListaCitaToProfesionalAutoagendar (
-            List<ProfesionalData> profesionalesDataList, Resultado mejoResultado){
-        return Flux.zip(
-                    Flux.fromIterable(profesionalesDataList),
-                    Flux.fromIterable(mejoResultado.getIndividuo().getCitaGen()))
-               .flatMap(tuple-> Flux.fromIterable(tuple.getT2())
-                                   .flatMap(cita-> citaRepository
-                                           .updateEstadoAndProfesional(cita.getIdCita(),
-                                                   AGENDADA.getEstado(),
-                                                   tuple.getT1().getNumeroIdentificacion())))
-                .then();
-    }
-    private Mono<Void> insertDesplazamientosAllCitasByProfesional(
-            LocalDate fechaTurno, String idCiudad,Integer idHorarioTurno){
-
-        return profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
-                .collectList()
-                .flatMap(profesionalListData -> Flux.fromIterable(profesionalListData)
-                        .flatMap(profesionalData -> calcularDesplazamientoCitaByProfesional(
-                                fechaTurno, idHorarioTurno, idCiudad, profesionalData.getNumeroIdentificacion()))
-                        .then());
-    }
     @Override
     public Mono<Boolean> calcularDesplazamientoCitaByProfesional(
             LocalDate fechaTurno, Integer idHorarioTurno,String idRegional, String idProfesional) {
@@ -112,22 +138,18 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
                                 fechaTurno,idHorarioTurno,idRegional,idProfesional,EstadosCita.CANCELADA.getEstado())
                         .collectList()
                         .flatMapMany(Flux::fromIterable)
-                        .buffer(ConfigMapBox.MAXSIZE,1)
-                        .filter(citas -> citas.size() == ConfigMapBox.MAXSIZE)
+                        .buffer(Config.MAXSIZE,1)
+                        .filter(citas -> citas.size() == Config.MAXSIZE)
                         .map(citas -> {
-                            CitaData citaPartida = citas.get(0);
-                            CitaData citaDestino = citas.get(1);
-
                             var duracionViaje = mapboxService.calcularTiempoViaje(
-                                    new GeoUbicacion(citaPartida.getLatitud(),citaPartida.getLongitud()),
-                                    new GeoUbicacion(citaDestino.getLatitud(),citaDestino.getLongitud())).block();
+                                    new GeoUbicacion(citas.get(0).getLatitud(),citas.get(0).getLongitud()),
+                                    new GeoUbicacion(citas.get(1).getLatitud(),citas.get(1).getLongitud())).block();
 
-                            return  crearDesplazamientoData(citaPartida,citaDestino).toBuilder()
+                            return  crearDesplazamientoData(citas.get(0),citas.get(1)).toBuilder()
                                     .tipo(TiposDesplazamientos.dvisita.name())
                                     .idHorarioTurno(idHorarioTurno)
                                     .duracion(duracionViaje)
-                                    .holgura(ConfigMapBox.HOLGURA_DEFECTO)
-                                    .build();
+                                    .holgura(Config.HOLGURA_DEFECTO).build();
                         })
                         .flatMap(desplazamientoRepository::save)
                         .then(Mono.just(Boolean.TRUE)));

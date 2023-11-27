@@ -1,4 +1,4 @@
-package co.com.sura.autoagendador;
+package co.com.sura.autoagendador.models;
 
 import co.com.sura.services.mapbox.GeoUbicacion;
 import co.com.sura.services.mapbox.MapboxServiceRepository;
@@ -16,7 +16,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static co.com.sura.autoagendador.Helper.*;
+import static co.com.sura.autoagendador.models.Helper.*;
 
 @Data
 public class AutoAgendador {
@@ -42,18 +42,12 @@ public class AutoAgendador {
 
     @Autowired
     public AutoAgendador(
-            CitaGenetic origen,
-            List<CitaGenetic> citas,
-            Integer numeroMoviles,
             Integer numeroGeneraciones,
             Integer sizePoblacionInicial,
             Integer numeroPadresEnparejados,
             Double penalizacionHolgura,
             MapboxServiceRepository mapboxService) {
 
-        this.origen = origen;
-        this.citas = new ArrayList<>(citas);
-        this.numeroMoviles = numeroMoviles;
         this.numeroGeneraciones = numeroGeneraciones;
         this.sizePoblacionInicial = sizePoblacionInicial;
         this.numeroPadresEnparejados = numeroPadresEnparejados;
@@ -66,6 +60,18 @@ public class AutoAgendador {
         this.mapboxService =mapboxService;
     }
 
+    public  AutoAgendador andOrigen(CitaGenetic origen){
+        this.origen = origen;
+        return this;
+    }
+    public  AutoAgendador withCitas(List<CitaGenetic> citas){
+        this.citas = citas;
+        return this;
+    }
+    public  AutoAgendador andNumeroMoviles(Integer numeroMoviles){
+        this.numeroMoviles = numeroMoviles;
+        return this;
+    }
 
     public void crearPoblacionInicial(){
        var poblacionInicial = new Poblacion();
@@ -75,10 +81,10 @@ public class AutoAgendador {
                    .builder()
                    .citaGen(
                        new ArrayList<>(
-                       CitaGenetic.dividirListaCitas(
-                           this.citas,
-                            this.numeroMoviles,
-                            this.origen)
+                            CitaGenetic.dividirListaCitas(
+                                this.citas,
+                                this.numeroMoviles,
+                                this.origen)
                            )
                    )
                    .build();
@@ -200,16 +206,14 @@ public class AutoAgendador {
                             .build());
         }
         this.resultadoActual = this.resultadoActual
-                .entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator
-                        .comparingDouble(Resultado::getPuntajeAptitudGlobalIndividuo)
-                        .reversed()))
-                .limit(this.numeroPadresEnparejados)
-                .collect(
-                        Collectors.toMap(
-                                Map.Entry::getKey,Map.Entry::getValue,(oldValue,newValue)->oldValue, LinkedHashMap::new)
-                );
+           .entrySet()
+           .stream()
+           .sorted(Map.Entry.comparingByValue(Comparator
+                    .comparingDouble(Resultado::getPuntajeAptitudGlobalIndividuo)
+                     .reversed()))
+           .limit(this.numeroPadresEnparejados)
+           .collect(
+             Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(oldValue,newValue)->oldValue, LinkedHashMap::new));
 
     }
 
@@ -225,7 +229,6 @@ public class AutoAgendador {
         }
         return coordenadas
                 .stream()
-                .filter(tupla -> tupla.getValue1() !=0 )
                 .collect(Collectors.toList());
     }
 
@@ -275,8 +278,17 @@ public class AutoAgendador {
             }
             nuevalistaCitasGen.add(itemIndividuo);
         }
+        nuevalistaCitasGen.forEach(v ->v.remove(0));
         mejorResultado.setIndividuo( new Individuo(nuevalistaCitasGen));
         return mejorResultado;
+    }
+    public void resetData(){
+        this.citas = new ArrayList<>();
+        this.origen = new CitaGenetic();
+        this.numeroMoviles=0;
+        this.resultadoActual = new HashMap<>();
+        this.poblacionActual=new Poblacion();
+        this.aptitudGlobalActual = 0.0;
     }
     public void run (){
         this.crearPoblacionInicial();

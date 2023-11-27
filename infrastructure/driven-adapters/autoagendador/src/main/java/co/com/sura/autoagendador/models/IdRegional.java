@@ -1,4 +1,4 @@
-package co.com.sura.autoagendador;
+package co.com.sura.autoagendador.models;
 
 import lombok.Getter;
 
@@ -15,10 +15,10 @@ public enum IdRegional {
     IdRegional(String codigo) {
         this.codigo = codigo;
     }
-    public static IdRegional getByIdCiudad(String idRegional) {
-        for (IdRegional ciudad : IdRegional.values()) {
-            if (ciudad.codigo.equals(idRegional)) {
-                return ciudad;
+    public static IdRegional getByIdRegional(String idRegional) {
+        for (IdRegional regional : IdRegional.values()) {
+            if (regional.codigo.equals(idRegional)) {
+                return regional;
             }
         }
         throw new IllegalArgumentException("Invalid idRegional: " + idRegional);

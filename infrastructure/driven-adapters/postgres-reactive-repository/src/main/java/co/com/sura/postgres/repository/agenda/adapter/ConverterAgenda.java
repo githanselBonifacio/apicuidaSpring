@@ -1,7 +1,7 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
 
-import co.com.sura.autoagendador.CitaGenetic;
+import co.com.sura.autoagendador.models.CitaGenetic;
 import co.com.sura.entity.agenda.Actividad;
 import co.com.sura.entity.agenda.Cita;
 import co.com.sura.entity.agenda.Tarea;

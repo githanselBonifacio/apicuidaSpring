@@ -46,7 +46,7 @@ public class HorarioTurnoData {
     private Integer duracionHoras;
 
     public static Boolean validarHorarioCita(LocalDateTime fechaCita, HorarioTurnoData horario, Integer duracionCita){
-        return fechaCita.toLocalTime().isAfter(horario.getHoraInicio()) &&
+        return fechaCita.toLocalTime().isAfter(horario.getHoraInicio().minusMinutes(1)) &&
                 fechaCita.toLocalTime().plusSeconds(duracionCita).isBefore(horario.getHoraFin());
     }
 }
