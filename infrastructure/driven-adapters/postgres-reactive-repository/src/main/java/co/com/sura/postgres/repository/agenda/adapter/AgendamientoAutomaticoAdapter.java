@@ -39,6 +39,7 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
     private final MaestroRepositoryAdapter maestroRepositoryAdapter;
     private final MapboxServiceRepository mapboxService;
     private final AutoAgendador autoAgendador;
+
     @Autowired
     public AgendamientoAutomaticoAdapter(CitaRepository citaRepository, ProfesionalRepository profesionalRepository,
                                          DesplazamientoRepository desplazamientoRepository,
@@ -61,7 +62,7 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
 
                       profesionalRepository.findFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno).collectList(),
 
-                      buildCitaOrigen(fechaTurno,idRegional,idHorarioTurno))
+                      buildCitaOrigenSede(fechaTurno,idRegional,idHorarioTurno))
 
                    .flatMap(tuple->{
                        autoAgendador.withCitas(ConverterAgenda.convertToListCitaGenetic(tuple.getT1()))
@@ -79,7 +80,7 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
                 .then(Mono.just(Boolean.TRUE));
     }
 
-    private Mono<CitaGenetic> buildCitaOrigen(LocalDate fechaTurno,String idRegional, Integer idHorarioTurno){
+    private Mono<CitaGenetic> buildCitaOrigenSede(LocalDate fechaTurno, String idRegional, Integer idHorarioTurno){
         return Mono.zip(
            maestroRepositoryAdapter.consultarRegionalById(idRegional),
            maestroRepositoryAdapter.consultarHorarioTurnoById(idHorarioTurno)
@@ -114,7 +115,7 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
                 .collectList()
                 .flatMap(profesionalListData ->
                          Flux.fromIterable(profesionalListData)
-                        .flatMap(profesionalData -> calcularDesplazamientoCitaByProfesional(
+                        .flatMap(profesionalData -> insertDesplazamientoCitaByProfesional(
                                 fechaTurno, idHorarioTurno, idRegional, profesionalData.getNumeroIdentificacion()))
                         .then());
     }
@@ -134,7 +135,7 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
     }
 
     @Override
-    public Mono<Boolean> calcularDesplazamientoCitaByProfesional(
+    public Mono<Boolean> insertDesplazamientoCitaByProfesional(
             LocalDate fechaTurno, Integer idHorarioTurno,String idRegional, String idProfesional) {
 
        return desplazamientoRepository.deleteByFechaTurnoProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional)
@@ -153,7 +154,6 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
                            tuple.getT3().add(0,tuple.getT2());
                            return Flux.fromIterable(tuple.getT3());
                        })
-
                        .buffer(Config.MAXSIZE,1)
                        .filter(citas -> citas.size() == Config.MAXSIZE)
                        .map(citas -> {
@@ -166,9 +166,8 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
                                      .duracion(duracionViaje)
                                      .holgura(Config.HOLGURA_DEFECTO)
                                      .build();
-                          })
-                          .flatMap(desplazamientoRepository::save)
-
+                        })
+                       .flatMap(desplazamientoRepository::save)
                   .then(Mono.just(Boolean.TRUE)));
     }
 }

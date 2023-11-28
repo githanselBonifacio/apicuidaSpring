@@ -60,7 +60,9 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     private final RemisionRepository remisionRepository;
     private final UbicacionRepository ubicacionRepository;
     private final PacienteRepository pacienteRepository;
+
     private final HorarioTurnoRepository horarioTurnoRepository;
+
     private final DatosAtencionPacienteRepository datosAtencionPacienteRepository;
     private final RemisionDiagnosticoRepository remisionDiagnosticoRepository;
     private final CitaRepository citaRepository;

@@ -64,7 +64,7 @@ public class AgendaUseCase  {
           Integer idHorarioTurno,
           String idRegional) {
         return agendaRepository
-                .consultarActividadesByProfesionalesCiudadHorarioTurno(fechaTurno,idHorarioTurno,idRegional);
+                .consultarActividadesByProfesionalesRegionalHorarioTurno(fechaTurno,idHorarioTurno,idRegional);
     }
      public Mono<Boolean> autoagendarTurnoCompleto( LocalDate fechaTurno,
                                                  Integer idHorarioTurno,

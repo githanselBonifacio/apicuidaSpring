@@ -65,7 +65,7 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
 
              }else{
                 return citaRepository.updateEstadoAndProfesional(idCita,EstadosCita.AGENDADA.getEstado(),idProfesional)
-                       .then(agendamientoAutomaticoAdapter.calcularDesplazamientoCitaByProfesional(
+                       .then(agendamientoAutomaticoAdapter.insertDesplazamientoCitaByProfesional(
                                            fechaProgramada.toLocalDate(), idHorarioTurno, idRegional, idProfesional));
              }
           });
@@ -73,37 +73,40 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
     }
     private Mono<Boolean> validarDisponibilidadFechaCita(CitaData cita,String idProfesional){
         return Mono.just(cita)
-                .flatMap(citaData -> Mono.zip(
+           .flatMap(citaData -> Mono.zip(
 
-                        citaRepository.findCitaMasCercanaAnterior(
+             citaRepository.findCitaMasCercanaAnterior(
                                 citaData.getFechaProgramada(),citaData.getIdCita(),
                                 citaData.getIdHorarioTurno(),citaData.getIdRegional(), idProfesional)
                                 .defaultIfEmpty(CitaData.builder().idCita("noCita").build()),
 
-                       citaRepository.findCitaMasCercanaPosterior(
+             citaRepository.findCitaMasCercanaPosterior(
                                 citaData.getFechaProgramada(), citaData.getIdCita(),
                                 citaData.getIdHorarioTurno(),citaData.getIdRegional(), idProfesional)
                                .defaultIfEmpty(CitaData.builder().idCita("noCita").build()),
 
                          Mono.just(citaData)))
-                .flatMap(citasTuple-> Mono.zip(
-                        desplazamientoRepository.findByIdCitaPartida(citasTuple.getT1().getIdCita())
-                                .defaultIfEmpty(DesplazamientoData.builder().duracion(0).build()),
-                        desplazamientoRepository.findByIdCitaPartida(citasTuple.getT3().getIdCita())
-                                .defaultIfEmpty(DesplazamientoData.builder()
-                                        .duracion(Numeros.NOVECIENTOS_SEGUNDOS.getValue()).build()))
+           .flatMap(citasTuple-> Mono.zip(
+             desplazamientoRepository.findByIdCitaPartida(citasTuple.getT1().getIdCita())
+                 .defaultIfEmpty(DesplazamientoData.builder().duracion(0).build()),
 
-                        .map(despTuple->CitaData.validarDisponibilidadFechasToAgendar(
+             desplazamientoRepository.findByIdCitaPartida(citasTuple.getT3().getIdCita())
+                .defaultIfEmpty(DesplazamientoData.builder().duracion(Numeros.NOVECIENTOS_SEGUNDOS.getValue()).build()),
+
+            desplazamientoRepository.findBySede(
+                    cita.getFechaProgramada(),cita.getIdRegional(),idProfesional,cita.getIdHorarioTurno()))
+
+           .map(despTuple->CitaData.validarDisponibilidadFechasToAgendar(
                                     citasTuple.getT1(),citasTuple.getT2(),citasTuple.getT3(),
-                                    despTuple.getT1(),despTuple.getT2()
-                        )));
+                                    despTuple.getT1(),despTuple.getT2(),despTuple.getT3()
+           )));
     }
     @Override
     public Mono<Boolean> desagendarToProfesional(
             String idCita,String idProfesional,LocalDate fechaTurno,Integer idHorarioTurno,String idRegional) {
         return citaRepository.updateEstadoAndProfesional(idCita,EstadosCita.SIN_AGENDAR.getEstado(),null)
                 .then(agendamientoAutomaticoAdapter
-                        .calcularDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional));
+                        .insertDesplazamientoCitaByProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional));
     }
 
 

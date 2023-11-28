@@ -93,13 +93,20 @@ public class CitaData  {
         }
     }
 
-    public static Boolean validarDisponibilidadFechasToReprogramar(CitaData citaFechaInferior,
-                                                                   CitaData citaFechaSuperior,
-                                                                   CitaData citaAsignada,
-                                                                   DesplazamientoData desplazamientoCitaInferior,
-                                                                   DesplazamientoData desplazamientoCitaAsignada,
-                                                                   LocalDateTime fechaProgramada){
+    public static Boolean validarFechasToReprogramar(CitaData citaFechaInferior,
+                                                     CitaData citaFechaSuperior,
+                                                     CitaData citaAsignada,
+                                                     DesplazamientoData desplazamientoCitaInferior,
+                                                     DesplazamientoData desplazamientoCitaAsignada,
+                                                     DesplazamientoData desplazamientoSede,
+                                                     LocalDateTime fechaProgramada){
 
+
+        var validarDesplazamientoDesdeSede  = true;
+        if(desplazamientoSede.getFechaProgramada()!=null){
+             validarDesplazamientoDesdeSede = fechaProgramada
+                    .isAfter(desplazamientoSede.getFechaProgramada().plusSeconds(desplazamientoSede.getDuracion()));
+        }
         boolean validacionFechaAnterior = citaFechaInferior.getFechaProgramada() == null ||
                 citaFechaInferior.getFechaProgramada().plusSeconds(citaFechaInferior.getDuracion())
                         .plusSeconds(desplazamientoCitaInferior.getDuracion())
@@ -110,14 +117,22 @@ public class CitaData  {
                         .isAfter(fechaProgramada.plusSeconds(citaAsignada.getDuracion())
                                 .plusSeconds(desplazamientoCitaAsignada.getDuracion()));
 
-        return validacionFechaAnterior && validacionFechaPosterior;
+        return validacionFechaAnterior && validacionFechaPosterior && validarDesplazamientoDesdeSede;
     }
     public static Boolean validarDisponibilidadFechasToAgendar(CitaData citaFechaInferior, CitaData citaFechaSuperior,
                                                                CitaData citaAgendada,
                                                                DesplazamientoData desplazamientoCitaInferior,
-                                                               DesplazamientoData desplazamientoCitaAsignada
+                                                               DesplazamientoData desplazamientoCitaAsignada,
+                                                              DesplazamientoData desplazamientoSede
 
     ){
+        var validarDesplazamientoDesdeSede  = true;
+        if (citaFechaInferior.getFechaProgramada() == null){
+             validarDesplazamientoDesdeSede = citaAgendada.getFechaProgramada()
+                    .isAfter(desplazamientoSede.getFechaProgramada().plusSeconds(desplazamientoSede.getDuracion()));
+        }
+
+
         boolean validacionFechaAnterior = citaFechaInferior.getFechaProgramada() == null ||
                 citaFechaInferior.getFechaProgramada()
                         .plusSeconds(citaFechaInferior.getDuracion())
@@ -130,6 +145,6 @@ public class CitaData  {
                                 .plusSeconds(citaAgendada.getDuracion())
                                 .plusSeconds(desplazamientoCitaAsignada.getDuracion()));
 
-        return validacionFechaAnterior && validacionFechaPosterior;
+        return validacionFechaAnterior && validacionFechaPosterior && validarDesplazamientoDesdeSede;
     }
 }

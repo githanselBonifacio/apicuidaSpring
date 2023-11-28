@@ -355,7 +355,7 @@ public class AgendaController {
           @RequestParam Integer idHorarioTurno,
           @RequestParam String idRegional) {
         return agendaUseCase.asignarProfesionaCita(idCita, idProfesional, fechaProgramada, idHorarioTurno, idRegional)
-               .map(asignado -> ResponseFactory.createStatus(
+              .map(asignado -> ResponseFactory.createStatus(
                         asignado,
                         StatusCode.STATUS_200.getValue(),
                         Mensajes.SE_ASIGNO_PROFESIONAL_CITA.getValue(),

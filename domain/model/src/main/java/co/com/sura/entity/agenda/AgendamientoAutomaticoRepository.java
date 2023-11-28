@@ -14,7 +14,7 @@ public interface AgendamientoAutomaticoRepository {
                                                                 Integer idHorarioTurno,
                                                                 String idCiudad);
 
-    Mono<Boolean>         calcularDesplazamientoCitaByProfesional(
+    Mono<Boolean>          insertDesplazamientoCitaByProfesional(
                                                                     LocalDate fechaProgramada,
                                                                     Integer idHorarioTurno,
                                                                     String idCiudad,

@@ -6,11 +6,19 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface DesplazamientoRepository extends ReactiveCrudRepository<DesplazamientoData,Integer> {
 
     @Query("SELECT * FROM desplazamientos WHERE id_cita_partida = $1;")
     Mono<DesplazamientoData> findByIdCitaPartida(String idCitaPartida);
+
+    @Query("SELECT * FROM desplazamientos " +
+            "WHERE fecha_programada::date = $1::date AND " +
+            "id_cita_partida LIKE concat('%-', $2) AND " +
+            "id_profesional = $3 and id_horario_turno = $4;")
+    Mono<DesplazamientoData> findBySede(
+            LocalDateTime fechaProgramada,String idRegional, String idProfesional, Integer idHorarioTurno);
 
     @Query("SELECT * FROM public.desplazamientos " +
             "WHERE public.desplazamientos.fecha_programada::date = $1 " +
