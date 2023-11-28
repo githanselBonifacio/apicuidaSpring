@@ -5,9 +5,9 @@ import reactor.core.publisher.Mono;
 
 public interface MaestroRepository {
 
-    //ciudad
-    Flux<Regional> consultarCiudad();
-    Mono<Regional> consultarCiudadById(String idCiudad);
+    //regional
+    Flux<Regional> consultarRegional();
+    Mono<Regional> consultarRegionalById(String idCiudad);
 
     //horario turno
     Flux<HorarioTurno> consultarHorarioTurno();

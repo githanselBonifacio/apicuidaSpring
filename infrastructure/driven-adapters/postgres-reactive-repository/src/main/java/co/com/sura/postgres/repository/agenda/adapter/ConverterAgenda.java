@@ -67,7 +67,7 @@ public class ConverterAgenda extends Converter {
                 .id(desplazamientoData.getIdCitaPartida()+" -> "+desplazamientoData.getIdCitaDestino())
                 .fechaInicio(desplazamientoData.getFechaProgramada())
                 .fechaProgramada(desplazamientoData.getFechaProgramada())
-                .tipo("dvisita")
+                .tipo(desplazamientoData.getTipo())
                 .duracion(desplazamientoData.getDuracion())
                 .holgura(desplazamientoData.getHolgura())
                 .build();

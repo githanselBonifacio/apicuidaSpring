@@ -21,7 +21,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @Entity
 @Table(name = "citas")
-public class CitaData {
+public class CitaData  {
     @Id
     @Column("id_cita")
     private String idCita;

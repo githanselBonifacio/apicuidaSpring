@@ -39,15 +39,15 @@ public class DesplazamientoData {
     @Column("id_horario_turno")
     private Integer idHorarioTurno;
 
-    @Column("id_estado")
-    private Integer idEstado;
+    @Column("id_regional")
+    private String idRegional;
 
     private String tipo;
     private Integer duracion;
     private Integer holgura;
 
-    @Column("id_movil")
-    private String idMovil;
+    @Column("id_conductor")
+    private String idConductor;
 
     @Column("id_profesional")
     private String idProfesional;
@@ -59,6 +59,9 @@ public class DesplazamientoData {
                 .idCitaDestino(citaDestino.getIdCita())
                 .fechaProgramada(citaPartida.getFechaProgramada()
                         .plus(citaPartida.getDuracion(), ChronoUnit.SECONDS))
+                .idProfesional(citaPartida.getIdProfesional())
+                .idRegional(citaPartida.getIdRegional())
+                .idHorarioTurno(citaPartida.getIdHorarioTurno())
                 .build();
     }
     public static Mono<Integer> calcularHorasTotalesDesplazamientoTurno(Flux<DesplazamientoData> desplazamientos){

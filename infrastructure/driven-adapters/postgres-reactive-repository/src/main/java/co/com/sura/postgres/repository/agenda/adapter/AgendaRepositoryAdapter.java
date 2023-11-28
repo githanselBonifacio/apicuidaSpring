@@ -113,7 +113,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                         profesionalData.getNumeroIdentificacion(),EstadosCita.CANCELADA.getEstado())
                 .map(ConverterAgenda :: convertToTarea)
                 .map(tarea -> {
-                    tarea.setTipo(TiposTarea.visita.name());
+                    tarea.setTipo(TiposTarea.VISITA.name());
                     return tarea;
                 })
                 .mergeWith(desplazamientoRepository
@@ -191,8 +191,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE.getValue())))
                 .flatMap(citaData -> Mono.zip(
                         validarDisponibilidadFechaCita (citaData,fechaProgramada),
-                        validarAgendamientoCitaEnHorarioTurno(citaData,fechaProgramada)
-                ))
+                        validarAgendamientoCitaEnHorarioTurno(citaData,fechaProgramada)))
+
                 .flatMap(tupleValidacion -> {
                     if(Boolean.FALSE.equals(tupleValidacion.getT1())){
                        return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA.getValue()));
@@ -211,8 +211,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Flux<Desplazamiento> consultarDesplazamientoByCitaPartida(
-            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad){
-        return desplazamientoRepository.findAllByturno(fechaProgramada,idHorarioTurno,idCiudad)
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional){
+        return desplazamientoRepository.findByFechaProgramada(fechaProgramada,idRegional,idHorarioTurno)
                 .map(ConverterAgenda :: converToDesplazamiento);
     }
 

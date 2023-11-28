@@ -1,7 +1,16 @@
 package co.com.sura.postgres.repository.maestros.adapter;
 
-import co.com.sura.entity.maestro.*;
-import co.com.sura.postgres.repository.maestros.data.*;
+import co.com.sura.entity.maestro.EstadoCita;
+import co.com.sura.entity.maestro.HorarioTurno;
+import co.com.sura.entity.maestro.MaestroRepository;
+import co.com.sura.entity.maestro.Profesion;
+import co.com.sura.entity.maestro.Regional;
+import co.com.sura.entity.maestro.TipoIdentificacion;
+import co.com.sura.postgres.repository.maestros.data.EstadoCitaRepository;
+import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
+import co.com.sura.postgres.repository.maestros.data.ProfesionRepository;
+import co.com.sura.postgres.repository.maestros.data.RegionalesRepository;
+import co.com.sura.postgres.repository.maestros.data.TipoIdentificacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -31,13 +40,13 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     }
 
     @Override
-    public Flux<Regional> consultarCiudad() {
+    public Flux<Regional> consultarRegional() {
         return ciudadRepository.findAll()
                 .map(ConverterMaestros::convertToCiudad);
     }
 
     @Override
-    public Mono<Regional> consultarCiudadById(String idCiudad) {
+    public Mono<Regional> consultarRegionalById(String idCiudad) {
         return ciudadRepository.findById(idCiudad)
                 .map(ConverterMaestros::convertToCiudad);
     }

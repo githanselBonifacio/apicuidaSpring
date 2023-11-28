@@ -74,6 +74,7 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
     private Mono<Boolean> validarDisponibilidadFechaCita(CitaData cita,String idProfesional){
         return Mono.just(cita)
                 .flatMap(citaData -> Mono.zip(
+
                         citaRepository.findCitaMasCercanaAnterior(
                                 citaData.getFechaProgramada(),citaData.getIdCita(),
                                 citaData.getIdHorarioTurno(),citaData.getIdRegional(), idProfesional)

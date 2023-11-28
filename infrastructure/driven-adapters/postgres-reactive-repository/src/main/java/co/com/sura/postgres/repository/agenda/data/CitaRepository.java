@@ -60,6 +60,9 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
             LocalDate fechaTurno,
             String numeroIdentificacionProfesional);
 
+    @Query("Select citas.* From citas WHERE id_cita LIKE concat('%-', $1)")
+    Mono<CitaData> findCitaDataSedeByIdRegional(String idRegional);
+
     //gestion de estados
     @Modifying
     @Query("UPDATE citas SET id_estado = $2 " +

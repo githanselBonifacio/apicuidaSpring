@@ -73,12 +73,15 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
                        return asignarListaCitaToProfesionalAutoagendar(tuple.getT2(),mejorSolucion);
                    }))
                 .then(insertDesplazamientosAllCitasByProfesional(fechaTurno, idRegional, idHorarioTurno))
+                .onErrorResume(e-> desagendarTurnoCompleto(fechaTurno, idHorarioTurno, idRegional)
+                        .then(desplazamientoRepository.deleteAllByFechaTurno(fechaTurno,idHorarioTurno,idRegional))
+                        .then(Mono.error(e)))
                 .then(Mono.just(Boolean.TRUE));
     }
 
     private Mono<CitaGenetic> buildCitaOrigen(LocalDate fechaTurno,String idRegional, Integer idHorarioTurno){
         return Mono.zip(
-           maestroRepositoryAdapter.consultarCiudadById(idRegional),
+           maestroRepositoryAdapter.consultarRegionalById(idRegional),
            maestroRepositoryAdapter.consultarHorarioTurnoById(idHorarioTurno)
                         .filter(HorarioTurno::getEsHorarioBase))
            .map(tuple-> CitaGenetic.builder()
@@ -109,7 +112,8 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
 
         return profesionalRepository.findFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno)
                 .collectList()
-                .flatMap(profesionalListData -> Flux.fromIterable(profesionalListData)
+                .flatMap(profesionalListData ->
+                         Flux.fromIterable(profesionalListData)
                         .flatMap(profesionalData -> calcularDesplazamientoCitaByProfesional(
                                 fechaTurno, idHorarioTurno, idRegional, profesionalData.getNumeroIdentificacion()))
                         .then());
@@ -117,7 +121,7 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
     @Override
     public Flux<Desplazamiento> consultarDesplazamientoByCitaPartida(
             LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional){
-        return desplazamientoRepository.findAllByturno(fechaProgramada,idHorarioTurno,idRegional)
+        return desplazamientoRepository.findByFechaProgramada(fechaProgramada,idRegional,idHorarioTurno)
                 .map(ConverterAgenda :: converToDesplazamiento);
     }
 
@@ -133,25 +137,38 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
     public Mono<Boolean> calcularDesplazamientoCitaByProfesional(
             LocalDate fechaTurno, Integer idHorarioTurno,String idRegional, String idProfesional) {
 
-        return desplazamientoRepository.deleteByFechaTurnoProfesional(fechaTurno,idHorarioTurno,idProfesional)
-                .then(citaRepository.findCitasByTurnoRegionalProfesional(
-                                fechaTurno,idHorarioTurno,idRegional,idProfesional,EstadosCita.CANCELADA.getEstado())
-                        .collectList()
-                        .flatMapMany(Flux::fromIterable)
-                        .buffer(Config.MAXSIZE,1)
-                        .filter(citas -> citas.size() == Config.MAXSIZE)
-                        .map(citas -> {
-                            var duracionViaje = mapboxService.calcularTiempoViaje(
-                                    new GeoUbicacion(citas.get(0).getLatitud(),citas.get(0).getLongitud()),
-                                    new GeoUbicacion(citas.get(1).getLatitud(),citas.get(1).getLongitud())).block();
+       return desplazamientoRepository.deleteByFechaTurnoProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional)
+               .then(Mono.zip(
+                       maestroRepositoryAdapter.consultarHorarioTurnoById(idHorarioTurno),
+                       citaRepository.findCitaDataSedeByIdRegional(idRegional),
+                       citaRepository.findCitasByTurnoRegionalProfesional(
+                               fechaTurno,idHorarioTurno,idRegional,idProfesional,EstadosCita.CANCELADA.getEstado())
+                               .collectList())
 
-                            return  crearDesplazamientoData(citas.get(0),citas.get(1)).toBuilder()
-                                    .tipo(TiposDesplazamientos.dvisita.name())
-                                    .idHorarioTurno(idHorarioTurno)
-                                    .duracion(duracionViaje)
-                                    .holgura(Config.HOLGURA_DEFECTO).build();
-                        })
-                        .flatMap(desplazamientoRepository::save)
-                        .then(Mono.just(Boolean.TRUE)));
+                       .flatMapMany(tuple-> {
+                           tuple.getT2().setFechaProgramada(LocalDateTime.of(fechaTurno,tuple.getT1().getHoraInicio()));
+                           tuple.getT2().setIdProfesional(idProfesional);
+                           tuple.getT2().setIdHorarioTurno(idHorarioTurno);
+                           tuple.getT2().setIdRegional(idRegional);
+                           tuple.getT3().add(0,tuple.getT2());
+                           return Flux.fromIterable(tuple.getT3());
+                       })
+
+                       .buffer(Config.MAXSIZE,1)
+                       .filter(citas -> citas.size() == Config.MAXSIZE)
+                       .map(citas -> {
+                           var duracionViaje = mapboxService.calcularTiempoViaje(
+                                   new GeoUbicacion(citas.get(0).getLatitud(),citas.get(0).getLongitud()),
+                                   new GeoUbicacion(citas.get(1).getLatitud(),citas.get(1).getLongitud())).block();
+
+                          return  crearDesplazamientoData(citas.get(0),citas.get(1)).toBuilder()
+                                     .tipo(TiposDesplazamientos.DVISITA.name())
+                                     .duracion(duracionViaje)
+                                     .holgura(Config.HOLGURA_DEFECTO)
+                                     .build();
+                          })
+                          .flatMap(desplazamientoRepository::save)
+
+                  .then(Mono.just(Boolean.TRUE)));
     }
 }

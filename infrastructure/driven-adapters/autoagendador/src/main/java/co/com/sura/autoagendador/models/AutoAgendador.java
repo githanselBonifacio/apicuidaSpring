@@ -227,9 +227,7 @@ public class AutoAgendador {
                 }
             }
         }
-        return coordenadas
-                .stream()
-                .collect(Collectors.toList());
+        return coordenadas;
     }
 
     private Poblacion mutarIndividuosPoblacion() {
