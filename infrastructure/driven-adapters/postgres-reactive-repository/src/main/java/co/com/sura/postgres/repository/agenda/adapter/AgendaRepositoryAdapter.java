@@ -63,6 +63,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
 
+    //gestion profesionales
     @Override
     public Mono<Boolean> asignarProfesionalTurno(TurnoProfesional turnoProfesional) {
         return  Mono.just(turnoProfesional)
@@ -106,8 +107,6 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 .onErrorResume(Mono::error);
     }
 
-
-
     public Flux<Tarea> consultarTareasTurnoByProfesional(
             ProfesionalData profesionalData,
             LocalDate fechaTurno,
@@ -150,7 +149,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                          .sort(Comparator.comparing(Actividad::getResponsable)));
     }
 
-
+    //citas
     @Override
     public Flux<Cita> consultarCitasByTurnoRegional(LocalDate fechaTurno, Integer idHorarioTurno, String idRegional) {
         return citaRepository.findCitasByTurnoRegionalHorario(

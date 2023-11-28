@@ -64,12 +64,17 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
                  return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA_HORARIO.getValue()));
 
              }else{
-                return citaRepository.updateEstadoAndProfesional(idCita,EstadosCita.AGENDADA.getEstado(),idProfesional)
-                       .then(agendamientoAutomaticoAdapter.insertDesplazamientoCitaByProfesional(
-                                           fechaProgramada.toLocalDate(), idHorarioTurno, idRegional, idProfesional));
+                return uptateEstadoProfesional(idCita,idProfesional,fechaProgramada,idHorarioTurno,idRegional);
              }
           });
 
+    }
+    private Mono<Boolean> uptateEstadoProfesional( String idCita, String idProfesional, LocalDateTime fechaProgramada,
+                                                   Integer idHorarioTurno, String idRegional){
+
+        return citaRepository.updateEstadoAndProfesional(idCita,EstadosCita.AGENDADA.getEstado(),idProfesional)
+                .then(agendamientoAutomaticoAdapter.insertDesplazamientoCitaByProfesional(
+                        fechaProgramada.toLocalDate(), idHorarioTurno, idRegional, idProfesional));
     }
     private Mono<Boolean> validarDisponibilidadFechaCita(CitaData cita,String idProfesional){
         return Mono.just(cita)
@@ -86,6 +91,7 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
                                .defaultIfEmpty(CitaData.builder().idCita("noCita").build()),
 
                          Mono.just(citaData)))
+
            .flatMap(citasTuple-> Mono.zip(
              desplazamientoRepository.findByIdCitaPartida(citasTuple.getT1().getIdCita())
                  .defaultIfEmpty(DesplazamientoData.builder().duracion(0).build()),
@@ -96,9 +102,8 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
             desplazamientoRepository.findBySede(
                     cita.getFechaProgramada(),cita.getIdRegional(),idProfesional,cita.getIdHorarioTurno()))
 
-           .map(despTuple->CitaData.validarDisponibilidadFechasToAgendar(
-                                    citasTuple.getT1(),citasTuple.getT2(),citasTuple.getT3(),
-                                    despTuple.getT1(),despTuple.getT2(),despTuple.getT3()
+           .map(despTuple->CitaData.validarDisponibilidadFechasToAgendar(citasTuple.getT1(),citasTuple.getT2(),
+                   citasTuple.getT3(), despTuple.getT1(),despTuple.getT2(),despTuple.getT3()
            )));
     }
     @Override
