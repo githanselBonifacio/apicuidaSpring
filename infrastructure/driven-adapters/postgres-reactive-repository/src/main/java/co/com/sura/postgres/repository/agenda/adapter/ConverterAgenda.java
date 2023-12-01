@@ -7,15 +7,16 @@ import co.com.sura.entity.agenda.Cita;
 import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.Tratamiento;
-import co.com.sura.entity.remision.Fototerapia;
-import co.com.sura.entity.remision.TomaMuestra;
-import co.com.sura.entity.remision.Sondaje;
-import co.com.sura.entity.remision.Canalizacion;
-import co.com.sura.entity.remision.Curacion;
-import co.com.sura.entity.remision.SoporteNutricional;
-import co.com.sura.entity.remision.Secrecion;
-import co.com.sura.entity.remision.Medicamento;
+import co.com.sura.entity.remision.datosremision.Tratamiento;
+import co.com.sura.entity.remision.historial.CitaHistorial;
+import co.com.sura.entity.remision.procedimientos.Fototerapia;
+import co.com.sura.entity.remision.procedimientos.TomaMuestra;
+import co.com.sura.entity.remision.procedimientos.Sondaje;
+import co.com.sura.entity.remision.procedimientos.Canalizacion;
+import co.com.sura.entity.remision.procedimientos.Curacion;
+import co.com.sura.entity.remision.procedimientos.SoporteNutricional;
+import co.com.sura.entity.remision.procedimientos.Secrecion;
+import co.com.sura.entity.remision.datosremision.Medicamento;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
@@ -29,15 +30,12 @@ import co.com.sura.postgres.repository.remision.data.SondajeData;
 import co.com.sura.postgres.repository.remision.data.SecrecionData;
 import co.com.sura.postgres.repository.remision.data.FototerapiaData;
 import co.com.sura.postgres.repository.remision.data.SoporteNutricionalData;
-import org.springframework.stereotype.Component;
-
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class ConverterAgenda extends Converter {
 
     public static Actividad convertToActividad(ProfesionalData profesionalData){
@@ -89,6 +87,25 @@ public class ConverterAgenda extends Converter {
                 .longitud(cita.getLongitud())
                 .build();
     }
+
+    public static CitaHistorial convertToCitaHistorial(CitaData citaData){
+        return CitaHistorial.builder()
+                .idCita(citaData.getIdCita())
+                .idRemision(citaData.getIdRemision())
+                .duracion(citaData.getDuracion())
+                .idEstado(citaData.getIdEstado())
+                .holgura(citaData.getHolgura())
+                .fechaInicio(citaData.getFechaInicio())
+                .fechaProgramada(citaData.getFechaProgramada())
+                .especialidad(citaData.getEspecialidad())
+                .idRegional(citaData.getIdRegional())
+                .idProfesional(citaData.getIdProfesional())
+                .idConductor(citaData.getIdConductor())
+                .latitud(citaData.getLatitud())
+                .longitud(citaData.getLongitud())
+                .build();
+    }
+
     public static Desplazamiento converToDesplazamiento(DesplazamientoData desplazamientoData){
         return converToEntity(desplazamientoData, Desplazamiento.class);
     }

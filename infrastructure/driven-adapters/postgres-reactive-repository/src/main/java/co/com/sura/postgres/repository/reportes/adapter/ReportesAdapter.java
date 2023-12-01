@@ -12,7 +12,7 @@ import co.com.sura.entity.reportes.turnos.ItemReporteMensual;
 import co.com.sura.entity.reportes.turnos.ReporteTurnoAnual;
 import co.com.sura.entity.reportes.turnos.ReporteTurnoMensual;
 import co.com.sura.postgres.repository.maestros.adapter.ConverterMaestros;
-import co.com.sura.postgres.repository.maestros.data.RegionalesRepository;
+import co.com.sura.postgres.repository.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.repository.reportes.querys.QueryReportes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;

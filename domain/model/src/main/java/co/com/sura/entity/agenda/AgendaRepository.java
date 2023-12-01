@@ -2,8 +2,8 @@ package co.com.sura.entity.agenda;
 
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.Procedimientos;
-import co.com.sura.entity.remision.Tratamiento;
+import co.com.sura.entity.remision.procedimientos.Procedimientos;
+import co.com.sura.entity.remision.datosremision.Tratamiento;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.time.LocalDate;

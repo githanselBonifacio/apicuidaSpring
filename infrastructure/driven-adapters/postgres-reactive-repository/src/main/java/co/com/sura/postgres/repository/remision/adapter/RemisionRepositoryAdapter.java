@@ -4,55 +4,31 @@ import co.com.sura.constantes.Mensajes;
 import co.com.sura.dto.remision.CitaRequest;
 import co.com.sura.dto.remision.NovedadRequest;
 import co.com.sura.dto.remision.RemisionRequest;
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.remision.DatosAtencionPaciente;
-import co.com.sura.entity.remision.Paciente;
-import co.com.sura.entity.remision.RegistroHistorialRemision;
+import co.com.sura.entity.remision.datosremision.DatosAtencionPaciente;
+import co.com.sura.entity.remision.datosremision.Paciente;
 import co.com.sura.entity.remision.Remision;
 import co.com.sura.entity.remision.RemisionCrudRepository;
+import co.com.sura.entity.remision.historial.CitaHistorial;
 import co.com.sura.exception.ErrorCitaProgreso;
 import co.com.sura.exception.ErrorValidacionIngresoRemision;
 import co.com.sura.genericos.EstadosCita;
-import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.agenda.data.CitaRepository;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
-import co.com.sura.postgres.repository.remision.data.CanalizacionData;
-import co.com.sura.postgres.repository.remision.data.CanalizacionRepository;
-import co.com.sura.postgres.repository.remision.data.CuracionData;
-import co.com.sura.postgres.repository.remision.data.CuracionRepository;
-import co.com.sura.postgres.repository.remision.data.DatosAtencionPacienteRepository;
-import co.com.sura.postgres.repository.remision.data.FototerapiaData;
-import co.com.sura.postgres.repository.remision.data.FototerapiaRepository;
-import co.com.sura.postgres.repository.remision.data.PacienteRepository;
-import co.com.sura.postgres.repository.remision.data.RegistroHistorialRemisionData;
-import co.com.sura.postgres.repository.remision.data.RegistroHistorialRepository;
+import co.com.sura.postgres.repository.agenda.repository.CitaRepository;
+import co.com.sura.postgres.repository.remision.repository.DatosAtencionPacienteRepository;
+import co.com.sura.postgres.repository.remision.repository.PacienteRepository;
 import co.com.sura.postgres.repository.remision.data.RemisionDiagnosticoData;
-import co.com.sura.postgres.repository.remision.data.RemisionDiagnosticoRepository;
-import co.com.sura.postgres.repository.remision.data.RemisionRepository;
-import co.com.sura.postgres.repository.remision.data.SecrecionData;
-import co.com.sura.postgres.repository.remision.data.SecrecionRepository;
-import co.com.sura.postgres.repository.remision.data.SondajeData;
-import co.com.sura.postgres.repository.remision.data.SondajeRepository;
-import co.com.sura.postgres.repository.remision.data.SoporteNutricionalData;
-import co.com.sura.postgres.repository.remision.data.SoporteNutricionalRepository;
-import co.com.sura.postgres.repository.remision.data.TomaMuestraData;
-import co.com.sura.postgres.repository.remision.data.TomaMuestraRepository;
-import co.com.sura.postgres.repository.remision.data.TratamientoData;
-import co.com.sura.postgres.repository.remision.data.TratamientoRepository;
-import co.com.sura.postgres.repository.remision.data.UbicacionRepository;
+import co.com.sura.postgres.repository.remision.repository.RemisionDiagnosticoRepository;
+import co.com.sura.postgres.repository.remision.repository.RemisionRepository;
+import co.com.sura.postgres.repository.remision.repository.UbicacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import static co.com.sura.constantes.Mensajes.*;
-import static co.com.sura.entity.remision.TipoNotificacionFarmacia.APLICACION_MEDICAMENTO;
-import static co.com.sura.entity.remision.TipoNotificacionFarmacia.SOPORTE_NUTRICIONAL;
+
 
 @Repository
 public class RemisionRepositoryAdapter implements RemisionCrudRepository {
@@ -60,50 +36,29 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
     private final RemisionRepository remisionRepository;
     private final UbicacionRepository ubicacionRepository;
     private final PacienteRepository pacienteRepository;
-
-    private final HorarioTurnoRepository horarioTurnoRepository;
-
+    private final PlanManejoRemisionAdapter planManejoRemisionAdapter;
     private final DatosAtencionPacienteRepository datosAtencionPacienteRepository;
     private final RemisionDiagnosticoRepository remisionDiagnosticoRepository;
     private final CitaRepository citaRepository;
-    private final TratamientoRepository tratamientoRepository;
-    private final CanalizacionRepository canalizacionRepository;
-    private final SecrecionRepository secrecionRepository;
-    private final CuracionRepository curacionRepository;
-    private final FototerapiaRepository fototerapiaRepository;
-    private final SondajeRepository sondajeRepository;
-    private final TomaMuestraRepository tomaMuestraRepository;
-    private final SoporteNutricionalRepository soporteNutricionalRepository;
-    private final RegistroHistorialRepository registroHistorialRemisionRepository;
+    private final HistorialRemisionAdapter historialRemisionAdapter;
 
     @Autowired
-    public RemisionRepositoryAdapter(
-            RemisionRepository remisionRepository, UbicacionRepository ubicacionRepository,
-            PacienteRepository pacienteRepository, HorarioTurnoRepository horarioTurnoRepository,
-            DatosAtencionPacienteRepository datosAtencionPacienteRepository,
-            RemisionDiagnosticoRepository remisionDiagnosticoRepository, CitaRepository citaRepository,
-            TratamientoRepository tratamientoRepository, CanalizacionRepository canalizacionRepository,
-            SecrecionRepository secrecionRepository, CuracionRepository curacionRepository,
-            FototerapiaRepository fototerapiaRepository, SondajeRepository sondajeRepository,
-            TomaMuestraRepository tomaMuestraRepository, SoporteNutricionalRepository soporteNutricionalRepository,
-            RegistroHistorialRepository registroHistorialRemisionRepository) {
+    public RemisionRepositoryAdapter(RemisionRepository remisionRepository, UbicacionRepository ubicacionRepository,
+                                     PacienteRepository pacienteRepository,
+                                     PlanManejoRemisionAdapter planManejoRemisionAdapter,
+                                     DatosAtencionPacienteRepository datosAtencionPacienteRepository,
+                                     RemisionDiagnosticoRepository remisionDiagnosticoRepository,
+                                     CitaRepository citaRepository,
+                                     HistorialRemisionAdapter historialRemisionAdapter) {
 
         this.remisionRepository = remisionRepository;
         this.ubicacionRepository = ubicacionRepository;
         this.pacienteRepository = pacienteRepository;
-        this.horarioTurnoRepository = horarioTurnoRepository;
+        this.planManejoRemisionAdapter = planManejoRemisionAdapter;
         this.datosAtencionPacienteRepository = datosAtencionPacienteRepository;
         this.remisionDiagnosticoRepository = remisionDiagnosticoRepository;
         this.citaRepository = citaRepository;
-        this.tratamientoRepository = tratamientoRepository;
-        this.canalizacionRepository = canalizacionRepository;
-        this.secrecionRepository = secrecionRepository;
-        this.curacionRepository = curacionRepository;
-        this.fototerapiaRepository = fototerapiaRepository;
-        this.sondajeRepository = sondajeRepository;
-        this.tomaMuestraRepository = tomaMuestraRepository;
-        this.soporteNutricionalRepository = soporteNutricionalRepository;
-        this.registroHistorialRemisionRepository = registroHistorialRemisionRepository;
+        this.historialRemisionAdapter = historialRemisionAdapter;
     }
 
     @Override
@@ -135,50 +90,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                });
         }
     }
-    protected  Mono<Void> registrarPlanManejo(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
-                                              NovedadRequest novedadRequest){
-        var counter = new AtomicInteger(
-                citaRepository.findLastNumberCitaRemision(remisionRequest.getIdRemision())
-                        .blockOptional()
-                        .orElse(0) + 1);
 
-        if(novedadRequest.getFechaAplicarNovedad() !=null){
-            citasRequest.removeIf(
-                    citaRequest -> citaRequest.getFechaInicio().isBefore(novedadRequest.getFechaAplicarNovedad()));
-        }
-
-        citasRequest.forEach(citaRequest -> {
-            String newIdCita = remisionRequest.getIdRemision() + "-" + counter;
-            citaRequest.setIdCita(newIdCita);
-            counter.getAndIncrement();
-        });
-
-        List<CitaData> citasData = ConverterRemision.convertirCitasDataList(citasRequest, remisionRequest);
-        List<TratamientoData> tratamientosData = ConverterRemision.extraerTratamientoData(citasRequest);
-        List<CanalizacionData> canalizacionesData = ConverterRemision.extraerCanalizacionData(citasRequest);
-        List<FototerapiaData> fototerapiaData = ConverterRemision.extraerFototerapiaData(citasRequest);
-        List<SecrecionData> secrecionData = ConverterRemision.extraerSecrecionData(citasRequest);
-        List<SondajeData> sondajeData = ConverterRemision.extraerSondajeData(citasRequest);
-        List<SoporteNutricionalData> soporteNutricionalData = ConverterRemision
-                .extraerSoporteNutricionalData(citasRequest);
-
-        List<TomaMuestraData> tomaMuestraData = ConverterRemision.extraerSoporteTomaMuestraData(citasRequest);
-        List<CuracionData> curacionesData = ConverterRemision.extraerCuracionData(citasRequest);
-
-        return  Mono.from(citaRepository.insertMultiplescitas(citasData))
-                .thenMany(this.asignarTurnoCitas(Flux.fromIterable(citasData))
-                                .flatMap(citaRepository::save))
-                .thenMany(tratamientoRepository.saveAll(tratamientosData))
-                .thenMany(canalizacionRepository.saveAll(canalizacionesData))
-                .thenMany(fototerapiaRepository.saveAll(fototerapiaData))
-                .thenMany(secrecionRepository.saveAll(secrecionData))
-                .thenMany(sondajeRepository.saveAll(sondajeData))
-                .thenMany(soporteNutricionalRepository.saveAll(soporteNutricionalData))
-                .thenMany(tomaMuestraRepository.saveAll(tomaMuestraData))
-                .thenMany(curacionRepository.saveAll(curacionesData))
-                .then();
-
-    }
     protected  Mono<Void> registrarDatosRemision(RemisionRequest remisionRequest, boolean esNovedad){
         var remisionData = ConverterRemision.convertToRemisionRequest(remisionRequest);
         var datosAtencionPacienteData = ConverterRemision
@@ -203,88 +115,73 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
        }
     }
 
-    private Flux<CitaData> asignarTurnoCitas(Flux <CitaData> citas){
-      return    horarioTurnoRepository.findAll()
-                .filter(HorarioTurnoData::getEsHorarioBase)
-                .collectList()
-                .flatMapMany(horariosTurno -> citas.map(cita->{
-                         HorarioTurnoData horario =  horariosTurno.stream()
-                              .filter(horarioTurnoData ->
-                                      cita.getFechaInicio().toLocalTime().isAfter(horarioTurnoData.getHoraInicio())
-                                      && cita.getFechaInicio().toLocalTime().isBefore(horarioTurnoData.getHoraFin()))
-                              .findFirst()
-                              .orElse(HorarioTurnoData.builder().build());
-
-                         cita.setIdHorarioTurno(horario.getId());
-                        return cita;
-                     })
-                 );
-
-    }
     @Override
     public Mono<Boolean> crearRemisionCita(RemisionRequest remisionRequest, List<CitaRequest> citasRequest) {
 
-        String idRemision = remisionRequest.getIdRemision();
-        Mono<Boolean> validarRemision = remisionRepository.existsById(idRemision);
-        validarRemision.subscribe();
-
-        if(validarRemision.blockOptional().orElse(false)){
-            return Mono.error(new Throwable(Mensajes.REMISION_EXISTENTE.getValue().replace("?",idRemision)));
-        }
-
-        String numeroIdentificacionPaciente = remisionRequest.getNumeroIdentificacion();
-        return registrarPacienteRemision(remisionRequest,false)
-                    .then(registrarDatosRemision(remisionRequest,false))
-                    .then(registrarPlanManejo(remisionRequest,citasRequest,new NovedadRequest()))
-                    .onErrorMap(throwable -> {
-                       Mono<Void>  error = Mono.from(
-                           remisionRepository.deleteAllDataRemision(idRemision,numeroIdentificacionPaciente));
-                       error.subscribe();
-                       return new Exception(throwable.getMessage());
-                    })
-                .then(Mono.just(true));
+      String idRemision = remisionRequest.getIdRemision();
+      return remisionRepository.existsById(idRemision)
+         .flatMap(validacion -> {
+                if (Boolean.TRUE.equals(validacion)) {
+                    return Mono.error(new Throwable(Mensajes.REMISION_EXISTENTE.getValue().replace("?", idRemision)));
+                }
+                return Mono.just(Boolean.TRUE);
+         })
+         .then(registrarPacienteRemision(remisionRequest,false)
+            .then(registrarDatosRemision(remisionRequest,false))
+            .then(planManejoRemisionAdapter.registrarPlanManejo(remisionRequest,citasRequest,0))
+            .onErrorResume(e-> eliminarDatosPacienteRemision(idRemision)
+                  .then(planManejoRemisionAdapter.eliminarPlanManejoByidRemision(idRemision))
+                  .then(Mono.error(e))))
+            .then(Mono.just(Boolean.TRUE));
     }
     @Override
     public Mono<Boolean> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
-                                                   NovedadRequest novedadRequest) {
+                                                      NovedadRequest novedadRequest) {
 
         String idRemision = remisionRequest.getIdRemision();
-        Mono<Boolean> validarRemision = remisionRepository.validarEstadosRemisionToEgreso(idRemision);
-        validarRemision.subscribe();
+        LocalDateTime fechaAplicacionNovedad = novedadRequest.getFechaAplicarNovedad();
 
-        if (!validarRemision.blockOptional().orElse(false)) {
-            return Mono.error(new Throwable(REMISION_NO_EXISTENTE.getValue().replace("?", idRemision)));
-        }
+        citasRequest.removeIf(
+                citaRequest -> citaRequest.getFechaInicio()
+                        .isBefore(novedadRequest.getFechaAplicarNovedad()));
 
-        Mono<RegistroHistorialRemisionData> registroRemision = Mono.from(
-            registroHistorialRemisionRepository
-                .buildByIdRemisionForUpdate(remisionRequest.getIdRemision(), novedadRequest.getFechaAplicarNovedad()));
-        registroRemision.subscribe();
-
-        var registroRemisionData = registroRemision.blockOptional().orElse(new RegistroHistorialRemisionData());
-        registroRemisionData.setMotivoNovedad(novedadRequest.getMotivoNovedad());
-        registroRemisionData.setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
-        registroRemisionData.setFechaRegistro(LocalDateTime.now());
-
-        if (citasRequest == null) {
-            registroRemisionData.setCitas(null);
-            return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
-                    .then(Mono.from(citaRepository
-                            .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
-                    .then(registrarPacienteRemision(remisionRequest, true))
-                    .then(registrarDatosRemision(remisionRequest, true))
-                    .then(Mono.just(Boolean.TRUE));
-        } else {
-            return Mono.from(registroHistorialRemisionRepository.save(registroRemisionData))
-                    .then(Mono.from(citaRepository
-                            .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
-                    .then(registrarPacienteRemision(remisionRequest, true))
-                    .then(registrarDatosRemision(remisionRequest, true))
-                    .then(registrarPlanManejo(remisionRequest, citasRequest, novedadRequest))
-                    .then(Mono.just(Boolean.TRUE));
-        }
-
+        var ultimoId= new AtomicInteger();
+        return remisionRepository.existsById(idRemision)
+            .flatMap(validacion->{
+                if(Boolean.FALSE.equals(validacion)){
+                    return Mono.error(new Throwable(REMISION_NO_EXISTENTE.getValue().replace("?", idRemision)));
+                }
+                    return Mono.just(Boolean.TRUE);
+            })
+            .then(Mono.zip(
+                citaRepository.findLastNumberIdCita(idRemision).defaultIfEmpty(0),
+                historialRemisionAdapter.buildRegistroActualRemision(idRemision, fechaAplicacionNovedad)))
+            .map(tuple->{
+                ultimoId.set(tuple.getT1());
+                List<CitaHistorial> citasNuevas = ConverterRemision
+                        .buildCitaHistorialFromRequest(citasRequest,remisionRequest,ultimoId.get());
+                tuple.getT2().setMotivoNovedad(novedadRequest.getMotivoNovedad());
+                tuple.getT2().setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
+                tuple.getT2().setFechaRegistro(LocalDateTime.now());
+                tuple.getT2().setCitasNuevas(ConverterRemision.convertToJsonb(citasNuevas));
+                return tuple.getT2();
+            })
+            .flatMap(historialRemisionAdapter::insertRegistro)
+            .then(Mono.from(citaRepository
+                        .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
+            .then(registrarPacienteRemision(remisionRequest, true))
+            .then(registrarDatosRemision(remisionRequest, true))
+            .then(Mono.just(citasRequest.isEmpty())
+                    .flatMap(validarCitas-> {
+                        if (Boolean.FALSE.equals(validarCitas)){
+                            return planManejoRemisionAdapter
+                                    .registrarPlanManejo(remisionRequest, citasRequest,  ultimoId.get());
+                        }
+                        return Mono.just(Boolean.TRUE);
+                    }))
+            .then(Mono.just(Boolean.TRUE));
     }
+
 
     @Override
     public Mono<Boolean> egresarRemisionById(String idRemision) {
@@ -293,22 +190,20 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                if (Boolean.FALSE.equals(exists)) {
                  return Mono.error(new ErrorValidacionIngresoRemision(
                          REMISION_NO_EXISTENTE.getValue().replace("?", idRemision)));
-               }else{
-                   return Mono.just(true);
                }
+               return Mono.just(true);
+
            })
-           .then(citaRepository.validarEstadosCitasToEgreso(
+           .then(citaRepository.validarEstadosToEgreso(
                    idRemision,EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado())
                 .flatMap(valid -> {
-                               if (Boolean.TRUE.equals(valid)) {
-                                   return Mono.error(new ErrorCitaProgreso(
+                      if (Boolean.TRUE.equals(valid)) {
+                            return Mono.error(new ErrorCitaProgreso(
                                            REMISION_CITAS_PROGRESO.getValue().replace("?", idRemision)));
-                               }else{
-                                   return Mono.just(true);
-                               }
-                   })
-           )
-           .then(citaRepository.cancelarCitasForEgreso(
+                      }
+                      return Mono.just(true);
+                }))
+           .then(citaRepository.cancelarToEgreso(
                    idRemision,EstadosCita.CANCELADA.getEstado(),
                    EstadosCita.SIN_AGENDAR.getEstado(),EstadosCita.AGENDADA.getEstado()))
            .then(remisionRepository.egresarRemisionById(idRemision))
@@ -334,79 +229,10 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                         }));
     }
 
-    //farmacia
-    @Override
-    public Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmacia() {
-        return pacienteRepository.findAllTratamientosPacientes()
-                .map(pacienteTratamientoCita -> {
-                            pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
-                            return pacienteTratamientoCita;
-                        }
-                ).mergeWith(pacienteRepository.findAllSoporteNutricionalPacientes()
-                        .map(pacienteTratamientoCita -> {
-                            pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
-                            return pacienteTratamientoCita;
-                })
-                ).sort(Comparator.comparing(PacienteTratamientoCita::getNotificado).reversed()
-                        .thenComparing(PacienteTratamientoCita::getFechaProgramada).reversed());
-
-    }
-
-    @Override
-    public Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
-            LocalDate turno, Integer idHorario, String idRegional) {
-        return pacienteRepository.findAllTratamientosPacientesByTurnoRegionalHorario(turno,idHorario,idRegional)
-                .map(pacienteTratamientoCita -> {
-                            pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
-                            return pacienteTratamientoCita;
-                        }
-                ).mergeWith(pacienteRepository.findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
-                        turno,idHorario,idRegional)
-                        .map(pacienteTratamientoCita -> {
-                            pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
-                            return pacienteTratamientoCita;
-                        })
-                ).sort(Comparator.comparing(PacienteTratamientoCita::getNotificado).reversed()
-                        .thenComparing(PacienteTratamientoCita::getFechaProgramada).reversed());
-    }
-
-    @Override
-    public Mono<Boolean> notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList) {
-        return Flux.fromIterable(tratamientoCitasList)
-              /*  .filter(pacienteTratamientoCita -> pacienteTratamientoCita.getIdTratamiento()!=null)
-                .flatMap(pacienteTratamientoCita ->tratamientoRepository
-                        .updateNotificar(pacienteTratamientoCita.getIdTratamiento())*/
-          .flatMap(pacienteTratamientoCita -> {
-              Mono<Void> tratamientoUpdate = Mono.empty();
-              if (pacienteTratamientoCita.getIdTratamiento() != null) {
-                  tratamientoUpdate = tratamientoRepository
-                          .updateNotificar(pacienteTratamientoCita.getIdTratamiento());
-              }
-              return tratamientoUpdate;
-          })
-           .thenMany(Flux.fromIterable(tratamientoCitasList)
-                   .flatMap(pacienteProcedimientoCita -> {
-                       Mono<Void> soporteNutricionalUpdate = Mono.empty();
-                       if (pacienteProcedimientoCita.getIdSoporteNutricional() != null) {
-                           soporteNutricionalUpdate = soporteNutricionalRepository
-                                   .updateNotificar(pacienteProcedimientoCita.getIdSoporteNutricional());
-                       }
-                       return soporteNutricionalUpdate;
-                   }))
-                .then(Mono.just(Boolean.TRUE));
-    }
-
-    //historial remision
-    @Override
-    public Flux<RegistroHistorialRemision> consultarHistoricoRemision(String idRemision) {
-        return registroHistorialRemisionRepository.findAllByIdRemision(idRemision)
-                .map(ConverterRemision::convertToRegistroHistoriaRemision);
-    }
-
-    @Override
-    public Mono<RegistroHistorialRemision> consultarDatosRemision(String idRemision) {
-        return registroHistorialRemisionRepository.buildByIdRemisionActual(idRemision)
-                .map(ConverterRemision::convertToRegistroHistoriaRemision);
+    public Mono<Void> eliminarDatosPacienteRemision(String idRemision){
+        return datosAtencionPacienteRepository.deleteByIdRemision(idRemision)
+                .then(remisionDiagnosticoRepository.deleteByIdRemision(idRemision))
+                .then(remisionRepository.deleteById(idRemision));
     }
 
 }

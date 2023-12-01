@@ -8,7 +8,7 @@ import co.com.sura.entity.personal.Profesional;
 import co.com.sura.entity.personal.ProfesionalWithTurno;
 import co.com.sura.entity.personal.SecuenciasHorarioRepository;
 import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.SecuenciaTurno;
+import co.com.sura.entity.personal.SecuenciaTurno;
 import co.com.sura.genericos.ResultadoActualizacionTurno;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

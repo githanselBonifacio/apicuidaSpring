@@ -7,9 +7,9 @@ import co.com.sura.exception.ExceptionNegocio;
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.agenda.repository.CitaRepository;
 import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
+import co.com.sura.postgres.repository.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,12 +80,12 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
         return Mono.just(cita)
            .flatMap(citaData -> Mono.zip(
 
-             citaRepository.findCitaMasCercanaAnterior(
+             citaRepository.findMasCercanaAnterior(
                                 citaData.getFechaProgramada(),citaData.getIdCita(),
                                 citaData.getIdHorarioTurno(),citaData.getIdRegional(), idProfesional)
                                 .defaultIfEmpty(CitaData.builder().idCita("noCita").build()),
 
-             citaRepository.findCitaMasCercanaPosterior(
+             citaRepository.findMasCercanaPosterior(
                                 citaData.getFechaProgramada(), citaData.getIdCita(),
                                 citaData.getIdHorarioTurno(),citaData.getIdRegional(), idProfesional)
                                .defaultIfEmpty(CitaData.builder().idCita("noCita").build()),

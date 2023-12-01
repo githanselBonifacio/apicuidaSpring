@@ -1,7 +1,6 @@
 package co.com.sura.entity.personal;
 
 import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
-import co.com.sura.entity.remision.SecuenciaTurno;
 import co.com.sura.genericos.ResultadoActualizacionTurno;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

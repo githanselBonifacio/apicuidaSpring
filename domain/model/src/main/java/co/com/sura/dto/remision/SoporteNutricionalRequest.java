@@ -1,6 +1,6 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.remision.Medicamento;
+import co.com.sura.entity.remision.datosremision.Medicamento;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

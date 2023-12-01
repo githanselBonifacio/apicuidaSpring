@@ -1,6 +1,6 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.remision.AlertaCita;
+import co.com.sura.entity.remision.datosremision.AlertaCita;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

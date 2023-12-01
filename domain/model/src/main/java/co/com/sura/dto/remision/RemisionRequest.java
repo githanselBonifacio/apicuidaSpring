@@ -1,6 +1,6 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.remision.Diagnostico;
+import co.com.sura.entity.remision.datosremision.Diagnostico;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

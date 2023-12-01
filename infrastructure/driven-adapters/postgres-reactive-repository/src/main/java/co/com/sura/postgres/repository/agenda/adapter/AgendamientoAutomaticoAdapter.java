@@ -10,11 +10,11 @@ import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.autoagendador.config.Config;
 import co.com.sura.genericos.Numeros;
-import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.agenda.repository.CitaRepository;
 import co.com.sura.postgres.repository.maestros.adapter.MaestroRepositoryAdapter;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.repository.personal.data.ProfesionalData;
-import co.com.sura.postgres.repository.personal.data.ProfesionalRepository;
+import co.com.sura.postgres.repository.personal.repository.ProfesionalRepository;
 import co.com.sura.services.mapbox.GeoUbicacion;
 import co.com.sura.services.mapbox.MapboxServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +57,7 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
         return desagendarTurnoCompleto(fechaTurno, idHorarioTurno, idRegional)
                 .then(
                    Mono.zip(
-                      citaRepository.findCitasByTurnoRegionalHorario(
+                      citaRepository.findAllByTurnoRegionalHorario(
                               fechaTurno,idHorarioTurno,idRegional, EstadosCita.CANCELADA.getEstado()).collectList(),
 
                       profesionalRepository.findFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno).collectList(),
@@ -141,8 +141,8 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
        return desplazamientoRepository.deleteByFechaTurnoProfesional(fechaTurno,idHorarioTurno,idRegional,idProfesional)
                .then(Mono.zip(
                        maestroRepositoryAdapter.consultarHorarioTurnoById(idHorarioTurno),
-                       citaRepository.findCitaDataSedeByIdRegional(idRegional),
-                       citaRepository.findCitasByTurnoRegionalProfesional(
+                       citaRepository.findSedeByIdRegional(idRegional),
+                       citaRepository.findAllByTurnoRegionalProfesional(
                                fechaTurno,idHorarioTurno,idRegional,idProfesional,EstadosCita.CANCELADA.getEstado())
                                .collectList())
 

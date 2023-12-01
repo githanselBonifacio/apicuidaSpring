@@ -6,7 +6,7 @@ import co.com.sura.entity.personal.Movil;
 import co.com.sura.entity.personal.Profesional;
 import co.com.sura.entity.personal.ProfesionalWithTurno;
 import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.ItemSecuenciaTurno;
+import co.com.sura.entity.remision.datosremision.ItemSecuenciaTurno;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.personal.data.ConductorData;
 import co.com.sura.postgres.repository.personal.data.ItemSecuenciaTurnoData;

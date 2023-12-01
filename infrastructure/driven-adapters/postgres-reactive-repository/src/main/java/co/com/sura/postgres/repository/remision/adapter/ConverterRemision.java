@@ -10,13 +10,22 @@ import co.com.sura.dto.remision.SondajeRequest;
 import co.com.sura.dto.remision.SoporteNutricionalRequest;
 import co.com.sura.dto.remision.TomaMuestraRequest;
 import co.com.sura.dto.remision.TratamientoRequest;
-import co.com.sura.entity.remision.Canalizacion;
-import co.com.sura.entity.remision.DatosAtencionPaciente;
-import co.com.sura.entity.remision.Diagnostico;
-import co.com.sura.entity.remision.Fototerapia;
-import co.com.sura.entity.remision.Paciente;
-import co.com.sura.entity.remision.RegistroHistorialRemision;
-import co.com.sura.entity.remision.Ubicacion;
+import co.com.sura.entity.remision.datosremision.DatosAtencionPaciente;
+import co.com.sura.entity.remision.datosremision.Diagnostico;
+import co.com.sura.entity.remision.datosremision.Medicamento;
+import co.com.sura.entity.remision.datosremision.Paciente;
+import co.com.sura.entity.remision.datosremision.Tratamiento;
+import co.com.sura.entity.remision.datosremision.Ubicacion;
+import co.com.sura.entity.remision.historial.CitaHistorial;
+import co.com.sura.entity.remision.historial.RegistroHistorialRemision;
+import co.com.sura.entity.remision.procedimientos.Canalizacion;
+import co.com.sura.entity.remision.procedimientos.Curacion;
+import co.com.sura.entity.remision.procedimientos.Fototerapia;
+import co.com.sura.entity.remision.procedimientos.Procedimientos;
+import co.com.sura.entity.remision.procedimientos.Secrecion;
+import co.com.sura.entity.remision.procedimientos.Sondaje;
+import co.com.sura.entity.remision.procedimientos.SoporteNutricional;
+import co.com.sura.entity.remision.procedimientos.TomaMuestra;
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
@@ -36,20 +45,30 @@ import co.com.sura.postgres.repository.remision.data.TratamientoData;
 import co.com.sura.postgres.repository.remision.data.UbicacionData;
 import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
+
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component
 public class ConverterRemision extends Converter {
-    protected static Object convertToJsonObject (Json jsonByteArrayInput ){
+
+    protected static <T> T convertToJsonObject (Json jsonByteArrayInput,Class<T> clazz ){
         if(jsonByteArrayInput!=null){
             byte[] byteArray = jsonByteArrayInput.asArray();
             var jsonString = new String(byteArray);
-            return  Converter.deserializarJson(jsonString, Object.class);
+            return  Converter.deserializarJson(jsonString, clazz);
         }else{
             return null;
         }
+
+    }
+    protected static Json convertToJsonb(Object object){
+        return Json.of(Objects.requireNonNull(Converter.convertirObjetoAJson(object)));
+
 
     }
     public static RemisionData convertToRemisionRequest(RemisionRequest remisionRequest){
@@ -65,7 +84,19 @@ public class ConverterRemision extends Converter {
                 .idRegional(remisionRequest.getRegional().getIdRegional())
                 .build();
     }
-
+    public static RegistroHistorialRemision buildHistorialRemision(RemisionData remisionData){
+        return RegistroHistorialRemision.builder()
+                .idRemision(remisionData.getIdRemision())
+                .estado(remisionData.getEstado())
+                .fechaAdmision(remisionData.getFechaAdmision())
+                .programa(remisionData.getPrograma())
+                .tipoAdmision(remisionData.getTipoAdmision())
+                .institucionRemite(remisionData.getInstitucionRemite())
+                .paciente(Paciente.builder()
+                        .numeroIdentificacion(remisionData.getNumeroIdentificacionPaciente())
+                        .build())
+                .build();
+    }
     public static  Paciente convertToPaciente (PacienteData pacienteData){
         return new Paciente()
                 .toBuilder()
@@ -82,11 +113,9 @@ public class ConverterRemision extends Converter {
                 .build();
     }
     public static Ubicacion convertToUbicacion(UbicacionData ubicacionData){
-
-        return deserializarJson(
-                convertirObjetoAJson(ubicacionData), Ubicacion.class
-        );
+        return converToEntity(ubicacionData, Ubicacion.class);
     }
+
     public static UbicacionData extraerUbicacionData(RemisionRequest remisionRequest){
         var ubicacionRequest = remisionRequest.getDatosAtencionPaciente().getUbicacion();
         return new UbicacionData()
@@ -164,6 +193,65 @@ public class ConverterRemision extends Converter {
                         .getDatosAtencionPaciente().getUbicacion().getLongitud()))
                 .collect(Collectors.toList());
     }
+    public static List<Tratamiento> builTratamientosFromRequest(CitaRequest citaRequest){
+        return citaRequest.getTratamientos().stream()
+                .map(ConverterRemision::extraerTratamientoData)
+                .map(ConverterRemision::converterToTratamiento)
+                .collect(Collectors.toList());
+    }
+    public static Procedimientos builProcedimientosFromRequest(CitaRequest citaRequest){
+        return Procedimientos.builder()
+                .curaciones(citaRequest.getProcedimientos().getCuraciones()
+                        .stream()
+                        .map(ConverterRemision::extraerCuracionData)
+                        .map(curacionData -> converToEntity(curacionData, Curacion.class))
+                        .collect(Collectors.toList()))
+                .canalizaciones(citaRequest.getProcedimientos().getCanalizaciones())
+                .fototerapias(citaRequest.getProcedimientos().getFototerapias())
+                .secreciones(citaRequest.getProcedimientos().getSecreciones()
+                        .stream()
+                        .map(ConverterRemision::extraerSecrecionData)
+                        .map(secrecionData -> converToEntity(secrecionData, Secrecion.class))
+                        .collect(Collectors.toList()))
+                .sondajes(citaRequest.getProcedimientos().getSondajes()
+                        .stream()
+                        .map(ConverterRemision::convertirSondajeData)
+                        .map(sondajeData->converToEntity(sondajeData, Sondaje.class))
+                        .collect(Collectors.toList()))
+                .soporteNutricionales(citaRequest.getProcedimientos().getSoporteNutricionales()
+                        .stream()
+                        .map(ConverterRemision::extraerSoporteNutricionalData)
+                        .map(ConverterRemision::convertToSoporteNutricional)
+                        .collect(Collectors.toList()))
+                .tomaMuestras(citaRequest.getProcedimientos().getTomaMuestras()
+                        .stream()
+                        .map(ConverterRemision::extraerTomaMuestra)
+                        .map(tomaMuestraData->converToEntity(tomaMuestraData, TomaMuestra.class))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+    public static List<CitaHistorial> buildCitaHistorialFromRequest(Collection<CitaRequest> citasRequest,
+                                                                    RemisionRequest remisionRequest, Integer idUltimo){
+        var idCita = new AtomicInteger(idUltimo+1);
+         return citasRequest.stream()
+                         .map(citaRequest->   CitaHistorial.builder()
+                                 .idCita(remisionRequest.getIdRemision()+"-"+ idCita.getAndIncrement())
+                                 .idRemision(remisionRequest.getIdRemision())
+                                 .idRegional(remisionRequest.getRegional().getIdRegional())
+                                 .idEstado(EstadosCita.SIN_AGENDAR.getEstado())
+                                 .duracion(citaRequest.getDuracion())
+                                 .holgura(citaRequest.getHolgura())
+                                 .fechaInicio(citaRequest.getFechaInicio())
+                                 .fechaProgramada(citaRequest.getFechaInicio())
+                                 .latitud(remisionRequest.getDatosAtencionPaciente().getUbicacion().getLatitud())
+                                 .longitud(remisionRequest.getDatosAtencionPaciente().getUbicacion().getLongitud())
+                                 .especialidad(citaRequest.getEspecialidad())
+                                 .tratamientos(builTratamientosFromRequest(citaRequest))
+                                 .procedimientos(builProcedimientosFromRequest(citaRequest)).build())
+                 .collect(Collectors.toList());
+
+    }
+
     public static DatosAtencionPacienteData extraerDatosAtencionPacienteData(
             DatosAtencionPacienteRequest datosAtencionPacienteRequest, String idRemision){
 
@@ -206,11 +294,28 @@ public class ConverterRemision extends Converter {
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
     }
+    public static Tratamiento converterToTratamiento(TratamientoData tratamientoData){
+        return Tratamiento.builder()
+                .tipoTratamiento(tratamientoData.getTipoTratamiento())
+                .medicamento(Medicamento.builder()
+                        .idMedicamento(tratamientoData.getIdMedicamento())
+                        .codigoMedicamento(tratamientoData.getCodigoMedicamento())
+                        .nombre(tratamientoData.getNombreMedicamento())
+                        .presentacion(tratamientoData.getPresentacionMedicamento())
+                        .build())
+                .cantidadDosis(tratamientoData.getCantidadDosis())
+                .unidadDosis(tratamientoData.getUnidadDosis())
+                .viaAdministracion(tratamientoData.getViaAdministracion())
+                .frecuencia(tratamientoData.getFrecuencia())
+                .duracion(tratamientoData.getDuracion())
+                .noPBS(tratamientoData.getNoPBS())
+                .tipoPrestacion(tratamientoData.getTipoPrestacion())
+                .notificado(tratamientoData.isNotificado())
+                .build();
+    }
 
     protected static CanalizacionData convertirCanalizacionData(Canalizacion canalizacion ){
-        return deserializarJson(
-                convertirObjetoAJson(canalizacion), CanalizacionData.class
-        );
+        return converToEntity(canalizacion, CanalizacionData.class);
     }
 
     public  static  List<CanalizacionData> extraerCanalizacionData (Collection<CitaRequest> listacitasRequest) {
@@ -226,9 +331,7 @@ public class ConverterRemision extends Converter {
     }
 
     protected static FototerapiaData convertirFototerapiaData(Fototerapia fototerapia ){
-        return deserializarJson(
-                convertirObjetoAJson(fototerapia), FototerapiaData.class
-        );
+        return converToEntity(fototerapia, FototerapiaData.class);
     }
 
     public  static  List<FototerapiaData> extraerFototerapiaData (Collection<CitaRequest> listacitasRequest) {
@@ -244,9 +347,7 @@ public class ConverterRemision extends Converter {
     }
 
     protected static SecrecionData extraerSecrecionData(SecrecionRequest secrecionRequest ){
-        return deserializarJson(
-                convertirObjetoAJson(secrecionRequest), SecrecionData.class
-        );
+        return converToEntity(secrecionRequest, SecrecionData.class);
     }
 
     public  static  List<SecrecionData> extraerSecrecionData (List<CitaRequest> listacitasRequest) {
@@ -282,7 +383,7 @@ public class ConverterRemision extends Converter {
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
     }
-    protected static SoporteNutricionalData extraerSoporteNutricional(
+    protected static SoporteNutricionalData extraerSoporteNutricionalData(
             SoporteNutricionalRequest soporteNutricionalRequest ){
 
         return new SoporteNutricionalData()
@@ -301,7 +402,27 @@ public class ConverterRemision extends Converter {
                 .tipoPrestacion(soporteNutricionalRequest.getTipoPrestacion())
                 .build();
     }
+    protected static SoporteNutricional convertToSoporteNutricional(
+            SoporteNutricionalData soporteNutricionalData){
 
+        return new SoporteNutricional()
+                .toBuilder()
+                .medicamento(Medicamento.builder()
+                        .idMedicamento(soporteNutricionalData.getIdMedicamento())
+                        .nombre(soporteNutricionalData.getNombreMedicamento())
+                        .presentacion(soporteNutricionalData.getPresentacionMedicamento())
+                        .codigoMedicamento(soporteNutricionalData.getCodigoMedicamento())
+                        .build())
+                .descripcion(soporteNutricionalData.getDescripcion())
+                .tipo(soporteNutricionalData.getTipo())
+                .unidadDosis(soporteNutricionalData.getUnidadDosis())
+                .duracion(soporteNutricionalData.getDuracion())
+                .volumen(soporteNutricionalData.getVolumen())
+                .cantidadDosis(soporteNutricionalData.getCantidadDosis())
+                .noPBS(soporteNutricionalData.getNoPBS())
+                .tipoPrestacion(soporteNutricionalData.getTipoPrestacion())
+                .build();
+    }
     public  static  List<SoporteNutricionalData> extraerSoporteNutricionalData(
             Collection<CitaRequest> listacitasRequest) {
 
@@ -309,7 +430,7 @@ public class ConverterRemision extends Converter {
                 .stream()
                 .map(citaRequest -> citaRequest.getProcedimientos().getSoporteNutricionales()
                         .stream()
-                        .map(ConverterRemision::extraerSoporteNutricional)
+                        .map(ConverterRemision::extraerSoporteNutricionalData)
                         .peek(soporteNutricionalData -> soporteNutricionalData.setIdCita(citaRequest.getIdCita()))
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
@@ -360,33 +481,57 @@ public class ConverterRemision extends Converter {
 
     public static DatosAtencionPaciente convertToDatosAtencionPaciente(
             DatosAtencionPacienteData datosAtencionPacienteData){
-        return deserializarJson(
-                convertirObjetoAJson(datosAtencionPacienteData), DatosAtencionPaciente.class
-        );
+        return converToEntity(datosAtencionPacienteData, DatosAtencionPaciente.class);
     }
 
     public static  RegistroHistorialRemision convertToRegistroHistoriaRemision(
             RegistroHistorialRemisionData registroHistorialRemisionData){
 
         var builder = new RegistroHistorialRemision().toBuilder()
-                .idRemision(registroHistorialRemisionData.getIdRemision())
-                .fechaAplicacionNovedad(registroHistorialRemisionData.getFechaAplicacionNovedad())
-                .motivoNovedad(registroHistorialRemisionData.getMotivoNovedad())
-                .estado(registroHistorialRemisionData.getEstado())
-                .fechaAdmision(registroHistorialRemisionData.getFechaAdmision())
-                .programa(registroHistorialRemisionData.getPrograma())
-                .tipoAdmision(registroHistorialRemisionData.getTipoAdmision())
-                .institucionRemite(registroHistorialRemisionData.getInstitucionRemite())
-                .paciente(convertToJsonObject(registroHistorialRemisionData.getPaciente()))
-                .datosAtencion(convertToJsonObject(registroHistorialRemisionData.getDatosAtencion()))
-                .ubicacionPaciente(convertToJsonObject(registroHistorialRemisionData.getUbicacionPaciente()))
-               .diagnosticos(convertToJsonObject(registroHistorialRemisionData.getDiagnosticos()));
+              .idRemision(registroHistorialRemisionData.getIdRemision())
+              .fechaAplicacionNovedad(registroHistorialRemisionData.getFechaAplicacionNovedad())
+              .motivoNovedad(registroHistorialRemisionData.getMotivoNovedad())
+              .estado(registroHistorialRemisionData.getEstado())
+              .fechaAdmision(registroHistorialRemisionData.getFechaAdmision())
+              .programa(registroHistorialRemisionData.getPrograma())
+              .tipoAdmision(registroHistorialRemisionData.getTipoAdmision())
+              .institucionRemite(registroHistorialRemisionData.getInstitucionRemite())
+              .paciente(convertToJsonObject(registroHistorialRemisionData.getPaciente(),Paciente.class))
+              .datosAtencion(convertToJsonObject(registroHistorialRemisionData.getDatosAtencion(),Object.class))
+              .ubicacionPaciente(convertToJsonObject(registroHistorialRemisionData.getUbicacionPaciente(),Object.class))
+              .diagnosticos(convertToJsonObject(registroHistorialRemisionData.getDiagnosticos(),Object.class));
 
         if (registroHistorialRemisionData.getCitas() != null) {
-            builder.citas(convertToJsonObject(registroHistorialRemisionData.getCitas()));
+            builder.citas(convertToJsonObject(registroHistorialRemisionData.getCitas(), LinkedList.class));
         }
-
+        if (registroHistorialRemisionData.getCitasNuevas() != null) {
+            builder.citasNuevas(convertToJsonObject(registroHistorialRemisionData.getCitasNuevas(), LinkedList.class));
+        }
         return builder.build();
     }
+    public static  RegistroHistorialRemisionData convertToRegistroHistoriaRemisionData(
+            RegistroHistorialRemision registroHistorialRemision){
 
+        var builder = new RegistroHistorialRemisionData().toBuilder()
+                .idRemision(registroHistorialRemision.getIdRemision())
+                .fechaAplicacionNovedad(registroHistorialRemision.getFechaAplicacionNovedad())
+                .motivoNovedad(registroHistorialRemision.getMotivoNovedad())
+                .estado(registroHistorialRemision.getEstado())
+                .fechaAdmision(registroHistorialRemision.getFechaAdmision())
+                .programa(registroHistorialRemision.getPrograma())
+                .tipoAdmision(registroHistorialRemision.getTipoAdmision())
+                .institucionRemite(registroHistorialRemision.getInstitucionRemite())
+                .paciente(convertToJsonb(registroHistorialRemision.getPaciente()))
+                .datosAtencion(convertToJsonb(registroHistorialRemision.getDatosAtencion()))
+                .ubicacionPaciente(convertToJsonb(registroHistorialRemision.getUbicacionPaciente()))
+                .diagnosticos(convertToJsonb(registroHistorialRemision.getDiagnosticos()));
+
+        if (registroHistorialRemision.getCitas() != null) {
+            builder.citas(convertToJsonb(registroHistorialRemision.getCitas()));
+        }
+        if (registroHistorialRemision.getCitasNuevas() != null) {
+            builder.citasNuevas(convertToJsonb(registroHistorialRemision.getCitasNuevas()));
+        }
+        return builder.build();
+    }
 }

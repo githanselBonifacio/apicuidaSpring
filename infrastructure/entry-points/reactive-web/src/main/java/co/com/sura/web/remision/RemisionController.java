@@ -4,27 +4,22 @@ package co.com.sura.web.remision;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
 import co.com.sura.dto.remision.CrearRemisionCitasRequest;
-import co.com.sura.entity.remision.DatosAtencionPaciente;
-import co.com.sura.entity.remision.Paciente;
-import co.com.sura.entity.remision.RegistroHistorialRemision;
+import co.com.sura.entity.remision.datosremision.DatosAtencionPaciente;
+import co.com.sura.entity.remision.datosremision.Paciente;
+import co.com.sura.entity.remision.historial.RegistroHistorialRemision;
 import co.com.sura.entity.remision.Remision;
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
 import co.com.sura.genericos.Response;
 import co.com.sura.remision.RemisionUseCase;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -59,7 +54,27 @@ public class RemisionController {
 
                 )));
     }
-
+    @PostMapping("/actualizarRemisionPorNovedad")
+    public Mono<Response<Boolean>> actualizarRemisionPorNovedad(
+            @RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
+        return adminUseCase.actualizarRemisionPorNovedad(
+                        crearRemisionCitasRequest.getRemision(),
+                        crearRemisionCitasRequest.getCitas(),
+                        crearRemisionCitasRequest.getNovedad())
+               .map(fueActualizada ->ResponseFactory.createStatus(
+                        fueActualizada,
+                        StatusCode.STATUS_200.getValue(),
+                        Mensajes.REMISION_ACTUALIZADA.getValue(),
+                        Mensajes.REMISION_ACTUALIZADA.getValue(),
+                        Mensajes.PETICION_EXITOSA.getValue()))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500.getValue(),
+                        Mensajes.ERROR_ACTUALIZAR_REMISION.getValue(),
+                        Mensajes.PETICION_FALLIDA.getValue(),
+                        e.getMessage()
+                )));
+    }
     @GetMapping(value = "")
     public Mono<Response<List<Remision>>> consultarRemisiones(){
         return adminUseCase.consultarRemisiones()
@@ -119,70 +134,6 @@ public class RemisionController {
                         e.getMessage()
                 )));
     }
-    //farmacia
-    @GetMapping(value = "tratamientosFarmacia")
-    public Mono<Response<List<PacienteTratamientoCita>>> consultarMedicamentosToFarmacia(){
-        return adminUseCase.consultarAllTratamientosToFarmacia()
-                .collectList()
-                .map(pacientes -> ResponseFactory.createStatus(
-                        pacientes,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-    @GetMapping(value = "tratamientosFarmaciaWithFilter")
-    public Mono<Response<List<PacienteTratamientoCita>>> consultarMedicamentosToFarmaciaWithFilter(
-            @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam String idRegional,
-            @RequestParam Integer idHorarioTurno
-    ){
-        return adminUseCase.consultarAllTratamientosToFarmaciaWithFilter(fechaTurno,idHorarioTurno,idRegional)
-                .collectList()
-                .map(pacientes -> ResponseFactory.createStatus(
-                        pacientes,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-
-    @PostMapping(value = "notificarFarmacia")
-    public Mono<Response<Boolean>>notificarMedicamentosToFarmacia(
-            @RequestBody List<PacienteTratamientoCita> tratamientoCitasList){
-        return adminUseCase.notificarMedicamentosToFarmacia(tratamientoCitasList)
-                .map(seNotifico -> ResponseFactory.createStatus(
-                        seNotifico,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_NOTIFICO_FARMACIA.getValue(),
-                        Mensajes.SE_NOTIFICO_FARMACIA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.NO_NOTIFICO_FARMACIA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
-
     //remisiones
     @GetMapping(value = "historial/{idRemision}")
     public Mono<Response<List<RegistroHistorialRemision>>> consultarHistorialRemisionById(
@@ -224,27 +175,7 @@ public class RemisionController {
                 )));
     }
 
-    @PostMapping("/actualizarRemisionPorNovedad")
-    public Mono<Response<Boolean>> actualizarRemisionPorNovedad(
-            @RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
-        return adminUseCase.actualizarRemisionPorNovedad(
-                crearRemisionCitasRequest.getRemision(),
-                crearRemisionCitasRequest.getCitas(),
-                crearRemisionCitasRequest.getNovedad())
-                .map(fueActualizada ->ResponseFactory.createStatus(
-                        fueActualizada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.REMISION_ACTUALIZADA.getValue(),
-                        Mensajes.REMISION_ACTUALIZADA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTUALIZAR_REMISION.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        e.getMessage()
-                )));
-    }
+
 
     @PostMapping(value="/egresar/{idRemision}")
     public Mono<Response<Boolean>> egresarRemisionById(@PathVariable String idRemision) {

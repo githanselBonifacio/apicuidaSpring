@@ -1,13 +1,13 @@
 package co.com.sura.entity.agenda;
 
-import co.com.sura.entity.remision.Canalizacion;
-import co.com.sura.entity.remision.Curacion;
-import co.com.sura.entity.remision.Fototerapia;
-import co.com.sura.entity.remision.Procedimientos;
-import co.com.sura.entity.remision.Secrecion;
-import co.com.sura.entity.remision.Sondaje;
-import co.com.sura.entity.remision.SoporteNutricional;
-import co.com.sura.entity.remision.TomaMuestra;
+import co.com.sura.entity.remision.procedimientos.Canalizacion;
+import co.com.sura.entity.remision.procedimientos.Curacion;
+import co.com.sura.entity.remision.procedimientos.Fototerapia;
+import co.com.sura.entity.remision.procedimientos.Procedimientos;
+import co.com.sura.entity.remision.procedimientos.Secrecion;
+import co.com.sura.entity.remision.procedimientos.Sondaje;
+import co.com.sura.entity.remision.procedimientos.SoporteNutricional;
+import co.com.sura.entity.remision.procedimientos.TomaMuestra;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

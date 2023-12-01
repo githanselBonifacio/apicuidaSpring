@@ -1,17 +1,17 @@
 package co.com.sura.postgres.repository.reportes.adapter;
 
-import co.com.sura.postgres.repository.remision.data.RegistroHistorialRepository;
-import co.com.sura.postgres.repository.remision.data.RemisionRepository;
+import co.com.sura.postgres.repository.remision.repository.RegistroHistorialRepository;
+import co.com.sura.postgres.repository.remision.repository.RemisionRepository;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.agenda.data.CitaRepository;
-import co.com.sura.postgres.repository.personal.data.TurnoProfesionalesRepository;
+import co.com.sura.postgres.repository.agenda.repository.CitaRepository;
+import co.com.sura.postgres.repository.personal.repository.TurnoProfesionalesRepository;
 import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
+import co.com.sura.postgres.repository.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.repository.maestros.data.RegionalesData;
-import co.com.sura.postgres.repository.maestros.data.RegionalesRepository;
+import co.com.sura.postgres.repository.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
-import co.com.sura.postgres.repository.reportes.data.ReporteTurnoRepository;
+import co.com.sura.postgres.repository.reportes.repository.ReporteTurnoRepository;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;

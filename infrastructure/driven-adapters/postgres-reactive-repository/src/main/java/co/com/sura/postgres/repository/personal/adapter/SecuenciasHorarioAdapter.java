@@ -7,16 +7,16 @@ import co.com.sura.entity.personal.Profesional;
 import co.com.sura.entity.personal.ProfesionalWithTurno;
 import co.com.sura.entity.personal.SecuenciasHorarioRepository;
 import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.ItemDiaTurno;
-import co.com.sura.entity.remision.SecuenciaTurno;
+import co.com.sura.entity.remision.datosremision.ItemDiaTurno;
+import co.com.sura.entity.personal.SecuenciaTurno;
 import co.com.sura.genericos.RespuestasFactory;
 import co.com.sura.genericos.ResultadoActualizacionTurno;
-import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.agenda.repository.CitaRepository;
 import co.com.sura.postgres.repository.maestros.adapter.ConverterMaestros;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
-import co.com.sura.postgres.repository.personal.data.ItemSecuenciaTurnoRepository;
-import co.com.sura.postgres.repository.personal.data.ProfesionalRepository;
-import co.com.sura.postgres.repository.personal.data.TurnoProfesionalesRepository;
+import co.com.sura.postgres.repository.maestros.repository.HorarioTurnoRepository;
+import co.com.sura.postgres.repository.personal.repository.ItemSecuenciaTurnoRepository;
+import co.com.sura.postgres.repository.personal.repository.ProfesionalRepository;
+import co.com.sura.postgres.repository.personal.repository.TurnoProfesionalesRepository;
 import co.com.sura.postgres.repository.remision.adapter.RemisionDataFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -74,7 +74,7 @@ public class SecuenciasHorarioAdapter implements SecuenciasHorarioRepository {
             List<EliminarTurnoProfesionalRequest> turnoRequest) {
         return Flux.fromIterable(turnoRequest)
                 .flatMap(turno ->citaRepository
-                        .findCitasByTurnoProfesional(turno.getFechaTurno(),turno.getIdProfesional())
+                        .findAllByTurnoProfesional(turno.getFechaTurno(),turno.getIdProfesional())
                         .hasElements()
                         .flatMap(hasElment ->{
                           if(Boolean.FALSE.equals(hasElment)){
@@ -100,7 +100,7 @@ public class SecuenciasHorarioAdapter implements SecuenciasHorarioRepository {
     public Flux<ResultadoActualizacionTurno> asignarTurnosProfesionalesAccionMasiva(List<TurnoProfesional> turnos) {
         return Flux.fromIterable(turnos)
                 .flatMap(turno-> citaRepository
-                     .findCitasByTurnoProfesional(turno.getFechaTurno(),turno.getIdProfesional())
+                     .findAllByTurnoProfesional(turno.getFechaTurno(),turno.getIdProfesional())
                      .hasElements()
                      .flatMap(hasElment ->{
                         if(Boolean.FALSE.equals(hasElment)){

@@ -9,21 +9,21 @@ import co.com.sura.entity.agenda.Tarea;
 import co.com.sura.entity.agenda.TiposTarea;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.Procedimientos;
-import co.com.sura.entity.remision.Tratamiento;
+import co.com.sura.entity.remision.procedimientos.Procedimientos;
+import co.com.sura.entity.remision.datosremision.Tratamiento;
 import co.com.sura.exception.ErrorEstadoCitaNoValido;
 import co.com.sura.exception.ExceptionNegocio;
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
-import co.com.sura.postgres.repository.agenda.data.CitaRepository;
+import co.com.sura.postgres.repository.agenda.repository.CitaRepository;
 import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.repository.maestros.data.HorarioTurnoRepository;
+import co.com.sura.postgres.repository.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.repository.moviles.data.DesplazamientoRepository;
-import co.com.sura.postgres.repository.remision.data.TratamientoRepository;
+import co.com.sura.postgres.repository.remision.repository.TratamientoRepository;
 import co.com.sura.postgres.repository.personal.data.ProfesionalData;
-import co.com.sura.postgres.repository.personal.data.TurnoProfesionalesRepository;
+import co.com.sura.postgres.repository.personal.repository.TurnoProfesionalesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -36,7 +36,6 @@ import java.util.List;
 
 @Repository
 public class AgendaRepositoryAdapter implements AgendaRepository {
-
     private final TurnoProfesionalesRepository turnoProfesionalesRepository;
     private final CitaRepository citaRepository;
     private final DesplazamientoRepository desplazamientoRepository;
@@ -51,7 +50,6 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             DesplazamientoRepository desplazamientoRepository, TratamientoRepository tratamientoRepository,
             ProcedimientosCitaRepository procedimientosCitaRepository,
             HorarioTurnoRepository horarioTurnoRepository, AgendamientoAutomaticoAdapter agendamientoAdapter) {
-
 
         this.turnoProfesionalesRepository = turnoProfesionalesRepository;
         this.citaRepository = citaRepository;
@@ -74,7 +72,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
 
     @Override
     public Mono<Boolean> desasignarProfesionalTurno(TurnoProfesional turnoProfesional) {
-        return citaRepository.findCitasByTurnoProfesional(
+        return citaRepository.findAllByTurnoProfesional(
                 turnoProfesional.getFechaTurno(),turnoProfesional.getIdProfesional())
                 .filter(citaData -> !(citaData.getIdEstado() == EstadosCita.AGENDADA.getEstado() ||
                         citaData.getIdEstado() == EstadosCita.SIN_AGENDAR.getEstado()))
@@ -114,7 +112,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             String idRegional){
 
         return citaRepository
-                .findCitasByTurnoRegionalProfesional(fechaTurno, idHorarioTurno, idRegional,
+                .findAllByTurnoRegionalProfesional(fechaTurno, idHorarioTurno, idRegional,
                         profesionalData.getNumeroIdentificacion(),EstadosCita.CANCELADA.getEstado())
                 .map(ConverterAgenda :: convertToTarea)
                 .map(tarea -> {
@@ -152,7 +150,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     //citas
     @Override
     public Flux<Cita> consultarCitasByTurnoRegional(LocalDate fechaTurno, Integer idHorarioTurno, String idRegional) {
-        return citaRepository.findCitasByTurnoRegionalHorario(
+        return citaRepository.findAllByTurnoRegionalHorario(
                 fechaTurno, idHorarioTurno, idRegional,EstadosCita.CANCELADA.getEstado())
                 .sort(Comparator.comparing(Cita::getIdEstado));
     }
@@ -161,12 +159,12 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             CitaData cita , LocalDateTime fechaProgramada, String idProfesional){
       return Mono.just(cita)
          .flatMap(citaData -> Mono.zip(
-              citaRepository.findCitaMasCercanaAnterior(
+              citaRepository.findMasCercanaAnterior(
                                citaData.getFechaProgramada(),citaData.getIdCita(),
                                citaData.getIdHorarioTurno(),citaData.getIdRegional(), idProfesional)
                                .defaultIfEmpty(CitaData.builder().build()),
 
-              citaRepository.findCitaMasCercanaPosterior(
+              citaRepository.findMasCercanaPosterior(
                                citaData.getFechaProgramada().plusSeconds(citaData.getDuracion()), citaData.getIdCita(),
                                citaData.getIdHorarioTurno(),citaData.getIdRegional(), idProfesional)
                                .defaultIfEmpty(CitaData.builder().build()),

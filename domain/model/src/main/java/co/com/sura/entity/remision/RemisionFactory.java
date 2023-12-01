@@ -1,12 +1,15 @@
 package co.com.sura.entity.remision;
 
 import co.com.sura.entity.maestro.HorarioTurno;
+import co.com.sura.entity.personal.SecuenciaTurno;
+import co.com.sura.entity.remision.datosremision.ItemDiaTurno;
+import co.com.sura.entity.remision.datosremision.ItemSecuenciaTurno;
 
 import java.util.Collections;
 import java.util.List;
 
 public interface RemisionFactory {
-     static  ItemDiaTurno crearItemDiaTurno(
+     static ItemDiaTurno crearItemDiaTurno(
             Integer numeroDia, String nombreDia, List<HorarioTurno> horariosTurno){
         return  ItemDiaTurno.builder()
                 .numeroDia(numeroDia)

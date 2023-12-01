@@ -8,8 +8,8 @@ import co.com.sura.entity.agenda.Cita;
 import co.com.sura.entity.moviles.Desplazamiento;
 import co.com.sura.entity.personal.Profesional;
 import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.Procedimientos;
-import co.com.sura.entity.remision.Tratamiento;
+import co.com.sura.entity.remision.procedimientos.Procedimientos;
+import co.com.sura.entity.remision.datosremision.Tratamiento;
 import co.com.sura.genericos.Response;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class AgendaController {
     private AgendaUseCase agendaUseCase;
 
     //profesionales en turno
-    @GetMapping(value = "/profesionalesByTurnoCiudad")
+    @GetMapping(value = "/profesionalesByTurnoRegional")
     public Mono<Response<List<Profesional>>> getProfesionalesbyTurnoCiudad(
              @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
              @RequestParam String idRegional){
@@ -62,7 +62,7 @@ public class AgendaController {
                 )));
     }
 
-    @GetMapping(value = "/profesionalesFromTurnoCiudad")
+    @GetMapping(value = "/profesionalesFromTurnoRegional")
     public Mono<Response<List<Profesional>>> getProfesionalesfromTurnoCiudad(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam String idRegional,
@@ -191,7 +191,7 @@ public class AgendaController {
                 .timeout(Duration.ofSeconds(TIMEOUT));
     }
    //actividades
-    @GetMapping(value = "/actividadesByprofesionalesCiudadHorario")
+    @GetMapping(value = "/actividadesByprofesionalesRegionalHorario")
     public Mono<Response<List<Actividad>>> getActividadesByProfesionalesCiudadHorario(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,

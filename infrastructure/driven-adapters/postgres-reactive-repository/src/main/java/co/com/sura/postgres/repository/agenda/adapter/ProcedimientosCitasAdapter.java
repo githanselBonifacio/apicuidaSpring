@@ -1,21 +1,21 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
 import co.com.sura.entity.agenda.ProcedimientosCitaRepository;
-import co.com.sura.entity.remision.Canalizacion;
-import co.com.sura.entity.remision.Curacion;
-import co.com.sura.entity.remision.Fototerapia;
-import co.com.sura.entity.remision.Procedimientos;
-import co.com.sura.entity.remision.Secrecion;
-import co.com.sura.entity.remision.Sondaje;
-import co.com.sura.entity.remision.SoporteNutricional;
-import co.com.sura.entity.remision.TomaMuestra;
-import co.com.sura.postgres.repository.remision.data.CanalizacionRepository;
-import co.com.sura.postgres.repository.remision.data.CuracionRepository;
-import co.com.sura.postgres.repository.remision.data.FototerapiaRepository;
-import co.com.sura.postgres.repository.remision.data.SecrecionRepository;
-import co.com.sura.postgres.repository.remision.data.SondajeRepository;
-import co.com.sura.postgres.repository.remision.data.SoporteNutricionalRepository;
-import co.com.sura.postgres.repository.remision.data.TomaMuestraRepository;
+import co.com.sura.entity.remision.procedimientos.Canalizacion;
+import co.com.sura.entity.remision.procedimientos.Curacion;
+import co.com.sura.entity.remision.procedimientos.Fototerapia;
+import co.com.sura.entity.remision.procedimientos.Procedimientos;
+import co.com.sura.entity.remision.procedimientos.Secrecion;
+import co.com.sura.entity.remision.procedimientos.Sondaje;
+import co.com.sura.entity.remision.procedimientos.SoporteNutricional;
+import co.com.sura.entity.remision.procedimientos.TomaMuestra;
+import co.com.sura.postgres.repository.remision.repository.CanalizacionRepository;
+import co.com.sura.postgres.repository.remision.repository.CuracionRepository;
+import co.com.sura.postgres.repository.remision.repository.FototerapiaRepository;
+import co.com.sura.postgres.repository.remision.repository.SecrecionRepository;
+import co.com.sura.postgres.repository.remision.repository.SondajeRepository;
+import co.com.sura.postgres.repository.remision.repository.SoporteNutricionalRepository;
+import co.com.sura.postgres.repository.remision.repository.TomaMuestraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -113,4 +113,6 @@ public class ProcedimientosCitasAdapter implements ProcedimientosCitaRepository 
         return soporteNutricionalRepository.findByIdCita(idCita)
                 .map(ConverterAgenda::convertToSoporteNutricionalData);
     }
+
+
 }

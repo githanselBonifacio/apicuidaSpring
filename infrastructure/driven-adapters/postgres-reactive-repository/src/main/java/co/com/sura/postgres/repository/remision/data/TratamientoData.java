@@ -56,4 +56,7 @@ public class TratamientoData {
 
     @Column("id_cita")
     private String idCita;
+
+    @Column("notificado")
+    private boolean notificado;
 }

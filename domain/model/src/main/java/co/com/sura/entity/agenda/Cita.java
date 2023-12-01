@@ -1,25 +1,30 @@
 package co.com.sura.entity.agenda;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 public class Cita {
     private String idCita;
     private String idRemision;
     private Integer duracion;
     private Integer holgura;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fechaInicio;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fechaProgramada;
+
     private Double latitud;
     private Double longitud;
     private String especialidad;
@@ -27,7 +32,13 @@ public class Cita {
     private String idRegional;
     private String idProfesional;
     private String idConductor;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String paciente;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String numeroIdentificacionPaciente;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String tipoIdentificacionPaciente;
 }

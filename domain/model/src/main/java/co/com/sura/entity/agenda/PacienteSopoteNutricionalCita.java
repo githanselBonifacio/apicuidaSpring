@@ -1,6 +1,6 @@
 package co.com.sura.entity.agenda;
 
-import co.com.sura.entity.remision.SoporteNutricional;
+import co.com.sura.entity.remision.procedimientos.SoporteNutricional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

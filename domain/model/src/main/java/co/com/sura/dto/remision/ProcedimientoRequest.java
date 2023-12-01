@@ -1,7 +1,7 @@
 package co.com.sura.dto.remision;
 
-import co.com.sura.entity.remision.Canalizacion;
-import co.com.sura.entity.remision.Fototerapia;
+import co.com.sura.entity.remision.procedimientos.Canalizacion;
+import co.com.sura.entity.remision.procedimientos.Fototerapia;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
