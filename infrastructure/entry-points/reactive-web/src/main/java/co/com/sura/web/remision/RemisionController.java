@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/admin")
+@RequestMapping("/remision")
 public class RemisionController {
 
     @Autowired
