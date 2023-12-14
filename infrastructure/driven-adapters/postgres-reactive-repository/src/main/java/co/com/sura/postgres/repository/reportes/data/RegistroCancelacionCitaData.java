@@ -25,8 +25,8 @@ public class RegistroCancelacionCitaData {
     private LocalDate fechaTurno;
 
     @Column("id_cita")
-    private String idRegional;
+    private String idCita;
 
     @Column("id_motivo_cancelacion")
-    private Integer idHorarioTurno;
+    private Integer idMotivoCancelacion;
 }

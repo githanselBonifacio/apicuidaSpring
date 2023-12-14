@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -63,7 +63,7 @@ public class AgendaController {
     }
 
     @GetMapping(value = "/profesionalesFromTurnoRegional")
-    public Mono<Response<List<Profesional>>> getProfesionalesfromTurnoCiudad(
+    public Mono<Response<List<Profesional>>> getProfesionalesfromTurnoRegional(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam String idRegional,
             @RequestParam Integer idHorarioTurno){
@@ -148,7 +148,7 @@ public class AgendaController {
     }
 
     //turno
-    @GetMapping(value = "/desagendarTurnoCompleto")
+    @PutMapping(value = "/desagendarTurnoCompleto")
     public Mono<Response<Boolean>> desagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
@@ -168,7 +168,7 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
-    @GetMapping(value = "/autoagendarTurnoCompleto")
+    @PutMapping(value = "/autoagendarTurnoCompleto")
     public Mono<Response<Boolean>> autoagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
@@ -261,22 +261,19 @@ public class AgendaController {
     }
     @PutMapping(value = "/reprogramarCita")
     public Mono<Response<Boolean>> reprogramarCita(
-            @RequestParam("fechaProgramada")  String fechaProgramada,
-            @RequestParam String idCita,
-            @RequestParam String nuevaHora,
-            @RequestParam String idProfesional,
-            @RequestParam ("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
-            @RequestParam Integer idHorarioTurno,
-            @RequestParam String idRegional) {
+          @RequestParam("fechaProgramada") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")  LocalDateTime fechaProgramada,
+          @RequestParam String idCita,
+          @RequestParam ("nuevaHora") @DateTimeFormat(pattern = "HH:mm")  LocalTime nuevaHora,
+          @RequestParam String idProfesional,
+          @RequestParam Integer idHorarioTurno,
+          @RequestParam String idRegional) {
 
-        var hora = nuevaHora.split(":");
-
-        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        var localDateTime = LocalDateTime.parse(fechaProgramada, formatter)
-                .withHour(Integer.parseInt(hora[0])).withMinute(Integer.parseInt(hora[1]));
+        var fechaNuevaProgramada = fechaProgramada
+                .withHour(nuevaHora.getHour())
+                .withMinute(nuevaHora.getMinute());
 
         return agendaUseCase.reprogramarCitaById(
-                localDateTime,idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional)
+                      fechaNuevaProgramada,idCita,idProfesional,fechaProgramada.toLocalDate(),idHorarioTurno,idRegional)
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
                         StatusCode.STATUS_200.getValue(),

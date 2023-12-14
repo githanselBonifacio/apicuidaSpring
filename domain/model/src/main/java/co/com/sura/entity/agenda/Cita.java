@@ -30,6 +30,7 @@ public class Cita {
     private String especialidad;
     private Integer idEstado;
     private String idRegional;
+    private Integer idHorarioTurno;
     private String idProfesional;
     private String idConductor;
 

@@ -22,9 +22,6 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "WHERE public.remisiones.id_remision = $1;")
     Mono<PacienteData> findPacienteByNumeroIdRemision(String idRemision);
 
-    @Override
-    Mono<Boolean> existsById(String numeroIdentificacion);
-
     @Query("INSERT INTO pacientes( " +
             " numero_identificacion) " +
             " VALUES " +

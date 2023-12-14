@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 
+
 @Repository
 public class HistorialRemisionAdapter implements HistorialRemisionRepository {
     private final RemisionRepository remisionRepository;

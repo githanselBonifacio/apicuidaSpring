@@ -116,7 +116,7 @@ public class RemisionController {
                 )));
     }
 
-    @GetMapping(value = "pacienteFromRemision/{idRemision}")
+    @GetMapping(value = "pacienteRemision/{idRemision}")
     public Mono<Response<Paciente>> consultarPacienteFromRemision(@PathVariable String idRemision){
         return adminUseCase.consultarPacienteFromRemision(idRemision)
                 .map(paciente -> ResponseFactory.createStatus(
@@ -156,10 +156,10 @@ public class RemisionController {
                 )));
     }
 
-    @GetMapping(value = "remision/{idRemision}")
+    @GetMapping(value = "/{idRemision}")
     public Mono<Response<RegistroHistorialRemision>> consultarAllDataRemisionById(@PathVariable String idRemision){
         return adminUseCase.consultarDataActualRemision(idRemision)
-                .map(registroHistorial -> ResponseFactory.createStatus(
+               .map(registroHistorial -> ResponseFactory.createStatus(
                         registroHistorial,
                         StatusCode.STATUS_200.getValue(),
                         Mensajes.PETICION_EXITOSA.getValue(),
