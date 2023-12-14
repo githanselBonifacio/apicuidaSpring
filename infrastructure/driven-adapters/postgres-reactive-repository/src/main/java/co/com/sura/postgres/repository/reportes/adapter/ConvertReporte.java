@@ -1,10 +1,10 @@
 package co.com.sura.postgres.repository.reportes.adapter;
 
-import co.com.sura.entity.reportes.cancelacioncitas.RegistroCancelacionCita;
-import co.com.sura.entity.reportes.turnos.ItemReporteAnual;
-import co.com.sura.entity.reportes.turnos.ItemReporteMensual;
-import co.com.sura.entity.reportes.cancelacioncitas.RegistroCancelacionCitaAnual;
-import co.com.sura.entity.reportes.cancelacioncitas.RegistroCancelacionCitaMensual;
+import co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCita;
+import co.com.sura.reportes.entity.turnos.ItemReporteAnual;
+import co.com.sura.reportes.entity.turnos.ItemReporteMensual;
+import co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCitaAnual;
+import co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCitaMensual;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;

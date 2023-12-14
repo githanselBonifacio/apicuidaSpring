@@ -1,14 +1,14 @@
 package co.com.sura.postgres.repository.personal.adapter;
 
 import co.com.sura.constantes.Mensajes;
-import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
-import co.com.sura.entity.personal.Conductor;
-import co.com.sura.entity.personal.Profesional;
-import co.com.sura.entity.personal.ProfesionalWithTurno;
-import co.com.sura.entity.personal.SecuenciasHorarioRepository;
-import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.datosremision.ItemDiaTurno;
-import co.com.sura.entity.personal.SecuenciaTurno;
+import co.com.sura.remision.dto.EliminarTurnoProfesionalRequest;
+import co.com.sura.personal.entity.Conductor;
+import co.com.sura.personal.entity.Profesional;
+import co.com.sura.personal.entity.ProfesionalWithTurno;
+import co.com.sura.personal.gateway.SecuenciasHorarioRepository;
+import co.com.sura.personal.entity.TurnoProfesional;
+import co.com.sura.remision.entity.datosremision.ItemDiaTurno;
+import co.com.sura.personal.entity.SecuenciaTurno;
 import co.com.sura.genericos.RespuestasFactory;
 import co.com.sura.genericos.ResultadoActualizacionTurno;
 import co.com.sura.postgres.repository.agenda.repository.CitaRepository;

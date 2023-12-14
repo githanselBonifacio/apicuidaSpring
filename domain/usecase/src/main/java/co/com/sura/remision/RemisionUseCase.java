@@ -1,15 +1,15 @@
 package co.com.sura.remision;
 
-import co.com.sura.dto.remision.CitaRequest;
-import co.com.sura.dto.remision.NovedadRequest;
-import co.com.sura.dto.remision.RemisionRequest;
-import co.com.sura.entity.remision.HistorialRemisionRepository;
-import co.com.sura.entity.remision.datosremision.DatosAtencionPaciente;
-import co.com.sura.entity.remision.datosremision.Paciente;
-import co.com.sura.entity.remision.historial.RegistroHistorialRemision;
-import co.com.sura.entity.remision.Remision;
-import co.com.sura.entity.remision.RemisionCrudRepository;
-import co.com.sura.entity.remision.RemisionFactory;
+import co.com.sura.remision.dto.CitaRequest;
+import co.com.sura.remision.dto.NovedadRequest;
+import co.com.sura.remision.dto.RemisionRequest;
+import co.com.sura.remision.gateway.HistorialRemisionRepository;
+import co.com.sura.remision.entity.datosremision.DatosAtencionPaciente;
+import co.com.sura.remision.entity.datosremision.Paciente;
+import co.com.sura.remision.entity.historial.RegistroHistorialRemision;
+import co.com.sura.remision.entity.Remision;
+import co.com.sura.remision.gateway.RemisionCrudRepository;
+import co.com.sura.remision.factory.RemisionFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

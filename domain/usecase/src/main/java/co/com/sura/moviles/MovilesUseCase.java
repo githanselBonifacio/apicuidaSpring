@@ -1,12 +1,12 @@
 package co.com.sura.moviles;
 
-import co.com.sura.entity.moviles.MovilRepository;
+import co.com.sura.reportes.gateway.ReportesRepository;
 
 public class MovilesUseCase {
 
-    private final MovilRepository movilRepository;
+    private final ReportesRepository movilRepository;
 
-    public MovilesUseCase(MovilRepository movilRepository) {
+    public MovilesUseCase(ReportesRepository movilRepository) {
         this.movilRepository = movilRepository;
     }
 }

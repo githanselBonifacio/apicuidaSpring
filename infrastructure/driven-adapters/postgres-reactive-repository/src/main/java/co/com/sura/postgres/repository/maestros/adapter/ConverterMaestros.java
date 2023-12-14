@@ -1,7 +1,7 @@
 package co.com.sura.postgres.repository.maestros.adapter;
 
 
-import co.com.sura.entity.maestro.*;
+import co.com.sura.maestros.entity.*;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.maestros.data.*;
 import org.springframework.stereotype.Component;

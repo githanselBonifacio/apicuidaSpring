@@ -4,6 +4,7 @@ buildscript {
 		springBootVersion      = '2.7.0'
 		springCloudVersion     = '2021.0.2'
 		springWebVersion       = '2.7.12'
+		mockitoVersion         = '3.12.4'
 		springDoc              = '1.7.0'
 		lombokVersion          = '1.18.24'
 		reactorVersion         = '3.4.18'

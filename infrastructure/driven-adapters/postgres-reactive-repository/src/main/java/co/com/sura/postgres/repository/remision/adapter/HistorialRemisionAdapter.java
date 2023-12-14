@@ -1,9 +1,9 @@
 package co.com.sura.postgres.repository.remision.adapter;
 
 import co.com.sura.constantes.Mensajes;
-import co.com.sura.entity.agenda.Cita;
-import co.com.sura.entity.remision.HistorialRemisionRepository;
-import co.com.sura.entity.remision.historial.RegistroHistorialRemision;
+import co.com.sura.agenda.entity.Cita;
+import co.com.sura.remision.gateway.HistorialRemisionRepository;
+import co.com.sura.remision.entity.historial.RegistroHistorialRemision;
 import co.com.sura.postgres.repository.agenda.adapter.ConverterAgenda;
 import co.com.sura.postgres.repository.agenda.adapter.ProcedimientosCitasAdapter;
 import co.com.sura.postgres.repository.agenda.repository.CitaRepository;

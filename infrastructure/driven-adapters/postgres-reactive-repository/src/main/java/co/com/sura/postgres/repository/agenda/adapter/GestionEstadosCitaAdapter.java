@@ -1,7 +1,7 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
 import co.com.sura.constantes.Mensajes;
-import co.com.sura.entity.agenda.GestionEstadosCitasRepository;
+import co.com.sura.agenda.gateway.GestionEstadosCitasRepository;
 import co.com.sura.exception.ErrorEstadoCitaNoValido;
 import co.com.sura.exception.ExceptionNegocio;
 import co.com.sura.genericos.EstadosCita;

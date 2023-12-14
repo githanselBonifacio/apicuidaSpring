@@ -3,11 +3,11 @@ package co.com.sura.web.remision;
 
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
-import co.com.sura.dto.remision.CrearRemisionCitasRequest;
-import co.com.sura.entity.remision.datosremision.DatosAtencionPaciente;
-import co.com.sura.entity.remision.datosremision.Paciente;
-import co.com.sura.entity.remision.historial.RegistroHistorialRemision;
-import co.com.sura.entity.remision.Remision;
+import co.com.sura.remision.dto.CrearRemisionCitasRequest;
+import co.com.sura.remision.entity.datosremision.DatosAtencionPaciente;
+import co.com.sura.remision.entity.datosremision.Paciente;
+import co.com.sura.remision.entity.historial.RegistroHistorialRemision;
+import co.com.sura.remision.entity.Remision;
 import co.com.sura.genericos.Response;
 import co.com.sura.remision.RemisionUseCase;
 import co.com.sura.web.factory.ResponseFactory;

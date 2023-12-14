@@ -1,7 +1,7 @@
 package co.com.sura.farmacia;
 
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.farmacia.FarmaciaRepository;
+import co.com.sura.agenda.entity.PacienteTratamientoCita;
+import co.com.sura.farmacia.gateway.FarmaciaRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

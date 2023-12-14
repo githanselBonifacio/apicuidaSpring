@@ -1,10 +1,10 @@
 package co.com.sura.reportes;
 
-import co.com.sura.entity.reportes.ReportesRepository;
-import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaAnual;
-import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaMensual;
-import co.com.sura.entity.reportes.turnos.ReporteTurnoAnual;
-import co.com.sura.entity.reportes.turnos.ReporteTurnoMensual;
+import co.com.sura.reportes.gateway.ReportesRepository;
+import co.com.sura.reportes.entity.cancelacioncitas.ReporteCancelacionCitaAnual;
+import co.com.sura.reportes.entity.cancelacioncitas.ReporteCancelacionCitaMensual;
+import co.com.sura.reportes.entity.turnos.ReporteTurnoAnual;
+import co.com.sura.reportes.entity.turnos.ReporteTurnoMensual;
 import reactor.core.publisher.Mono;
 
 

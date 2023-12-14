@@ -2,10 +2,10 @@ package co.com.sura.web.reportes;
 
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
-import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaAnual;
-import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaMensual;
-import co.com.sura.entity.reportes.turnos.ReporteTurnoAnual;
-import co.com.sura.entity.reportes.turnos.ReporteTurnoMensual;
+import co.com.sura.reportes.entity.cancelacioncitas.ReporteCancelacionCitaAnual;
+import co.com.sura.reportes.entity.cancelacioncitas.ReporteCancelacionCitaMensual;
+import co.com.sura.reportes.entity.turnos.ReporteTurnoAnual;
+import co.com.sura.reportes.entity.turnos.ReporteTurnoMensual;
 import co.com.sura.genericos.Response;
 import co.com.sura.reportes.ReportesUseCase;
 import co.com.sura.web.factory.ResponseFactory;

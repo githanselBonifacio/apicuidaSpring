@@ -2,11 +2,11 @@ package co.com.sura.web.maestro;
 
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
-import co.com.sura.entity.maestro.EstadoCita;
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.maestro.Profesion;
-import co.com.sura.entity.maestro.Regional;
-import co.com.sura.entity.maestro.TipoIdentificacion;
+import co.com.sura.maestros.entity.EstadoCita;
+import co.com.sura.maestros.entity.HorarioTurno;
+import co.com.sura.maestros.entity.Profesion;
+import co.com.sura.maestros.entity.Regional;
+import co.com.sura.maestros.entity.TipoIdentificacion;
 import co.com.sura.genericos.Response;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.web.factory.ResponseFactory;

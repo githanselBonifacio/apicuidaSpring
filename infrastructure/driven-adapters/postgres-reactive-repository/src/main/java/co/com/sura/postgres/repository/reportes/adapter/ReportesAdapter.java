@@ -1,16 +1,16 @@
 package co.com.sura.postgres.repository.reportes.adapter;
 
-import co.com.sura.entity.maestro.Regional;
-import co.com.sura.entity.reportes.ReportesRepository;
-import co.com.sura.entity.reportes.cancelacioncitas.RegistroCancelacionCitaAnual;
-import co.com.sura.entity.reportes.cancelacioncitas.RegistroCancelacionCitaMensual;
-import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaAnual;
-import co.com.sura.entity.reportes.cancelacioncitas.ReporteCancelacionCitaMensual;
-import co.com.sura.entity.reportes.cancelacioncitas.ResumenCancelacionCita;
-import co.com.sura.entity.reportes.turnos.ItemReporteAnual;
-import co.com.sura.entity.reportes.turnos.ItemReporteMensual;
-import co.com.sura.entity.reportes.turnos.ReporteTurnoAnual;
-import co.com.sura.entity.reportes.turnos.ReporteTurnoMensual;
+import co.com.sura.maestros.entity.Regional;
+import co.com.sura.reportes.gateway.ReportesRepository;
+import co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCitaAnual;
+import co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCitaMensual;
+import co.com.sura.reportes.entity.cancelacioncitas.ReporteCancelacionCitaAnual;
+import co.com.sura.reportes.entity.cancelacioncitas.ReporteCancelacionCitaMensual;
+import co.com.sura.reportes.entity.cancelacioncitas.ResumenCancelacionCita;
+import co.com.sura.reportes.entity.turnos.ItemReporteAnual;
+import co.com.sura.reportes.entity.turnos.ItemReporteMensual;
+import co.com.sura.reportes.entity.turnos.ReporteTurnoAnual;
+import co.com.sura.reportes.entity.turnos.ReporteTurnoMensual;
 import co.com.sura.postgres.repository.maestros.adapter.ConverterMaestros;
 import co.com.sura.postgres.repository.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.repository.reportes.querys.QueryReportes;

@@ -1,6 +1,6 @@
 package co.com.sura.postgres.repository.personal.repository;
 
-import co.com.sura.entity.personal.Movil;
+import co.com.sura.moviles.entity.Movil;
 import co.com.sura.postgres.repository.personal.data.MovilData;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;

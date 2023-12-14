@@ -1,7 +1,7 @@
 package co.com.sura.autoagendador.models;
 
-import co.com.sura.services.mapbox.GeoUbicacion;
-import co.com.sura.services.mapbox.MapboxServiceRepository;
+import co.com.sura.mapbox.entity.GeoUbicacion;
+import co.com.sura.mapbox.gateway.MapboxServiceRepository;
 import lombok.Data;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;

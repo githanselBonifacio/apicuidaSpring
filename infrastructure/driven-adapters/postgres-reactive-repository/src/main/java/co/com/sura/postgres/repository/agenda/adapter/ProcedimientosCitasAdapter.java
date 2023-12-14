@@ -1,14 +1,14 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
-import co.com.sura.entity.agenda.ProcedimientosCitaRepository;
-import co.com.sura.entity.remision.procedimientos.Canalizacion;
-import co.com.sura.entity.remision.procedimientos.Curacion;
-import co.com.sura.entity.remision.procedimientos.Fototerapia;
-import co.com.sura.entity.remision.procedimientos.Procedimientos;
-import co.com.sura.entity.remision.procedimientos.Secrecion;
-import co.com.sura.entity.remision.procedimientos.Sondaje;
-import co.com.sura.entity.remision.procedimientos.SoporteNutricional;
-import co.com.sura.entity.remision.procedimientos.TomaMuestra;
+import co.com.sura.agenda.gateway.ProcedimientosCitaRepository;
+import co.com.sura.remision.entity.procedimientos.Canalizacion;
+import co.com.sura.remision.entity.procedimientos.Curacion;
+import co.com.sura.remision.entity.procedimientos.Fototerapia;
+import co.com.sura.remision.entity.procedimientos.Procedimientos;
+import co.com.sura.remision.entity.procedimientos.Secrecion;
+import co.com.sura.remision.entity.procedimientos.Sondaje;
+import co.com.sura.remision.entity.procedimientos.SoporteNutricional;
+import co.com.sura.remision.entity.procedimientos.TomaMuestra;
 import co.com.sura.postgres.repository.remision.repository.CanalizacionRepository;
 import co.com.sura.postgres.repository.remision.repository.CuracionRepository;
 import co.com.sura.postgres.repository.remision.repository.FototerapiaRepository;

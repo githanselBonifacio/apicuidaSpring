@@ -1,17 +1,16 @@
 package co.com.sura.config;
 
 import co.com.sura.agenda.AgendaUseCase;
-import co.com.sura.entity.agenda.AgendaRepository;
-import co.com.sura.entity.agenda.AgendamientoAutomaticoRepository;
-import co.com.sura.entity.agenda.GestionEstadosCitasRepository;
-import co.com.sura.entity.farmacia.FarmaciaRepository;
-import co.com.sura.entity.maestro.MaestroRepository;
-import co.com.sura.entity.moviles.MovilRepository;
-import co.com.sura.entity.personal.SecuenciasHorarioRepository;
-import co.com.sura.entity.remision.HistorialRemisionRepository;
-import co.com.sura.entity.remision.RemisionCrudRepository;
-import co.com.sura.entity.personal.PersonalCrudRepository;
-import co.com.sura.entity.reportes.ReportesRepository;
+import co.com.sura.agenda.gateway.AgendaRepository;
+import co.com.sura.agenda.gateway.AgendamientoAutomaticoRepository;
+import co.com.sura.agenda.gateway.GestionEstadosCitasRepository;
+import co.com.sura.farmacia.gateway.FarmaciaRepository;
+import co.com.sura.maestros.gateway.MaestroRepository;
+import co.com.sura.personal.gateway.SecuenciasHorarioRepository;
+import co.com.sura.remision.gateway.HistorialRemisionRepository;
+import co.com.sura.remision.gateway.RemisionCrudRepository;
+import co.com.sura.personal.gateway.PersonalCrudRepository;
+import co.com.sura.reportes.gateway.ReportesRepository;
 import co.com.sura.farmacia.FarmaciaUseCase;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.moviles.MovilesUseCase;
@@ -54,7 +53,7 @@ public class UseCaseConfig {
         return  new FarmaciaUseCase(farmaciaRepository);
     }
     @Bean
-    public MovilesUseCase movilesUseCase (MovilRepository movilRepository){
+    public MovilesUseCase movilesUseCase (ReportesRepository movilRepository){
         return new MovilesUseCase(movilRepository);
     }
 
@@ -64,8 +63,8 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public PersonalUseCase personalesUseCase (PersonalCrudRepository personalRepository,
-                                              SecuenciasHorarioRepository secuenciasHorarioRepository){
+    public PersonalUseCase personalUseCase(PersonalCrudRepository personalRepository,
+                                           SecuenciasHorarioRepository secuenciasHorarioRepository){
         return new PersonalUseCase(personalRepository, secuenciasHorarioRepository);
     }
 

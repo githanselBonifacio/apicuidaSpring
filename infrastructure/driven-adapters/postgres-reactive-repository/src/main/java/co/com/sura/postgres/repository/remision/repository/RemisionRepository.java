@@ -1,6 +1,6 @@
 package co.com.sura.postgres.repository.remision.repository;
 
-import co.com.sura.entity.remision.Remision;
+import co.com.sura.remision.entity.Remision;
 import co.com.sura.postgres.repository.remision.data.RemisionData;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;

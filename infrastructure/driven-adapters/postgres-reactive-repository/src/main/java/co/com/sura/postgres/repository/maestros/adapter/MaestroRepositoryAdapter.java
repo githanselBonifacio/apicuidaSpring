@@ -1,11 +1,11 @@
 package co.com.sura.postgres.repository.maestros.adapter;
 
-import co.com.sura.entity.maestro.EstadoCita;
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.maestro.MaestroRepository;
-import co.com.sura.entity.maestro.Profesion;
-import co.com.sura.entity.maestro.Regional;
-import co.com.sura.entity.maestro.TipoIdentificacion;
+import co.com.sura.maestros.entity.EstadoCita;
+import co.com.sura.maestros.entity.HorarioTurno;
+import co.com.sura.maestros.gateway.MaestroRepository;
+import co.com.sura.maestros.entity.Profesion;
+import co.com.sura.maestros.entity.Regional;
+import co.com.sura.maestros.entity.TipoIdentificacion;
 import co.com.sura.postgres.repository.maestros.repository.EstadoCitaRepository;
 import co.com.sura.postgres.repository.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.repository.maestros.repository.ProfesionRepository;

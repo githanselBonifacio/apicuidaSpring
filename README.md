@@ -1,3 +1,3 @@
-# FUR ms
+# CUIDA ms
 
-Microservicio para extender las funcionalidades de FUR
+Microservicio para gestion de visitas

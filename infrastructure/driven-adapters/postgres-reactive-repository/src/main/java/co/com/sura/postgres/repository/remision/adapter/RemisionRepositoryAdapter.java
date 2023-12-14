@@ -1,14 +1,14 @@
 package co.com.sura.postgres.repository.remision.adapter;
 
 import co.com.sura.constantes.Mensajes;
-import co.com.sura.dto.remision.CitaRequest;
-import co.com.sura.dto.remision.NovedadRequest;
-import co.com.sura.dto.remision.RemisionRequest;
-import co.com.sura.entity.remision.datosremision.DatosAtencionPaciente;
-import co.com.sura.entity.remision.datosremision.Paciente;
-import co.com.sura.entity.remision.Remision;
-import co.com.sura.entity.remision.RemisionCrudRepository;
-import co.com.sura.entity.remision.historial.CitaHistorial;
+import co.com.sura.remision.dto.CitaRequest;
+import co.com.sura.remision.dto.NovedadRequest;
+import co.com.sura.remision.dto.RemisionRequest;
+import co.com.sura.remision.entity.datosremision.DatosAtencionPaciente;
+import co.com.sura.remision.entity.datosremision.Paciente;
+import co.com.sura.remision.entity.Remision;
+import co.com.sura.remision.gateway.RemisionCrudRepository;
+import co.com.sura.remision.entity.historial.CitaHistorial;
 import co.com.sura.exception.ErrorCitaProgreso;
 import co.com.sura.exception.ErrorValidacionIngresoRemision;
 import co.com.sura.genericos.EstadosCita;

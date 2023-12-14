@@ -1,7 +1,7 @@
 package co.com.sura.postgres.repository.remision.repository;
 
 
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
+import co.com.sura.agenda.entity.PacienteTratamientoCita;
 import co.com.sura.postgres.repository.remision.data.PacienteData;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;

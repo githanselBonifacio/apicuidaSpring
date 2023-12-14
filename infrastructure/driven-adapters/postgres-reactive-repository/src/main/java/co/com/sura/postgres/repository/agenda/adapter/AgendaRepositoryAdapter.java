@@ -1,16 +1,16 @@
 package co.com.sura.postgres.repository.agenda.adapter;
 
 import co.com.sura.constantes.Mensajes;
-import co.com.sura.entity.agenda.Actividad;
-import co.com.sura.entity.agenda.AgendaRepository;
-import co.com.sura.entity.agenda.Cita;
-import co.com.sura.entity.agenda.ProcedimientosCitaRepository;
-import co.com.sura.entity.agenda.Tarea;
-import co.com.sura.entity.agenda.TiposTarea;
-import co.com.sura.entity.moviles.Desplazamiento;
-import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.procedimientos.Procedimientos;
-import co.com.sura.entity.remision.datosremision.Tratamiento;
+import co.com.sura.agenda.entity.Actividad;
+import co.com.sura.agenda.gateway.AgendaRepository;
+import co.com.sura.agenda.entity.Cita;
+import co.com.sura.agenda.gateway.ProcedimientosCitaRepository;
+import co.com.sura.agenda.entity.Tarea;
+import co.com.sura.agenda.entity.TiposTarea;
+import co.com.sura.moviles.entity.Desplazamiento;
+import co.com.sura.personal.entity.TurnoProfesional;
+import co.com.sura.remision.entity.procedimientos.Procedimientos;
+import co.com.sura.remision.entity.datosremision.Tratamiento;
 import co.com.sura.exception.ErrorEstadoCitaNoValido;
 import co.com.sura.exception.ExceptionNegocio;
 import co.com.sura.genericos.EstadosCita;

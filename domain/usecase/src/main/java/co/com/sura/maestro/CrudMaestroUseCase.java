@@ -1,11 +1,11 @@
 package co.com.sura.maestro;
 
-import co.com.sura.entity.maestro.EstadoCita;
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.maestro.MaestroRepository;
-import co.com.sura.entity.maestro.Profesion;
-import co.com.sura.entity.maestro.Regional;
-import co.com.sura.entity.maestro.TipoIdentificacion;
+import co.com.sura.maestros.entity.EstadoCita;
+import co.com.sura.maestros.entity.HorarioTurno;
+import co.com.sura.maestros.gateway.MaestroRepository;
+import co.com.sura.maestros.entity.Profesion;
+import co.com.sura.maestros.entity.Regional;
+import co.com.sura.maestros.entity.TipoIdentificacion;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

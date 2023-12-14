@@ -1,8 +1,8 @@
 package co.com.sura.postgres.repository.remision.adapter;
 
-import co.com.sura.entity.remision.datosremision.ItemDiaTurno;
-import co.com.sura.entity.personal.SecuenciaTurno;
-import co.com.sura.entity.maestro.HorarioTurno;
+import co.com.sura.remision.entity.datosremision.ItemDiaTurno;
+import co.com.sura.personal.entity.SecuenciaTurno;
+import co.com.sura.maestros.entity.HorarioTurno;
 import co.com.sura.postgres.repository.personal.data.ItemSecuenciaTurnoData;
 
 

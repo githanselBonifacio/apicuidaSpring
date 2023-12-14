@@ -1,10 +1,10 @@
 package co.com.sura.postgres.repository.personal.adapter;
 
 import co.com.sura.constantes.Mensajes;
-import co.com.sura.entity.personal.Conductor;
-import co.com.sura.entity.personal.Movil;
-import co.com.sura.entity.personal.Profesional;
-import co.com.sura.entity.personal.PersonalCrudRepository;
+import co.com.sura.personal.entity.Conductor;
+import co.com.sura.moviles.entity.Movil;
+import co.com.sura.personal.entity.Profesional;
+import co.com.sura.personal.gateway.PersonalCrudRepository;
 import co.com.sura.exception.ErrorValidacionPersonal;
 import co.com.sura.postgres.repository.personal.repository.ConductorRepository;
 import co.com.sura.postgres.repository.personal.repository.MovilRepository;

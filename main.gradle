@@ -22,7 +22,7 @@ subprojects {
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
         testImplementation group: 'junit', name: 'junit', version: '4.12'
-        testImplementation 'org.mockito:mockito-core:2.28.2'
+        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
 
 
         implementation "io.projectreactor:reactor-core:${reactorVersion}"
@@ -44,11 +44,17 @@ subprojects {
 
     }
 
+    test {
+        useJUnitPlatform()
+        finalizedBy jacocoTestReport
+    }
+
     jacoco {
         toolVersion = '0.8.7'
     }
 
     jacocoTestReport {
+        dependsOn test
         reports {
             xml.enabled true
         }

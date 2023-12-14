@@ -1,16 +1,16 @@
 package co.com.sura.agenda;
 
-import co.com.sura.entity.agenda.Actividad;
-import co.com.sura.entity.agenda.AgendaRepository;
-import co.com.sura.entity.agenda.AgendamientoAutomaticoRepository;
-import co.com.sura.entity.agenda.Cita;
-import co.com.sura.entity.agenda.GestionEstadosCitasRepository;
-import co.com.sura.entity.personal.PersonalCrudRepository;
-import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.procedimientos.Procedimientos;
-import co.com.sura.entity.remision.datosremision.Tratamiento;
-import co.com.sura.entity.personal.Profesional;
-import co.com.sura.entity.moviles.Desplazamiento;
+import co.com.sura.agenda.entity.Actividad;
+import co.com.sura.agenda.gateway.AgendaRepository;
+import co.com.sura.agenda.gateway.AgendamientoAutomaticoRepository;
+import co.com.sura.agenda.entity.Cita;
+import co.com.sura.agenda.gateway.GestionEstadosCitasRepository;
+import co.com.sura.personal.gateway.PersonalCrudRepository;
+import co.com.sura.personal.entity.TurnoProfesional;
+import co.com.sura.remision.entity.procedimientos.Procedimientos;
+import co.com.sura.remision.entity.datosremision.Tratamiento;
+import co.com.sura.personal.entity.Profesional;
+import co.com.sura.moviles.entity.Desplazamiento;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

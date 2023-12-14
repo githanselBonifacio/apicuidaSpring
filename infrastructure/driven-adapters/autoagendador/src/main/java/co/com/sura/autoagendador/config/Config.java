@@ -1,7 +1,7 @@
 package co.com.sura.autoagendador.config;
 
 import co.com.sura.autoagendador.models.AutoAgendador;
-import co.com.sura.services.mapbox.MapboxServiceRepository;
+import co.com.sura.mapbox.gateway.MapboxServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -2,7 +2,7 @@ package co.com.sura.web.farmacia;
 
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
+import co.com.sura.agenda.entity.PacienteTratamientoCita;
 import co.com.sura.farmacia.FarmaciaUseCase;
 import co.com.sura.genericos.Response;
 import co.com.sura.web.factory.ResponseFactory;

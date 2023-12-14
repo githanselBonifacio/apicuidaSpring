@@ -1,7 +1,7 @@
 package co.com.sura.postgres.repository.farmacia.adapter;
 
-import co.com.sura.entity.agenda.PacienteTratamientoCita;
-import co.com.sura.entity.farmacia.FarmaciaRepository;
+import co.com.sura.agenda.entity.PacienteTratamientoCita;
+import co.com.sura.farmacia.gateway.FarmaciaRepository;
 import co.com.sura.postgres.repository.remision.repository.PacienteRepository;
 import co.com.sura.postgres.repository.remision.repository.SoporteNutricionalRepository;
 import co.com.sura.postgres.repository.remision.repository.TratamientoRepository;
@@ -14,8 +14,8 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
-import static co.com.sura.entity.farmacia.TipoNotificacionFarmacia.APLICACION_MEDICAMENTO;
-import static co.com.sura.entity.farmacia.TipoNotificacionFarmacia.SOPORTE_NUTRICIONAL;
+import static co.com.sura.farmacia.entity.TipoNotificacionFarmacia.APLICACION_MEDICAMENTO;
+import static co.com.sura.farmacia.entity.TipoNotificacionFarmacia.SOPORTE_NUTRICIONAL;
 
 @Repository
 public class FarmaciaAdapter implements FarmaciaRepository {

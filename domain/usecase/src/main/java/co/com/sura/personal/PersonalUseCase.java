@@ -1,14 +1,14 @@
 package co.com.sura.personal;
 
-import co.com.sura.dto.request.EliminarTurnoProfesionalRequest;
-import co.com.sura.entity.personal.Conductor;
-import co.com.sura.entity.personal.Movil;
-import co.com.sura.entity.personal.PersonalCrudRepository;
-import co.com.sura.entity.personal.Profesional;
-import co.com.sura.entity.personal.ProfesionalWithTurno;
-import co.com.sura.entity.personal.SecuenciasHorarioRepository;
-import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.personal.SecuenciaTurno;
+import co.com.sura.remision.dto.EliminarTurnoProfesionalRequest;
+import co.com.sura.personal.entity.Conductor;
+import co.com.sura.moviles.entity.Movil;
+import co.com.sura.personal.gateway.PersonalCrudRepository;
+import co.com.sura.personal.entity.Profesional;
+import co.com.sura.personal.entity.ProfesionalWithTurno;
+import co.com.sura.personal.gateway.SecuenciasHorarioRepository;
+import co.com.sura.personal.entity.TurnoProfesional;
+import co.com.sura.personal.entity.SecuenciaTurno;
 import co.com.sura.genericos.ResultadoActualizacionTurno;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

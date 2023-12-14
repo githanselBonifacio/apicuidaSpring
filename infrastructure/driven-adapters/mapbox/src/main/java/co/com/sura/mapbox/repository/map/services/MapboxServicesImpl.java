@@ -1,9 +1,9 @@
 package co.com.sura.mapbox.repository.map.services;
 
-import co.com.sura.services.mapbox.MapboxServiceRepository;
-import co.com.sura.services.mapbox.GeoUbicacion;
+import co.com.sura.mapbox.gateway.MapboxServiceRepository;
+import co.com.sura.mapbox.entity.GeoUbicacion;
 
-import co.com.sura.response.mapbox.DireccionResponse;
+import co.com.sura.mapbox.entity.DireccionResponse;
 import com.mapbox.api.directions.v5.MapboxDirections;
 import com.mapbox.geojson.Point;
 import org.springframework.beans.factory.annotation.Autowired;

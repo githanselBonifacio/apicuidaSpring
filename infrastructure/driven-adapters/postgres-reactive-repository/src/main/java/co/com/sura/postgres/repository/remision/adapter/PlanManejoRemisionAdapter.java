@@ -1,8 +1,8 @@
 package co.com.sura.postgres.repository.remision.adapter;
 
-import co.com.sura.dto.remision.CitaRequest;
-import co.com.sura.dto.remision.RemisionRequest;
-import co.com.sura.entity.remision.PlanManejoRemisionRepository;
+import co.com.sura.remision.dto.CitaRequest;
+import co.com.sura.remision.dto.RemisionRequest;
+import co.com.sura.remision.gateway.PlanManejoRemisionRepository;
 import co.com.sura.postgres.repository.agenda.data.CitaData;
 import co.com.sura.postgres.repository.agenda.repository.CitaRepository;
 import co.com.sura.postgres.repository.maestros.data.HorarioTurnoData;

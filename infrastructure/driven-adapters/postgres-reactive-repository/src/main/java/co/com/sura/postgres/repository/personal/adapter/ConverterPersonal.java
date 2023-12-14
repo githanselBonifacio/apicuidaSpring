@@ -1,12 +1,12 @@
 package co.com.sura.postgres.repository.personal.adapter;
 
-import co.com.sura.entity.maestro.HorarioTurno;
-import co.com.sura.entity.personal.Conductor;
-import co.com.sura.entity.personal.Movil;
-import co.com.sura.entity.personal.Profesional;
-import co.com.sura.entity.personal.ProfesionalWithTurno;
-import co.com.sura.entity.personal.TurnoProfesional;
-import co.com.sura.entity.remision.datosremision.ItemSecuenciaTurno;
+import co.com.sura.maestros.entity.HorarioTurno;
+import co.com.sura.personal.entity.Conductor;
+import co.com.sura.moviles.entity.Movil;
+import co.com.sura.personal.entity.Profesional;
+import co.com.sura.personal.entity.ProfesionalWithTurno;
+import co.com.sura.personal.entity.TurnoProfesional;
+import co.com.sura.remision.entity.datosremision.ItemSecuenciaTurno;
 import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.repository.personal.data.ConductorData;
 import co.com.sura.postgres.repository.personal.data.ItemSecuenciaTurnoData;
