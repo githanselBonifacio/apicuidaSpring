@@ -31,7 +31,7 @@ public class MaestroController {
     //ciudades
     @GetMapping("regionales")
     public Mono<Response<List<Regional>>> consultarRegional(){
-        return crudMaestroUseCase.consultarCiudad()
+        return crudMaestroUseCase.consultarRegionales()
                 .collectList()
                 .map(ciudades -> ResponseFactory.createStatus(
                         ciudades,
@@ -51,7 +51,7 @@ public class MaestroController {
 
     @GetMapping("regionales/{idRegional}")
     public Mono<Response<Regional>> consultarRegionalById(@PathVariable String idRegional){
-        return crudMaestroUseCase.consultarCiudadById(idRegional)
+        return crudMaestroUseCase.consultarRegionalById(idRegional)
                 .map(ciudades -> ResponseFactory.createStatus(
                         ciudades,
                         StatusCode.STATUS_200,

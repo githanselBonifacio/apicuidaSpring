@@ -39,8 +39,8 @@ public class AgendaUseCase  {
     }
 
     public Flux<Profesional> consultarProfesionalesFromTurnoRegional(
-            LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno) {
-        return personalCrudRepository.consultarProfesionalFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno);
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno) {
+        return personalCrudRepository.consultarProfesionalFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno);
     }
 
     public Mono<Boolean> asignarProfesionalTurno(TurnoProfesional turnoProfesional){
@@ -73,14 +73,14 @@ public class AgendaUseCase  {
      }
 
     public Flux<Desplazamiento> consultarDesplazamientoByIdCitaPartida(
-            LocalDate fechaProgramada, Integer idHorarioTurno,String idCiudad){
+            LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional){
         return agendaRepository.consultarDesplazamientoByCitaPartida(
-                fechaProgramada,idHorarioTurno,idCiudad);
+                fechaProgramada,idHorarioTurno,idRegional);
     }
 
 
-    public Flux<Cita> consultarCitasByTurnoRegional(LocalDate fechaTurno, Integer idHorarioTurno, String idCiudad){
-        return agendaRepository.consultarCitasByTurnoRegional(fechaTurno, idHorarioTurno, idCiudad);
+    public Flux<Cita> consultarCitasByTurnoRegional(LocalDate fechaTurno, Integer idHorarioTurno, String idRegional){
+        return agendaRepository.consultarCitasByTurnoRegional(fechaTurno, idHorarioTurno, idRegional);
     }
     public Mono<Boolean> reprogramarCitaById (
             LocalDateTime fechaProgramada,

@@ -19,10 +19,10 @@ public class CrudMaestroUseCase {
         this.maestroRepository = maestroRepository;
     }
     //ciudades
-    public Flux<Regional> consultarCiudad(){return maestroRepository.consultarRegional();}
+    public Flux<Regional> consultarRegionales(){return maestroRepository.consultarRegional();}
 
-    public Mono<Regional> consultarCiudadById(String idCiudad){
-        return maestroRepository.consultarRegionalById(idCiudad);
+    public Mono<Regional> consultarRegionalById(String idRegional){
+        return maestroRepository.consultarRegionalById(idRegional);
     }
 
     //horario turno
