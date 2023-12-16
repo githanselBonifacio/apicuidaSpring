@@ -42,16 +42,16 @@ public class PersonalController {
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -61,16 +61,16 @@ public class PersonalController {
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -79,15 +79,15 @@ public class PersonalController {
         return personalUseCase.crearProfesional(profesional)
                 .map(profesionalCreado -> ResponseFactory.createStatus(
                         profesionalCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_CREA_PROFESIONAL.getValue(),
-                        Mensajes.SE_CREA_PROFESIONAL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_CREA_PROFESIONAL,
+                        Mensajes.SE_CREA_PROFESIONAL,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_CREAR_PROFESIONAL.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_CREAR_PROFESIONAL,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -99,15 +99,15 @@ public class PersonalController {
         return personalUseCase.actualizarProfesional(profesional)
                 .map(profesionalCreado -> ResponseFactory.createStatus(
                         profesionalCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ACTUALIZA_PROFESIONAL.getValue(),
-                        Mensajes.SE_ACTUALIZA_PROFESIONAL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_ACTUALIZA_PROFESIONAL,
+                        Mensajes.SE_ACTUALIZA_PROFESIONAL,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTTUALIZAR_PROFESIONAL.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_ACTTUALIZAR_PROFESIONAL,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -120,16 +120,16 @@ public class PersonalController {
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -138,15 +138,15 @@ public class PersonalController {
         return personalUseCase.crearConductor(conductor)
                 .map(conductorCreado -> ResponseFactory.createStatus(
                         conductorCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_CREA_CONDUCTOR.getValue(),
-                        Mensajes.SE_CREA_CONDUCTOR.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_CREA_CONDUCTOR,
+                        Mensajes.SE_CREA_CONDUCTOR,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_CREAR_CONDUCTOR.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_CREAR_CONDUCTOR,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -158,15 +158,15 @@ public class PersonalController {
         return personalUseCase.actualizarConductor(conductor)
                 .map(conductorCreado -> ResponseFactory.createStatus(
                         conductorCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ACTUALIZA_CONDUCTOR.getValue(),
-                        Mensajes.SE_ACTUALIZA_CONDUCTOR.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_ACTUALIZA_CONDUCTOR,
+                        Mensajes.SE_ACTUALIZA_CONDUCTOR,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTUALIZAR_CONDUCTOR.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_ACTUALIZAR_CONDUCTOR,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -178,15 +178,15 @@ public class PersonalController {
         return personalUseCase.crearMovil(movil)
                 .map(conductorCreado -> ResponseFactory.createStatus(
                         conductorCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_CREA_MOVIL.getValue(),
-                        Mensajes.SE_CREA_MOVIL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_CREA_MOVIL,
+                        Mensajes.SE_CREA_MOVIL,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_CREAR_MOVIL.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_CREAR_MOVIL,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -198,15 +198,15 @@ public class PersonalController {
         return personalUseCase.actualizarMovil(movil)
                 .map(movilCreado -> ResponseFactory.createStatus(
                         movilCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ACTUALIZA_MOVIL.getValue(),
-                        Mensajes.SE_ACTUALIZA_MOVIL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_ACTUALIZA_MOVIL,
+                        Mensajes.SE_ACTUALIZA_MOVIL,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTUALIZAR_MOVIL.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_ACTUALIZAR_MOVIL,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -218,15 +218,15 @@ public class PersonalController {
                 .collectList()
                 .map(movil->ResponseFactory.createStatus(
                         movil,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -236,15 +236,15 @@ public class PersonalController {
                 .collectList()
                 .map(movil->ResponseFactory.createStatus(
                         movil,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -254,15 +254,15 @@ public class PersonalController {
                 .collectList()
                 .map(movil->ResponseFactory.createStatus(
                         movil,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -274,15 +274,15 @@ public class PersonalController {
                 .collectList()
                 .map(secuenciaTurno -> ResponseFactory.createStatus(
                         secuenciaTurno,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -295,16 +295,16 @@ public class PersonalController {
                 .collectList()
                 .map(resultado -> ResponseFactory.createStatus(
                         resultado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -315,16 +315,16 @@ public class PersonalController {
                 .collectList()
                 .map(resultado -> ResponseFactory.createStatus(
                         resultado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -333,16 +333,16 @@ public class PersonalController {
         return personalUseCase.configurarSecuenciaTurno(secuenciaTurno)
                 .map(secuenciaCreada -> ResponseFactory.createStatus(
                         secuenciaCreada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -355,16 +355,16 @@ public class PersonalController {
                 .collectList()
                 .map(historial -> ResponseFactory.createStatus(
                         historial,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -374,16 +374,16 @@ public class PersonalController {
         return personalUseCase.actualizarTurnosByProfesional(turnosProfesional)
                 .map(turnosCreado-> ResponseFactory.createStatus(
                         turnosCreado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ACTUALIZA_TURNO_PROFESIONAL.getValue(),
-                        Mensajes.SE_ACTUALIZA_TURNO_PROFESIONAL.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_ACTUALIZA_TURNO_PROFESIONAL,
+                        Mensajes.SE_ACTUALIZA_TURNO_PROFESIONAL,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTUALIZAR_TURNO_PROFESIONAL.getValue(),
-                        Mensajes.ERROR_ACTUALIZAR_TURNO_PROFESIONAL.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_ACTUALIZAR_TURNO_PROFESIONAL,
+                        Mensajes.ERROR_ACTUALIZAR_TURNO_PROFESIONAL,
                         e.getMessage()
                 )));
     }

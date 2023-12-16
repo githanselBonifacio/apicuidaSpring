@@ -4,6 +4,7 @@ import co.com.sura.maestros.entity.Regional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,6 +17,7 @@ import static co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCi
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
 @SuperBuilder(toBuilder = true)
 public class ReporteCancelacionCitaMensual{
     private Regional regional;
@@ -56,14 +58,5 @@ public class ReporteCancelacionCitaMensual{
                         })
                 .doOnNext(reporte::setResumen)
                 .thenReturn(reporte);
-    }
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

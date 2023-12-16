@@ -2,18 +2,12 @@ package co.com.sura.reportes.entity.cancelacioncitas;
 
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -21,6 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
+@ToString
 @JsonPropertyOrder({"mes"})
 public class RegistroCancelacionCitaAnual {
     private String mes;
@@ -41,6 +36,7 @@ public class RegistroCancelacionCitaAnual {
                 .sorted(Comparator.comparingInt(registro -> Integer.parseInt(registro.getMes())))
                 .map(RegistroCancelacionCitaAnual::converNumeroToNombreMes)
                 .collect(Collectors.toList());
+
 
     }
 }

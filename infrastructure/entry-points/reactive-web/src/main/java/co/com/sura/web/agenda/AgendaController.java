@@ -48,16 +48,16 @@ public class AgendaController {
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -71,16 +71,16 @@ public class AgendaController {
                 .collectList()
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -90,16 +90,16 @@ public class AgendaController {
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -110,18 +110,18 @@ public class AgendaController {
         return agendaUseCase.asignarProfesionalTurno(turnoProfesional)
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.replace("?",turnoProfesional
                                 .getFechaTurno().toString()),
-                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                        Mensajes.SE_ASIGNO_PROFESIONAL_TURNO.replace("?",turnoProfesional
                                 .getFechaTurno().toString()),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.NO_ASIGNO_PROFESIONAL_TURNO.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.NO_ASIGNO_PROFESIONAL_TURNO,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -131,17 +131,17 @@ public class AgendaController {
         return agendaUseCase.desasignarProfesionalTurno(turnoProfesional)
                 .map(profesionales -> ResponseFactory.createStatus(
                         profesionales,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.replace("?",turnoProfesional
                                 .getFechaTurno().toString()),
-                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.getValue().replace("?",turnoProfesional
+                        Mensajes.SE_DESASIGNO_PROFESIONAL_TURNO.replace("?",turnoProfesional
                                 .getFechaTurno().toString()),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.NO_DESASIGNO_PROFESIONAL_TURNO.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.NO_DESASIGNO_PROFESIONAL_TURNO,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -156,15 +156,15 @@ public class AgendaController {
         return agendaUseCase.desagendarTurnoCompleto(fechaTurno, idHorarioTurno,idRegional)
                 .map(seDesagendo -> ResponseFactory.createStatus(
                         seDesagendo,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.TURNO_DESAGENDADO.getValue(),
-                        Mensajes.TURNO_DESAGENDADO.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.TURNO_DESAGENDADO,
+                        Mensajes.TURNO_DESAGENDADO,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_TURNO_DESAGENDADO.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_TURNO_DESAGENDADO,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -177,15 +177,15 @@ public class AgendaController {
         return agendaUseCase.autoagendarTurnoCompleto(fechaTurno, idHorarioTurno, idRegional)
                 .map(turnoAutoagendado -> ResponseFactory.createStatus(
                         turnoAutoagendado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.TURNO_AUTOAGENDADO.getValue(),
-                        Mensajes.TURNO_AUTOAGENDADO.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.TURNO_AUTOAGENDADO,
+                        Mensajes.TURNO_AUTOAGENDADO,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_AUTOAGENDADO.getValue(),
-                        Mensajes.ERROR_AUTOAGENDADO.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_AUTOAGENDADO,
+                        Mensajes.ERROR_AUTOAGENDADO,
                         e.getMessage()
                 )))
                 .timeout(Duration.ofSeconds(TIMEOUT));
@@ -200,16 +200,16 @@ public class AgendaController {
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -222,16 +222,16 @@ public class AgendaController {
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -245,16 +245,16 @@ public class AgendaController {
                 .collectList()
                 .map(citas -> ResponseFactory.createStatus(
                         citas,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
 
@@ -276,15 +276,15 @@ public class AgendaController {
                       fechaNuevaProgramada,idCita,idProfesional,fechaProgramada.toLocalDate(),idHorarioTurno,idRegional)
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_REPROGRAMO_HORA_CITA.getValue(),
-                        Mensajes.SE_REPROGRAMO_HORA_CITA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_REPROGRAMO_HORA_CITA,
+                        Mensajes.SE_REPROGRAMO_HORA_CITA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.NO_REPROGRAMO_HORA_CITA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.NO_REPROGRAMO_HORA_CITA,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -295,15 +295,15 @@ public class AgendaController {
         return agendaUseCase.confirmarCita(idCita)
                 .map(confirmada->ResponseFactory.createStatus(
                         confirmada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
-                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
-                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.ESTADO_CITA_ACTUALIZADO,
+                        Mensajes.ESTADO_CITA_ACTUALIZADO,
+                        Mensajes.ESTADO_CITA_ACTUALIZADO
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -313,15 +313,15 @@ public class AgendaController {
         return agendaUseCase.iniciarAtencionCita(idCita)
                 .map(confirmada->ResponseFactory.createStatus(
                         confirmada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
-                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.ESTADO_CITA_ACTUALIZADO,
+                        Mensajes.ESTADO_CITA_ACTUALIZADO,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -331,15 +331,15 @@ public class AgendaController {
         return agendaUseCase.finalizarAtencionCita(idCita)
                 .map(confirmada->ResponseFactory.createStatus(
                         confirmada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
-                        Mensajes.ESTADO_CITA_ACTUALIZADO.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.ESTADO_CITA_ACTUALIZADO,
+                        Mensajes.ESTADO_CITA_ACTUALIZADO,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -354,15 +354,15 @@ public class AgendaController {
         return agendaUseCase.asignarProfesionaCita(idCita, idProfesional, fechaProgramada, idHorarioTurno, idRegional)
               .map(asignado -> ResponseFactory.createStatus(
                         asignado,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_ASIGNO_PROFESIONAL_CITA.getValue(),
-                        Mensajes.SE_ASIGNO_PROFESIONAL_CITA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_ASIGNO_PROFESIONAL_CITA,
+                        Mensajes.SE_ASIGNO_PROFESIONAL_CITA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.NO_ASIGNO_PROFESIONAL_CITA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.NO_ASIGNO_PROFESIONAL_CITA,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -378,16 +378,16 @@ public class AgendaController {
         return agendaUseCase.desasignarProfesionaCita(idCita, idProfesional, fechaTurno, idHorarioTurno, idRegional)
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_DESASIGNO_PROFESIONAL_CITA.getValue(),
-                        Mensajes.SE_DESASIGNO_PROFESIONAL_CITA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_DESASIGNO_PROFESIONAL_CITA,
+                        Mensajes.SE_DESASIGNO_PROFESIONAL_CITA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.NO_DESASIGNO_PROFESIONAL_CITA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.NO_DESASIGNO_PROFESIONAL_CITA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
 
@@ -399,16 +399,16 @@ public class AgendaController {
                 .collectList()
                 .map(tratamientos -> ResponseFactory.createStatus(
                         tratamientos,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
 
@@ -419,16 +419,16 @@ public class AgendaController {
         return agendaUseCase.consultarProcedimietosByIdCita(idCita)
                 .map(procedimientos -> ResponseFactory.createStatus(
                         procedimientos,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }

@@ -1,16 +1,10 @@
 package co.com.sura.genericos;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+public class Numeros {
+    public   static final Integer CIEN =100;
+    public  static final Integer DOS =2;
+    public  static final Integer NOVECIENTOS_SEGUNDOS =900;
+    public  static final Integer SEGUNDOS_EN_HORAS =3600;
 
-@Getter
-@AllArgsConstructor
-public enum Numeros {
-    CIEN(100),
-    DOS(2),
-    NOVECIENTOS_SEGUNDOS(900),
-    SEGUNDOS_EN_HORAS(3600);
-
-    private final int value;
-
+    private Numeros() {throw new IllegalStateException("Utility class");}
 }

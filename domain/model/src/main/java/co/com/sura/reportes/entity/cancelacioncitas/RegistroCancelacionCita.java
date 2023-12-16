@@ -3,6 +3,7 @@ package co.com.sura.reportes.entity.cancelacioncitas;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import java.util.Collection;
 
@@ -10,6 +11,7 @@ import java.util.Collection;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @SuperBuilder(toBuilder = true)
 public class RegistroCancelacionCita {
     private String descripcion;

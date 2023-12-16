@@ -34,16 +34,16 @@ public class FarmaciaController {
                 .collectList()
                 .map(pacientes -> ResponseFactory.createStatus(
                         pacientes,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -57,16 +57,16 @@ public class FarmaciaController {
                 .collectList()
                 .map(pacientes -> ResponseFactory.createStatus(
                         pacientes,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -77,16 +77,16 @@ public class FarmaciaController {
         return farmaciaUseCase.notificarMedicamentosToFarmacia(tratamientoCitasList)
                 .map(seNotifico -> ResponseFactory.createStatus(
                         seNotifico,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.SE_NOTIFICO_FARMACIA.getValue(),
-                        Mensajes.SE_NOTIFICO_FARMACIA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_NOTIFICO_FARMACIA,
+                        Mensajes.SE_NOTIFICO_FARMACIA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.NO_NOTIFICO_FARMACIA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.NO_NOTIFICO_FARMACIA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }

@@ -4,10 +4,7 @@ import co.com.sura.maestros.entity.HorarioTurno;
 import co.com.sura.remision.factory.RemisionFactory;
 import co.com.sura.remision.entity.datosremision.ItemDiaTurno;
 import co.com.sura.remision.entity.datosremision.ItemSecuenciaTurno;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,6 +14,7 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Builder(toBuilder = true)
 public class SecuenciaTurno {
     private String nombre;

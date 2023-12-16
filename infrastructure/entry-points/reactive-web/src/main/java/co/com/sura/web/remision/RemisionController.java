@@ -39,17 +39,17 @@ public class RemisionController {
                         crearRemisionCitasRequest.getCitas())
                 .map(fueCreada -> ResponseFactory.createStatus(
                         fueCreada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.REMISION_CREADA.getValue(),
-                        Mensajes.REMISION_CREADA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.REMISION_CREADA,
+                        Mensajes.REMISION_CREADA,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
                         e.getMessage().contains(
-                                Mensajes.REMISION_EXISTENTE.getValue().split("d")[0])?
-                                StatusCode.STATUS_400.getValue():StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_CREAR_REMISION.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                                Mensajes.REMISION_EXISTENTE.split("d")[0])?
+                                StatusCode.STATUS_400:StatusCode.STATUS_500,
+                        Mensajes.ERROR_CREAR_REMISION,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
 
                 )));
@@ -63,15 +63,15 @@ public class RemisionController {
                         crearRemisionCitasRequest.getNovedad())
                .map(fueActualizada ->ResponseFactory.createStatus(
                         fueActualizada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.REMISION_ACTUALIZADA.getValue(),
-                        Mensajes.REMISION_ACTUALIZADA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.REMISION_ACTUALIZADA,
+                        Mensajes.REMISION_ACTUALIZADA,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_ACTUALIZAR_REMISION.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_ACTUALIZAR_REMISION,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -81,16 +81,16 @@ public class RemisionController {
                 .collectList()
                 .map(remisiones -> ResponseFactory.createStatus(
                         remisiones,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
 
@@ -102,16 +102,16 @@ public class RemisionController {
         return adminUseCase.consultarDatosAtencionPacienteByRemision(idRemision)
                 .map(datosAtencion -> ResponseFactory.createStatus(
                         datosAtencion,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -121,16 +121,16 @@ public class RemisionController {
         return adminUseCase.consultarPacienteFromRemision(idRemision)
                 .map(paciente -> ResponseFactory.createStatus(
                         paciente,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -142,16 +142,16 @@ public class RemisionController {
                 .collectList()
                 .map(historial -> ResponseFactory.createStatus(
                         historial,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -161,15 +161,15 @@ public class RemisionController {
         return adminUseCase.consultarDataActualRemision(idRemision)
                .map(registroHistorial -> ResponseFactory.createStatus(
                         registroHistorial,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage(),
                         e.getMessage()
                 )));
@@ -182,14 +182,14 @@ public class RemisionController {
         return adminUseCase.egresarRemisionById(idRemision)
                 .map(fueEgresada -> ResponseFactory.createStatus(
                         fueEgresada,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.REMISION_EGRESADA.getValue(),
-                        Mensajes.REMISION_EGRESADA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()))
+                        StatusCode.STATUS_200,
+                        Mensajes.REMISION_EGRESADA,
+                        Mensajes.REMISION_EGRESADA,
+                        Mensajes.PETICION_EXITOSA))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.ERROR_EGRESAR_REMISION.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_EGRESAR_REMISION,
                         e.getMessage(),
                         e.getMessage()
                 )));

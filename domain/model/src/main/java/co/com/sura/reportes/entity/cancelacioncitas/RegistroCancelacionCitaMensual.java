@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -12,19 +13,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
+@ToString
 @JsonPropertyOrder({"dia"})
 public class RegistroCancelacionCitaMensual{
     private String dia;
     private Integer totalCitasCanceladas;
     private List<RegistroCancelacionCita> registros;
 
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 }

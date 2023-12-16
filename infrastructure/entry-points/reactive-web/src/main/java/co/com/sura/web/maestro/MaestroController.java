@@ -35,16 +35,16 @@ public class MaestroController {
                 .collectList()
                 .map(ciudades -> ResponseFactory.createStatus(
                         ciudades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -54,16 +54,16 @@ public class MaestroController {
         return crudMaestroUseCase.consultarCiudadById(idRegional)
                 .map(ciudades -> ResponseFactory.createStatus(
                         ciudades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -74,16 +74,16 @@ public class MaestroController {
                 .collectList()
                 .map(ciudades -> ResponseFactory.createStatus(
                         ciudades,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -93,16 +93,16 @@ public class MaestroController {
         return crudMaestroUseCase.consultarHorarioTurnoById(idHorarioTurno)
                 .map(horarioTurno -> ResponseFactory.createStatus(
                         horarioTurno,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -113,16 +113,16 @@ public class MaestroController {
         return crudMaestroUseCase.consultarTipoIdentificacion() .collectList()
                 .map(tipoIdentificacion -> ResponseFactory.createStatus(
                         tipoIdentificacion,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -133,16 +133,16 @@ public class MaestroController {
         return crudMaestroUseCase.consultarTipoIdentificacionById(idTipoIdentificacion)
                 .map(tipoIdentificacion -> ResponseFactory.createStatus(
                         tipoIdentificacion,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -154,16 +154,16 @@ public class MaestroController {
                 .collectList()
                 .map(estadosCitas -> ResponseFactory.createStatus(
                         estadosCitas,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
@@ -175,16 +175,16 @@ public class MaestroController {
                 .collectList()
                 .map(estadosCitas -> ResponseFactory.createStatus(
                         estadosCitas,
-                        StatusCode.STATUS_200.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue(),
-                        Mensajes.PETICION_EXITOSA.getValue()
+                        StatusCode.STATUS_200,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA,
+                        Mensajes.PETICION_EXITOSA
                 ))
                 .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
                         null,
-                        StatusCode.STATUS_500.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
-                        Mensajes.PETICION_FALLIDA.getValue(),
+                        StatusCode.STATUS_500,
+                        Mensajes.PETICION_FALLIDA,
+                        Mensajes.PETICION_FALLIDA,
                         e.getMessage()
                 )));
     }
