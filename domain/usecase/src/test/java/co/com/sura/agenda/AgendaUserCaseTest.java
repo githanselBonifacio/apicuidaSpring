@@ -27,22 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-
  class AgendaUserCaseTest {
-
     LocalDate fechaTurno = LocalDate.of(2023,7,7);
     LocalDateTime fechaTurnoProgramada = LocalDateTime.of(2023,7,7,8,0);
     String idRegional = "427";
     Integer idHorarioTurno = 1;
-
     String idProfesional = "989898";
-
     String idCita = "af456asdf-1";
     @Mock
     private PersonalCrudRepository personalCrudRepositoryMock;
     @Mock
     private AgendaRepository agendaRepositoryMock;
-
     @Mock
     private AgendamientoAutomaticoRepository agendamientoAutomaticoRepositoryMock;
     @Mock
@@ -95,7 +90,7 @@ import java.util.List;
         Mono<Boolean> esAsignadoTurno= agendaUseCaseMock.asignarProfesionalTurno(turnoProfesional);
 
         StepVerifier.create(esAsignadoTurno)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -104,12 +99,12 @@ import java.util.List;
         TurnoProfesional turnoProfesional = TurnoProfesional.builder().build();
 
         Mockito.when(agendaRepositoryMock.desasignarProfesionalTurno(turnoProfesional))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> esDesasignadoTurno= agendaUseCaseMock.desasignarProfesionalTurno(turnoProfesional);
 
         StepVerifier.create(esDesasignadoTurno)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -117,14 +112,14 @@ import java.util.List;
     @Test
     void desagendarTurnoCompleto(){
         Mockito.when(agendamientoAutomaticoRepositoryMock.desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idRegional))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> esDesasignadoTurnoCompleto= agendaUseCaseMock.desagendarTurnoCompleto(
                 fechaTurno,idHorarioTurno,idRegional
         );
 
         StepVerifier.create(esDesasignadoTurnoCompleto)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -177,7 +172,7 @@ import java.util.List;
         );
 
         StepVerifier.create(esautoagendadoTurnoCompleto)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -226,14 +221,14 @@ import java.util.List;
     void reprogramarCitaById(){
         Mockito.when(agendaRepositoryMock.reprogramarCitaFromProfesional(
                 fechaTurnoProgramada,idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> seReprogramaCita= agendaUseCaseMock.reprogramarCitaById(
                 fechaTurnoProgramada,idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional
         );
 
         StepVerifier.create(seReprogramaCita)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -242,14 +237,14 @@ import java.util.List;
     void asignarProfesionaCita(){
         Mockito.when(gestionEstadosCitasRepositoryMock.agendarToProfesional(
                        idCita,idProfesional,fechaTurnoProgramada,idHorarioTurno,idRegional))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> seAsignoProfesional= agendaUseCaseMock.asignarProfesionaCita(
                 idCita,idProfesional,fechaTurnoProgramada,idHorarioTurno,idRegional
         );
 
         StepVerifier.create(seAsignoProfesional)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -258,14 +253,14 @@ import java.util.List;
     void desasignarProfesionaCita(){
         Mockito.when(gestionEstadosCitasRepositoryMock.desagendarToProfesional(
                         idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> seDesasignoProfesional= agendaUseCaseMock.desasignarProfesionaCita(
                 idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional
         );
 
         StepVerifier.create(seDesasignoProfesional)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -273,12 +268,12 @@ import java.util.List;
     @Test
     void confirmarCita(){
         Mockito.when(gestionEstadosCitasRepositoryMock.confirmarCita(idCita))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> seConfirmoCita= agendaUseCaseMock.confirmarCita(idCita);
 
         StepVerifier.create(seConfirmoCita)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -286,12 +281,12 @@ import java.util.List;
     @Test
     void iniciarAtencionCita(){
         Mockito.when(gestionEstadosCitasRepositoryMock.iniciarAtencionCita(idCita))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> seInicioatencion= agendaUseCaseMock.iniciarAtencionCita(idCita);
 
         StepVerifier.create(seInicioatencion)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
@@ -299,12 +294,12 @@ import java.util.List;
     @Test
     void finalizarAtencionCita(){
         Mockito.when(gestionEstadosCitasRepositoryMock.finalizarAtencionCita(idCita))
-                .thenReturn(Mono.just(true));
+                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mono<Boolean> seFinalizoAtencion= agendaUseCaseMock.finalizarAtencionCita(idCita);
 
         StepVerifier.create(seFinalizoAtencion)
-                .expectNext(true)
+                .expectNext(Boolean.TRUE)
                 .expectComplete()
                 .verify();
     }
