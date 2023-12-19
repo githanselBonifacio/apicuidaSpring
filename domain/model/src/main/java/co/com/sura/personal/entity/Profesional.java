@@ -2,16 +2,16 @@ package co.com.sura.personal.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@Data
 @NoArgsConstructor
+@ToString
 @SuperBuilder(toBuilder = true)
 public class Profesional {
     private Integer idTipoIdentificacion;

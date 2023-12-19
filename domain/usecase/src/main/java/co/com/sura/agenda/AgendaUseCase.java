@@ -43,6 +43,10 @@ public class AgendaUseCase  {
         return personalCrudRepository.consultarProfesionalFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno);
     }
 
+    public Flux<Profesional> consultarProfesionalesByRegional(String idRegional) {
+        return personalCrudRepository.consultarProfesionalesByIdRegional(idRegional);
+    }
+
     public Mono<Boolean> asignarProfesionalTurno(TurnoProfesional turnoProfesional){
         return agendaRepository.asignarProfesionalTurno(turnoProfesional);
     }
@@ -55,9 +59,7 @@ public class AgendaUseCase  {
         return agendamientoAutomaticoRepository.desagendarTurnoCompleto(fechaTurno,idHorarioTurno,idRegional);
     }
 
-    public Flux<Profesional> consultarProfesionalesByRegional(String idRegional) {
-        return personalCrudRepository.consultarProfesionalesByIdRegional(idRegional);
-    }
+
 
     public Flux<Actividad> consultarActividadesProfesionalesRegionalHorario(
           LocalDate fechaTurno,
@@ -100,7 +102,8 @@ public class AgendaUseCase  {
             Integer idHorarioTurno,
             String idRegional){
         return gestionEstadosCitasRepository
-                .agendarToProfesional( idCita,idProfesional,fechaProgramada,idHorarioTurno,idRegional);
+                .agendarToProfesional( idCita,idProfesional,fechaProgramada,idHorarioTurno,idRegional)
+                .onErrorResume(e->Mono.error(new Exception(e.getMessage())));
     }
 
     public Mono<Boolean> desasignarProfesionaCita (

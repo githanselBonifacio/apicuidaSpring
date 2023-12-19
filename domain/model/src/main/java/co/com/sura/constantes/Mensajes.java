@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class Mensajes {
+    public static  final String ERROR_TEST = "error test";
     public static final String PETICION_EXITOSA = "Solicitud exitosa";
     public static final String PETICION_FALLIDA ="Error en petición";
 

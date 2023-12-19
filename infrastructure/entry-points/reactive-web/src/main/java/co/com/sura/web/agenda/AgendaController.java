@@ -26,8 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 
@@ -41,7 +39,7 @@ public class AgendaController {
 
     //profesionales en turno
     @GetMapping(value = "/profesionalesByTurnoRegional")
-    public Mono<Response<List<Profesional>>> getProfesionalesbyTurnoCiudad(
+    public Mono<Response<List<Profesional>>> getProfesionalesbyTurnoRegional(
              @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
              @RequestParam String idRegional){
         return agendaUseCase.consultarProfesionalesByTurnoRegional(fechaTurno, idRegional)
@@ -85,7 +83,7 @@ public class AgendaController {
                 )));
     }
     @GetMapping(value = "/profesionales/{idRegional}")
-    public Mono<Response<List<Profesional>>> getProfesionalesByCiudad(@PathVariable String idRegional){
+    public Mono<Response<List<Profesional>>> getProfesionalesByRegional(@PathVariable String idRegional){
         return agendaUseCase.consultarProfesionalesByRegional(idRegional)
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
@@ -237,7 +235,7 @@ public class AgendaController {
     }
 
     @GetMapping(value = "/citas")
-    public Mono<Response<List<Cita>>> getCitasByTurnoCiudad(
+    public Mono<Response<List<Cita>>> getCitasByTurnoRegional(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idRegional) {
@@ -261,21 +259,12 @@ public class AgendaController {
     }
     @PutMapping(value = "/reprogramarCita")
     public Mono<Response<Boolean>> reprogramarCita(
-          @RequestParam("fechaProgramada") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")  LocalDateTime fechaProgramada,
-          @RequestParam String idCita,
-          @RequestParam ("nuevaHora") @DateTimeFormat(pattern = "HH:mm")  LocalTime nuevaHora,
-          @RequestParam String idProfesional,
-          @RequestParam Integer idHorarioTurno,
-          @RequestParam String idRegional) {
-
-        var fechaNuevaProgramada = fechaProgramada
-                .withHour(nuevaHora.getHour())
-                .withMinute(nuevaHora.getMinute());
-
+          @RequestBody Cita cita) {
         return agendaUseCase.reprogramarCitaById(
-                      fechaNuevaProgramada,idCita,idProfesional,fechaProgramada.toLocalDate(),idHorarioTurno,idRegional)
-                .map(actividades -> ResponseFactory.createStatus(
-                        actividades,
+                   cita.getFechaProgramada(),cita.getIdCita(),cita.getIdProfesional(),
+                        cita.getFechaProgramada().toLocalDate(),cita.getIdHorarioTurno(), cita.getIdRegional())
+                .map(seReprogramo -> ResponseFactory.createStatus(
+                        seReprogramo,
                         StatusCode.STATUS_200,
                         Mensajes.SE_REPROGRAMO_HORA_CITA,
                         Mensajes.SE_REPROGRAMO_HORA_CITA,
@@ -346,26 +335,27 @@ public class AgendaController {
     }
     @PutMapping(value = "/asignarProfesionalCita")
     public Mono<Response<Boolean>> asignarProfesionalCita(
-          @RequestParam String idCita,
-          @RequestParam String idProfesional,
-          @RequestParam ("fechaProgramada") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime fechaProgramada,
-          @RequestParam Integer idHorarioTurno,
-          @RequestParam String idRegional) {
-        return agendaUseCase.asignarProfesionaCita(idCita, idProfesional, fechaProgramada, idHorarioTurno, idRegional)
-              .map(asignado -> ResponseFactory.createStatus(
-                        asignado,
+            @RequestBody Cita cita){
+        return agendaUseCase.asignarProfesionaCita(
+                cita.getIdCita(),
+                        cita.getIdProfesional(),
+                        cita.getFechaProgramada(),
+                        cita.getIdHorarioTurno() ,
+                        cita.getIdRegional())
+                .map(seAgendo->ResponseFactory.createStatus(
+                        seAgendo,
                         StatusCode.STATUS_200,
                         Mensajes.SE_ASIGNO_PROFESIONAL_CITA,
                         Mensajes.SE_ASIGNO_PROFESIONAL_CITA,
-                        Mensajes.PETICION_EXITOSA
-                ))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        Mensajes.PETICION_EXITOSA))
+                .onErrorResume(e ->Mono.just(ResponseFactory.createStatus(
                         null,
                         StatusCode.STATUS_500,
                         Mensajes.NO_ASIGNO_PROFESIONAL_CITA,
                         e.getMessage(),
                         e.getMessage()
                 )));
+
 
     }
     @PutMapping(value = "/desasignarProfesionalCita")

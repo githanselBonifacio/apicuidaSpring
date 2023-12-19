@@ -123,11 +123,10 @@ public class CitaData  {
                                                                CitaData citaAgendada,
                                                                DesplazamientoData desplazamientoCitaInferior,
                                                                DesplazamientoData desplazamientoCitaAsignada,
-                                                              DesplazamientoData desplazamientoSede
+                                                              DesplazamientoData desplazamientoSede){
 
-    ){
         var validarDesplazamientoDesdeSede  = true;
-        if (citaFechaInferior.getFechaProgramada() == null){
+        if (citaFechaInferior.getFechaProgramada() == null && desplazamientoSede.getFechaProgramada()!=null){
              validarDesplazamientoDesdeSede = citaAgendada.getFechaProgramada()
                     .isAfter(desplazamientoSede.getFechaProgramada().plusSeconds(desplazamientoSede.getDuracion()));
         }

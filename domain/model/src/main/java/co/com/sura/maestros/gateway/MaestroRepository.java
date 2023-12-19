@@ -8,7 +8,7 @@ public interface MaestroRepository {
 
     //regional
     Flux<Regional> consultarRegional();
-    Mono<Regional> consultarRegionalById(String idCiudad);
+    Mono<Regional> consultarRegionalById(String idRegional);
 
     //horario turno
     Flux<HorarioTurno> consultarHorarioTurno();

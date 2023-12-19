@@ -42,7 +42,8 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
                 .flatMap(citaData -> horarioTurnoRepository.findById(cita.getIdHorarioTurno())
                    .map(horarioTurnoData ->
                           HorarioTurnoData
-                                 .validarHorarioCita(cita.getFechaProgramada(),horarioTurnoData, cita.getDuracion())));
+                                 .validarHorarioCita(cita.getFechaProgramada(),horarioTurnoData, cita.getDuracion())))
+                .onErrorResume(e->Mono.error(new Exception(e.getMessage())));
     }
 
     @Override
@@ -55,6 +56,7 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
           .flatMap(citaData -> Mono.zip(
                                validarDisponibilidadFechaCita(citaData,idProfesional),
                                validarReprogramacionCitaEnHorarioTurno(citaData)))
+
 
           .flatMap(tupleValidacion ->{
              if(Boolean.FALSE.equals(tupleValidacion.getT1())){
@@ -100,11 +102,10 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
                 .defaultIfEmpty(DesplazamientoData.builder().duracion(Numeros.NOVECIENTOS_SEGUNDOS).build()),
 
             desplazamientoRepository.findBySede(
-                    cita.getFechaProgramada(),cita.getIdRegional(),idProfesional,cita.getIdHorarioTurno()))
-
+                    cita.getFechaProgramada(),cita.getIdRegional(),idProfesional,cita.getIdHorarioTurno())
+                    .defaultIfEmpty(DesplazamientoData.builder().build()))
            .map(despTuple->CitaData.validarDisponibilidadFechasToAgendar(citasTuple.getT1(),citasTuple.getT2(),
-                   citasTuple.getT3(), despTuple.getT1(),despTuple.getT2(),despTuple.getT3()
-           )));
+                   citasTuple.getT3(), despTuple.getT1(),despTuple.getT2(),despTuple.getT3())));
     }
     @Override
     public Mono<Boolean> desagendarToProfesional(
