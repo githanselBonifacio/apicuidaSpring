@@ -74,9 +74,9 @@ public class AgendaUseCase  {
         return agendamientoAutomaticoRepository.autoagendarTurnoCompleto(fechaTurno,idHorarioTurno,idRegional);
      }
 
-    public Flux<Desplazamiento> consultarDesplazamientoByIdCitaPartida(
+    public Flux<Desplazamiento> consultarDesplazamientoByTurnoRegional(
             LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional){
-        return agendaRepository.consultarDesplazamientoByCitaPartida(
+        return agendaRepository.consultarDesplazamientoRegional(
                 fechaProgramada,idHorarioTurno,idRegional);
     }
 

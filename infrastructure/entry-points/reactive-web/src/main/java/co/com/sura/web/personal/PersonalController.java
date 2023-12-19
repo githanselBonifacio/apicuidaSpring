@@ -75,7 +75,7 @@ public class PersonalController {
                 )));
     }
     @PostMapping(value = "/crearProfesional")
-    public Mono<Response<Profesional>> crearProfesional(@RequestBody Profesional profesional) {
+    public Mono<Response<Profesional>> crearConductor(@RequestBody Profesional profesional) {
         return personalUseCase.crearProfesional(profesional)
                 .map(profesionalCreado -> ResponseFactory.createStatus(
                         profesionalCreado,
@@ -95,7 +95,7 @@ public class PersonalController {
     }
 
     @PutMapping(value = "/actualizarProfesional")
-    public Mono<Response<Profesional>> actualizarProfesional(@RequestBody Profesional profesional) {
+    public Mono<Response<Profesional>> actualizarConductor(@RequestBody Profesional profesional) {
         return personalUseCase.actualizarProfesional(profesional)
                 .map(profesionalCreado -> ResponseFactory.createStatus(
                         profesionalCreado,
@@ -134,7 +134,7 @@ public class PersonalController {
                 )));
     }
     @PostMapping(value = "/crearConductor")
-    public Mono<Response<Conductor>> crearProfesional(@RequestBody Conductor conductor) {
+    public Mono<Response<Conductor>> crearConductor(@RequestBody Conductor conductor) {
         return personalUseCase.crearConductor(conductor)
                 .map(conductorCreado -> ResponseFactory.createStatus(
                         conductorCreado,
@@ -154,7 +154,7 @@ public class PersonalController {
     }
 
     @PutMapping(value = "/actualizarConductor")
-    public Mono<Response<Conductor>> actualizarProfesional(@RequestBody Conductor conductor) {
+    public Mono<Response<Conductor>> actualizarConductor(@RequestBody Conductor conductor) {
         return personalUseCase.actualizarConductor(conductor)
                 .map(conductorCreado -> ResponseFactory.createStatus(
                         conductorCreado,
@@ -174,7 +174,7 @@ public class PersonalController {
     }
     //moviles
     @PostMapping(value = "/crearMovil")
-    public Mono<Response<Movil>> crearProfesional(@RequestBody Movil movil) {
+    public Mono<Response<Movil>> crearMovil(@RequestBody Movil movil) {
         return personalUseCase.crearMovil(movil)
                 .map(conductorCreado -> ResponseFactory.createStatus(
                         conductorCreado,

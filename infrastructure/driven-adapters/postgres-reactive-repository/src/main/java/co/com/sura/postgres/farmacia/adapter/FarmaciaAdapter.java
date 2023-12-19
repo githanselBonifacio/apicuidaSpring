@@ -2,9 +2,9 @@ package co.com.sura.postgres.farmacia.adapter;
 
 import co.com.sura.agenda.entity.PacienteTratamientoCita;
 import co.com.sura.farmacia.gateway.FarmaciaRepository;
-import co.com.sura.postgres.remision.repository.PacienteRepository;
-import co.com.sura.postgres.remision.repository.SoporteNutricionalRepository;
-import co.com.sura.postgres.remision.repository.TratamientoRepository;
+import co.com.sura.postgres.remision.repository.datospaciente.PacienteRepository;
+import co.com.sura.postgres.remision.repository.procedimientos.SoporteNutricionalRepository;
+import co.com.sura.postgres.remision.repository.tratamientos.TratamientoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -40,14 +40,14 @@ public class FarmaciaAdapter implements FarmaciaRepository {
                 .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
                             return pacienteTratamientoCita;
-                        }
-                ).mergeWith(pacienteRepository.findAllSoporteNutricionalPacientes()
+                        })
+                .mergeWith(pacienteRepository.findAllSoporteNutricionalPacientes()
                         .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
                             return pacienteTratamientoCita;
-                        })
-                ).sort(Comparator.comparing(PacienteTratamientoCita::getNotificado).reversed()
-                        .thenComparing(PacienteTratamientoCita::getFechaProgramada).reversed());
+                        }))
+                .sort(Comparator.comparing(PacienteTratamientoCita::getNotificado).reversed()
+                .thenComparing(PacienteTratamientoCita::getFechaProgramada).reversed());
 
     }
 
@@ -73,21 +73,18 @@ public class FarmaciaAdapter implements FarmaciaRepository {
     public Mono<Boolean> notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList) {
         return Flux.fromIterable(tratamientoCitasList)
                 .flatMap(pacienteTratamientoCita -> {
-                    Mono<Void> tratamientoUpdate = Mono.empty();
                     if (pacienteTratamientoCita.getIdTratamiento() != null) {
-                        tratamientoUpdate = tratamientoRepository
-                                .updateNotificar(pacienteTratamientoCita.getIdTratamiento());
+                        tratamientoRepository.updateNotificar(pacienteTratamientoCita.getIdTratamiento());
                     }
-                    return tratamientoUpdate;
+                    return Mono.empty();
                 })
                 .thenMany(Flux.fromIterable(tratamientoCitasList)
                         .flatMap(pacienteProcedimientoCita -> {
-                            Mono<Void> soporteNutricionalUpdate = Mono.empty();
                             if (pacienteProcedimientoCita.getIdSoporteNutricional() != null) {
-                                soporteNutricionalUpdate = soporteNutricionalRepository
-                                        .updateNotificar(pacienteProcedimientoCita.getIdSoporteNutricional());
+                               soporteNutricionalRepository
+                                       .updateNotificar(pacienteProcedimientoCita.getIdSoporteNutricional());
                             }
-                            return soporteNutricionalUpdate;
+                            return Mono.empty();
                         }))
                 .then(Mono.just(Boolean.TRUE));
     }

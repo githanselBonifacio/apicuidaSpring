@@ -23,7 +23,7 @@ import co.com.sura.exception.ExceptionNegocio;
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.agenda.data.CitaData;
-import co.com.sura.postgres.remision.repository.TratamientoRepository;
+import co.com.sura.postgres.remision.repository.tratamientos.TratamientoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -223,7 +223,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
     }
 
     @Override
-    public Flux<Desplazamiento> consultarDesplazamientoByCitaPartida(
+    public Flux<Desplazamiento> consultarDesplazamientoRegional(
             LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional){
         return desplazamientoRepository.findByFechaProgramada(fechaProgramada,idRegional,idHorarioTurno)
                 .map(ConverterAgenda :: converToDesplazamiento);

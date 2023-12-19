@@ -6,6 +6,7 @@ import co.com.sura.agenda.gateway.AgendamientoAutomaticoRepository;
 import co.com.sura.agenda.gateway.GestionEstadosCitasRepository;
 import co.com.sura.farmacia.gateway.FarmaciaRepository;
 import co.com.sura.maestros.gateway.MaestroRepository;
+import co.com.sura.moviles.gateway.MovilRepository;
 import co.com.sura.personal.gateway.SecuenciasHorarioRepository;
 import co.com.sura.remision.gateway.HistorialRemisionRepository;
 import co.com.sura.remision.gateway.RemisionCrudRepository;
@@ -53,7 +54,7 @@ public class UseCaseConfig {
         return  new FarmaciaUseCase(farmaciaRepository);
     }
     @Bean
-    public MovilesUseCase movilesUseCase (ReportesRepository movilRepository){
+    public MovilesUseCase movilesUseCase (MovilRepository movilRepository){
         return new MovilesUseCase(movilRepository);
     }
 

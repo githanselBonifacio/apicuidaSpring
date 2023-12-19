@@ -216,7 +216,7 @@ public class AgendaController {
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idRegional ){
-        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idRegional)
+        return agendaUseCase.consultarDesplazamientoByTurnoRegional(fechaTurno,idHorarioTurno,idRegional)
                 .collectList()
                 .map(actividades -> ResponseFactory.createStatus(
                         actividades,

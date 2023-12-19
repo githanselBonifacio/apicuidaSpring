@@ -1,9 +1,7 @@
 package co.com.sura.reportes.entity.turnos;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Month;
@@ -12,7 +10,10 @@ import java.util.Locale;
 
 @Getter
 @Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@ToString
 @SuperBuilder(toBuilder = true)
 @JsonPropertyOrder({"mes"})
 public class ItemReporteAnual extends ItemReporte{

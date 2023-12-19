@@ -282,7 +282,7 @@ import java.util.*;
                 .result(desplazamientos)
                 .build();
 
-        Mockito.when(agendaRepositoryMock.consultarDesplazamientoByCitaPartida(
+        Mockito.when(agendaRepositoryMock.consultarDesplazamientoRegional(
                         fechaTurno,idHorarioTurno,idRegional))
                 .thenReturn(Flux.fromIterable(desplazamientos));
 

@@ -1,12 +1,21 @@
 package co.com.sura.moviles;
 
-import co.com.sura.reportes.gateway.ReportesRepository;
+import co.com.sura.moviles.entity.Desplazamiento;
+import co.com.sura.moviles.gateway.MovilRepository;
+import reactor.core.publisher.Flux;
+
+import java.time.LocalDate;
 
 public class MovilesUseCase {
 
-    private final ReportesRepository movilRepository;
+    private final MovilRepository movilRepository;
 
-    public MovilesUseCase(ReportesRepository movilRepository) {
+    public MovilesUseCase(MovilRepository movilRepository) {
         this.movilRepository = movilRepository;
+    }
+    public Flux<Desplazamiento> consultarDesplazamientoByTurnoRegional(
+            LocalDate fechaProgramada, Integer idHorarioTurno, String idRegional){
+        return movilRepository.consultarDesplazamientoRegional(
+                fechaProgramada,idHorarioTurno,idRegional);
     }
 }

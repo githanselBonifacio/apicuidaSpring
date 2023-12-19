@@ -1,8 +1,8 @@
 package co.com.sura.web.moviles;
 
-import co.com.sura.agenda.AgendaUseCase;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.constantes.StatusCode;
+import co.com.sura.moviles.MovilesUseCase;
 import co.com.sura.moviles.entity.Desplazamiento;
 import co.com.sura.genericos.Response;
 import co.com.sura.web.factory.ResponseFactory;
@@ -19,14 +19,14 @@ import java.util.List;
 @RequestMapping("/moviles")
 public class MovilesController {
     @Autowired
-    private AgendaUseCase agendaUseCase;
+    private MovilesUseCase movilesUseCase;
 
     @GetMapping(value = "/desplazamientoVisita")
-    public Mono<Response<List<Desplazamiento>>> getDesplazamientoByIdCitaPartida(
+    public Mono<Response<List<Desplazamiento>>> getDesplazamientoByTurnoRegional(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idRegional ){
-        return agendaUseCase.consultarDesplazamientoByIdCitaPartida(fechaTurno,idHorarioTurno,idRegional)
+        return movilesUseCase.consultarDesplazamientoByTurnoRegional(fechaTurno,idHorarioTurno,idRegional)
                 .collectList()
                 .map(desplazamientos -> ResponseFactory.createStatus(
                         desplazamientos,

@@ -1,8 +1,6 @@
 package co.com.sura.reportes.entity.turnos;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,7 +10,10 @@ import java.util.List;
 
 @Getter
 @Setter
+@Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper=false)
+@ToString
 @SuperBuilder(toBuilder = true)
 public class ReporteTurnoMensual extends ReporteTurno {
     private List<ItemReporteMensual> reportes;

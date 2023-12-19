@@ -183,13 +183,13 @@ import java.util.List;
         desplazamientos.add(Desplazamiento.builder().build());
         desplazamientos.add(Desplazamiento.builder().build());
 
-        Mockito.when(agendaRepositoryMock.consultarDesplazamientoByCitaPartida(
+        Mockito.when(agendaRepositoryMock.consultarDesplazamientoRegional(
                         fechaTurno,idHorarioTurno,idRegional
                 ))
                 .thenReturn(Flux.fromIterable(desplazamientos));
 
         Flux<Desplazamiento> consultaDesplazamientos = agendaUseCaseMock
-                .consultarDesplazamientoByIdCitaPartida(  fechaTurno,idHorarioTurno,idRegional);
+                .consultarDesplazamientoByTurnoRegional(  fechaTurno,idHorarioTurno,idRegional);
 
         StepVerifier.create(consultaDesplazamientos)
                 .expectNextCount(2)

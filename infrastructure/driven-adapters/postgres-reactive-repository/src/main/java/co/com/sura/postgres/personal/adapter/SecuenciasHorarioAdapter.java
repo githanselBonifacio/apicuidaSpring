@@ -17,7 +17,7 @@ import co.com.sura.genericos.ResultadoActualizacionTurno;
 import co.com.sura.postgres.agenda.repository.CitaRepository;
 import co.com.sura.postgres.maestros.adapter.ConverterMaestros;
 import co.com.sura.postgres.maestros.repository.HorarioTurnoRepository;
-import co.com.sura.postgres.remision.adapter.RemisionDataFactory;
+import co.com.sura.postgres.remision.factory.RemisionDataFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;

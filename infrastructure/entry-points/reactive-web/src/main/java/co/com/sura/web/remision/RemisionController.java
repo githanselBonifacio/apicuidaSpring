@@ -12,13 +12,7 @@ import co.com.sura.genericos.Response;
 import co.com.sura.remision.RemisionUseCase;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import java.util.List;
 
@@ -177,8 +171,8 @@ public class RemisionController {
 
 
 
-    @PostMapping(value="/egresar/{idRemision}")
-    public Mono<Response<Boolean>> egresarRemisionById(@PathVariable String idRemision) {
+    @PutMapping(value="/egresar")
+    public Mono<Response<Boolean>> egresarRemisionById(@RequestParam String idRemision) {
         return adminUseCase.egresarRemisionById(idRemision)
                 .map(fueEgresada -> ResponseFactory.createStatus(
                         fueEgresada,

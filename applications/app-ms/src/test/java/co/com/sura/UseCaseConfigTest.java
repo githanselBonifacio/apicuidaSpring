@@ -9,7 +9,6 @@ import co.com.sura.farmacia.FarmaciaUseCase;
 import co.com.sura.farmacia.gateway.FarmaciaRepository;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.maestros.gateway.MaestroRepository;
-import co.com.sura.moviles.MovilesUseCase;
 import co.com.sura.personal.PersonalUseCase;
 import co.com.sura.personal.gateway.PersonalCrudRepository;
 import co.com.sura.personal.gateway.SecuenciasHorarioRepository;
@@ -94,13 +93,6 @@ class UseCaseConfigTest {
         Assertions.assertNotNull(farmaciaUseCase);
     }
 
-    @Test
-    void crearMovilesCase() {
-        MovilesUseCase movilesUseCase = useCaseConfig.movilesUseCase(
-                movilRepositoryMock
-        );
-        Assertions.assertNotNull(movilesUseCase);
-    }
 
     @Test
     void crearReporteCase() {

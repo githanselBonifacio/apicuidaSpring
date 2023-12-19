@@ -21,18 +21,18 @@ import java.util.Comparator;
 @Repository
 public class MaestroRepositoryAdapter implements MaestroRepository {
 
-    private final RegionalesRepository ciudadRepository;
+    private final RegionalesRepository regionalesRepository;
     private final HorarioTurnoRepository horarioTurnoRepository;
     private final TipoIdentificacionRepository tipoIdentificacionRepository;
     private final EstadoCitaRepository estadoCitaRepository;
     private final ProfesionRepository profesionRepository;
 
     @Autowired
-    public MaestroRepositoryAdapter(RegionalesRepository ciudadRepository,
+    public MaestroRepositoryAdapter(RegionalesRepository regionalesRepository,
                                     HorarioTurnoRepository horarioTurnoRepository,
                                     TipoIdentificacionRepository tipoIdentificacionRepository,
                                     EstadoCitaRepository estadoCitaRepository, ProfesionRepository profesionRepository){
-        this.ciudadRepository = ciudadRepository;
+        this.regionalesRepository = regionalesRepository;
         this.horarioTurnoRepository = horarioTurnoRepository;
         this.tipoIdentificacionRepository = tipoIdentificacionRepository;
         this.estadoCitaRepository = estadoCitaRepository;
@@ -41,14 +41,14 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
 
     @Override
     public Flux<Regional> consultarRegional() {
-        return ciudadRepository.findAll()
-                .map(ConverterMaestros::convertToCiudad);
+        return regionalesRepository.findAll()
+                .map(ConverterMaestros::convertToRegional);
     }
 
     @Override
-    public Mono<Regional> consultarRegionalById(String idCiudad) {
-        return ciudadRepository.findById(idCiudad)
-                .map(ConverterMaestros::convertToCiudad);
+    public Mono<Regional> consultarRegionalById(String idRegional) {
+        return regionalesRepository.findById(idRegional)
+                .map(ConverterMaestros::convertToRegional);
     }
 
     @Override

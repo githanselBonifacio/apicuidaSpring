@@ -1,10 +1,7 @@
 package co.com.sura.reportes.entity.cancelacioncitas;
 
 import co.com.sura.maestros.entity.Regional;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,7 +16,10 @@ import static co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCi
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
+@Data
+@EqualsAndHashCode(callSuper=false)
 @SuperBuilder(toBuilder = true)
 public class ReporteCancelacionCitaAnual {
     private Regional regional;

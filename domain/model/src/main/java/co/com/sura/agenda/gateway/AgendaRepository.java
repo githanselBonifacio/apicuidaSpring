@@ -37,10 +37,10 @@ public interface AgendaRepository {
 
 
     //desplazamientos
-    Flux<Desplazamiento>  consultarDesplazamientoByCitaPartida(
+    Flux<Desplazamiento> consultarDesplazamientoRegional(
                                         LocalDate fechaProgramada,
                                         Integer idHorarioTurno,
-                                        String idCiudad);
+                                        String idRegional);
 
     //tratamientos
     Flux<Tratamiento>       consultarTratamientoByCitas(String idCita);

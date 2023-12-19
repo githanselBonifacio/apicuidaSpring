@@ -43,7 +43,7 @@ public class ReportesAdapter implements ReportesRepository {
     @Override
     public Mono<ReporteTurnoAnual> consultarReporteAnual(Integer anio, String idRegional) {
         Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
-                .map(ConverterMaestros::convertToCiudad);
+                .map(ConverterMaestros::convertToRegional);
 
         Mono<List<ItemReporteAnual>> itemsReporteAnual = consultarItemsReporteAnual(anio, idRegional)
                 .collectList();
@@ -61,7 +61,7 @@ public class ReportesAdapter implements ReportesRepository {
     @Override
     public Mono<ReporteTurnoMensual> consultarReporteMensual(Integer anio, Integer numeroMes, String idRegional) {
         Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
-                .map(ConverterMaestros::convertToCiudad);
+                .map(ConverterMaestros::convertToRegional);
 
         Mono<List<ItemReporteMensual>> itemsReporteMensual = consultarItemsReporteMensual(anio,numeroMes, idRegional)
                 .collectList();
@@ -77,7 +77,7 @@ public class ReportesAdapter implements ReportesRepository {
     @Override
     public Mono<ReporteCancelacionCitaAnual> consultaReporteCancelacionCitasAnual(Integer anio, String idRegional) {
         Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
-                .map(ConverterMaestros::convertToCiudad);
+                .map(ConverterMaestros::convertToRegional);
 
       Mono<List<RegistroCancelacionCitaAnual>> registroCancelacion =
                                consultarRegistroCancelacionCitaAnual(anio, idRegional)
@@ -98,7 +98,7 @@ public class ReportesAdapter implements ReportesRepository {
     public Mono<ReporteCancelacionCitaMensual> consultaReporteCancelacionCitasMensual(
             Integer anio, Integer numeroMes, String idRegional) {
            Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
-                .map(ConverterMaestros::convertToCiudad);
+                .map(ConverterMaestros::convertToRegional);
 
         Mono<List<RegistroCancelacionCitaMensual>> registroCancelacion =
                 consultarRegistroCancelacionCitaMensual(anio,numeroMes, idRegional)
