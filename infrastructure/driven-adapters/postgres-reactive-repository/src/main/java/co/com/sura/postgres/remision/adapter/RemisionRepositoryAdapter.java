@@ -101,14 +101,14 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 .extraerRemisionDiagnosticoData(remisionRequest.getDiagnosticos(), remisionRequest.getIdRemision());
 
        if(esNovedad){
-           return   Mono.from(Mono.from(remisionRepository.save(remisionData)))
+           return   Mono.from(remisionRepository.save(remisionData))
                    .then(Mono.from(datosAtencionPacienteRepository.updateDatosAtencion(datosAtencionPacienteData)))
                    .then(Mono.from(remisionDiagnosticoRepository.updateMultiplesDiagnosticos(diagnosticosData)))
                    .then();
 
        }else {
-           return  Mono.from(Mono.from(remisionRepository.insertNuevaRemision(remisionData.getIdRemision())))
-                   .then(Mono.from(Mono.from(remisionRepository.save(remisionData))))
+           return  Mono.from(remisionRepository.insertNuevaRemision(remisionData.getIdRemision()))
+                   .then(Mono.from(remisionRepository.save(remisionData)))
                    .then(Mono.from(datosAtencionPacienteRepository.save(datosAtencionPacienteData)))
                    .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)))
                    .then();
