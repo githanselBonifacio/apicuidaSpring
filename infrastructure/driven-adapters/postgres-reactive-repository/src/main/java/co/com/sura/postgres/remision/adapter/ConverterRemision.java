@@ -445,7 +445,7 @@ public class ConverterRemision extends Converter {
                 .build();
     }
 
-    public  static  List<TomaMuestraData> extraerSoporteTomaMuestraData (Collection<CitaRequest> listacitasRequest) {
+    public  static  List<TomaMuestraData> extraerTomaMuestraData(Collection<CitaRequest> listacitasRequest) {
         return listacitasRequest
                 .stream()
                 .map(citaRequest -> citaRequest.getProcedimientos().getTomaMuestras()

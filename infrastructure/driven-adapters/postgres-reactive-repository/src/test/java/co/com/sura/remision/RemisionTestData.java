@@ -1,10 +1,11 @@
-package co.com.sura;
+package co.com.sura.remision;
 
 import co.com.sura.postgres.remision.data.datospaciente.*;
 import co.com.sura.remision.dto.*;
 import co.com.sura.remision.entity.datosremision.Diagnostico;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,35 +30,42 @@ public class RemisionTestData {
         String programa = "programa";
         String nombreResponsable = "responsable";
         String direccionPrueba = "direccion prueba";
+
         Diagnostico diagnostico = Diagnostico
                 .builder()
                 .codigo("xxx")
                 .nombre("diagnostico")
                 .build();
+
         RemisionDiagnosticoData remisionDiagnosticoData = RemisionDiagnosticoData
                 .builder()
                 .codigo("xxx")
                 .idRemision(idRemision)
                 .nombreDiagnostico("diagnostico")
                 .build();
+
         ProgramaRequest programaRequest = ProgramaRequest
                 .builder()
                 .idPrograma("1")
                 .nombre(programa)
                 .build();
+
         TipoIdentificacionRequest tipoIdentificacionRequest = TipoIdentificacionRequest
                 .builder()
                 .idTipo("1")
                 .nombre("cedula")
                 .build();
+
         TipoAfiliacionRequest tipoAfiliacionRequest = TipoAfiliacionRequest
                 .builder()
                 .idPlan("1")
                 .nombre("tipo plan")
                 .build();
+
         RegionalRequest regionalRequest = RegionalRequest.builder()
                 .idRegional("427")
                 .build();
+
         MunicipioRequest municipioRequest = MunicipioRequest
                 .builder()
                 .idMunicipio("001")
@@ -68,16 +76,21 @@ public class RemisionTestData {
                 .builder()
                 .direccion(direccionPrueba)
                 .municipio(municipioRequest)
+                .latitud(0.0)
+                .longitud(0.0)
                 .build();
+
         //datos atencion
         DatosAtencionPacienteRequest datosAtencionPacienteRequest = DatosAtencionPacienteRequest
                 .builder()
                 .nombreResponsable(nombreResponsable)
                 .ubicacion(UbicacionRequest)
                 .build();
+
         //diagnostico
         List<Diagnostico> diagnosticos = new ArrayList<>();
         diagnosticos.add(diagnostico);
+
         this.remisionRequest = RemisionRequest.builder()
                 .idRemision(idRemision)
                 .nombre("nombre prueba")
@@ -93,7 +106,10 @@ public class RemisionTestData {
         //citas
         this.citasRequest = new ArrayList<>();
         this.citasRequest.add(
-                CitaRequest.builder().build());
+                CitaRequest.builder()
+                        .idCita("4sds4sd-1")
+                        .fechaInicio(LocalDateTime.now())
+                        .build());
 
         this.remisionData = RemisionData
                 .builder()

@@ -111,17 +111,16 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             Integer idHorarioTurno,
             String idRegional){
 
-        return citaRepository
-                .findAllByTurnoRegionalProfesional(fechaTurno, idHorarioTurno, idRegional,
+        return citaRepository.findAllByTurnoRegionalProfesional(fechaTurno, idHorarioTurno, idRegional,
                         profesionalData.getNumeroIdentificacion(),EstadosCita.CANCELADA.getEstado())
                 .map(ConverterAgenda :: convertToTarea)
                 .map(tarea -> {
                     tarea.setTipo(TiposTarea.VISITA.name());
                     return tarea;
                 })
-                .mergeWith(desplazamientoRepository
-                                .findAllByTurnoProfesional(
-                                        fechaTurno,idHorarioTurno,idRegional,profesionalData.getNumeroIdentificacion())
+           .mergeWith(desplazamientoRepository
+                           .findAllByTurnoProfesional(
+                                fechaTurno,idHorarioTurno,idRegional,profesionalData.getNumeroIdentificacion())
                                 .map(ConverterAgenda :: convertToTarea))
                 .sort(Comparator.comparing(Tarea::getFechaProgramada));
     }
@@ -131,17 +130,16 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
             LocalDate fechaTurno,
             Integer idHorarioTurno,
             String idRegional) {
-         return turnoProfesionalesRepository.findTurnoProfesionalByCiudadHorario(
+         return turnoProfesionalesRepository.findTurnoProfesionalByRegionalHorario(
                  fechaTurno,idHorarioTurno,idRegional)
-                 .flatMap(profesionalData -> {
-                     Flux<Tarea> tareaFlux = consultarTareasTurnoByProfesional(
-                             profesionalData, fechaTurno, idHorarioTurno, idRegional);
-                     return tareaFlux.collectList().map(citas ->{
-                                 List<Tarea> tareaList = new ArrayList<>(citas);
-                                 return ConverterAgenda.convertToActividad(profesionalData)
-                                         .toBuilder().tareas(tareaList).build();
-                     });
-                 })
+                 .flatMap(profesionalData -> this.consultarTareasTurnoByProfesional(
+                         profesionalData, fechaTurno, idHorarioTurno, idRegional)
+                         .collectList()
+                         .map(citas ->{
+                             List<Tarea> tareaList = new ArrayList<>(citas);
+                             return ConverterAgenda.convertToActividad(profesionalData)
+                                     .toBuilder().tareas(tareaList).build();
+                 }))
                  .collectList()
                  .flatMapMany(actividades -> Flux.fromIterable(actividades)
                          .sort(Comparator.comparing(Actividad::getResponsable)));
@@ -155,7 +153,7 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                 .sort(Comparator.comparing(Cita::getIdEstado));
     }
 
-    private Mono<Boolean> validarDisponibilidadFechaCita(
+    public Mono<Boolean> validarDisponibilidadFechaCita(
             CitaData cita , LocalDateTime fechaProgramada, String idProfesional){
       return Mono.just(cita)
          .flatMap(citaData -> Mono.zip(
@@ -185,11 +183,11 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
           .map(despTuple-> CitaData.validarFechasToReprogramar(citasTuple.getT1(),citasTuple.getT2(),citasTuple.getT3(),
                                 despTuple.getT1(),despTuple.getT2(),despTuple.getT3(),fechaProgramada)));
     }
-    private Mono<Boolean> validarAgendamientoCitaEnHorarioTurno(CitaData cita, LocalDateTime fechaReprogramada){
+    public Mono<Boolean> validarAgendamientoCitaEnHorarioTurno(CitaData cita, LocalDateTime fechaReprogramada){
         return Mono.just(cita)
                 .flatMap(citaData -> horarioTurnoRepository.findById(cita.getIdHorarioTurno())
                    .map(horarioTurnoData ->
-                            HorarioTurnoData
+                           HorarioTurnoData
                                  .validarHorarioCita(fechaReprogramada,horarioTurnoData,cita.getDuracion())));
     }
     @Override
@@ -199,8 +197,8 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
         return citaRepository.findById(idCita)
                 .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE)))
                 .flatMap(citaData -> Mono.zip(
-                        validarDisponibilidadFechaCita (citaData,fechaProgramada,idProfesional),
-                        validarAgendamientoCitaEnHorarioTurno(citaData,fechaProgramada)))
+                        this.validarDisponibilidadFechaCita (citaData,fechaProgramada,idProfesional),
+                        this.validarAgendamientoCitaEnHorarioTurno(citaData,fechaProgramada)))
 
                 .flatMap(tupleValidacion -> {
                     if(Boolean.FALSE.equals(tupleValidacion.getT1())){
@@ -210,11 +208,11 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                        return Mono.error(new ExceptionNegocio(Mensajes.ERROR_FECHA_CITA_HORARIO));
 
                    }else{
-                       return updateFechaProgramadaCita(fechaProgramada,idProfesional,idCita,idRegional,idHorarioTurno);
+                       return this.updateFechaProgramadaCita(fechaProgramada,idProfesional,idCita,idRegional,idHorarioTurno);
                    }
                 });
     }
-    private Mono<Boolean> updateFechaProgramadaCita(LocalDateTime fechaProgramada, String idProfesional,
+    public Mono<Boolean> updateFechaProgramadaCita(LocalDateTime fechaProgramada, String idProfesional,
                                                     String idCita,String idRegional, Integer idHorarioTurno){
 
         return citaRepository.updateFechaProgramada(fechaProgramada,idCita)

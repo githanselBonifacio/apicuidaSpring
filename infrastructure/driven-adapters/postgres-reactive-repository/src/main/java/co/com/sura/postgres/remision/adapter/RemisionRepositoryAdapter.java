@@ -102,7 +102,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
        if(esNovedad){
            return   Mono.from(remisionRepository.save(remisionData))
-                   .then(Mono.from(datosAtencionPacienteRepository.updateDatosAtencion(datosAtencionPacienteData)))
+                  .then(Mono.from(datosAtencionPacienteRepository.updateDatosAtencion(datosAtencionPacienteData)))
                    .then(Mono.from(remisionDiagnosticoRepository.updateMultiplesDiagnosticos(diagnosticosData)))
                    .then();
 
@@ -110,8 +110,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
            return  Mono.from(remisionRepository.insertNuevaRemision(remisionData.getIdRemision()))
                    .then(Mono.from(remisionRepository.save(remisionData)))
                    .then(Mono.from(datosAtencionPacienteRepository.save(datosAtencionPacienteData)))
-                   .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)))
-                   .then();
+                   .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)));
        }
     }
 
@@ -123,16 +122,23 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
          .flatMap(validacion -> {
                 if (Boolean.TRUE.equals(validacion)) {
                     return Mono.error(new Throwable(Mensajes.REMISION_EXISTENTE.replace("?", idRemision)));
+                }else{
+                    return Mono.just(Boolean.TRUE);
                 }
-                return Mono.just(Boolean.TRUE);
          })
-         .then(registrarPacienteRemision(remisionRequest,false)
-            .then(registrarDatosRemision(remisionRequest,false))
-            .then(planManejoRemisionAdapter.registrarPlanManejo(remisionRequest,citasRequest,0))
-            .onErrorResume(e-> eliminarDatosPacienteRemision(idRemision)
-                  .then(planManejoRemisionAdapter.eliminarPlanManejoByidRemision(idRemision))
-                  .then(Mono.error(e))))
-            .then(Mono.just(Boolean.TRUE));
+         .flatMap(validacion->{
+             if(Boolean.TRUE.equals(validacion)){
+                 return registrarPacienteRemision(remisionRequest,false)
+                         .then(registrarDatosRemision(remisionRequest,false))
+                         .then(planManejoRemisionAdapter.registrarPlanManejo(remisionRequest,citasRequest,0))
+                         .onErrorResume(e-> eliminarDatosPacienteRemision(idRemision)
+                                 .then(planManejoRemisionAdapter.eliminarPlanManejoByidRemision(idRemision))
+                                 .then(Mono.error(e)))
+                         .then(Mono.just(Boolean.TRUE));
+             }else {
+                 return Mono.just(Boolean.FALSE);
+             }
+         });
     }
     @Override
     public Mono<Boolean> actualizarRemisionPorNovedad(RemisionRequest remisionRequest, List<CitaRequest> citasRequest,
@@ -153,32 +159,38 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 }
                     return Mono.just(Boolean.TRUE);
             })
-            .then(Mono.zip(
-                citaRepository.findLastNumberIdCita(idRemision).defaultIfEmpty(0),
-                historialRemisionAdapter.buildRegistroActualRemision(idRemision, fechaAplicacionNovedad)))
-            .map(tuple->{
-                ultimoId.set(tuple.getT1());
-                List<CitaHistorial> citasNuevas = ConverterRemision
-                        .buildCitaHistorialFromRequest(citasRequest,remisionRequest,ultimoId.get());
-                tuple.getT2().setMotivoNovedad(novedadRequest.getMotivoNovedad());
-                tuple.getT2().setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
-                tuple.getT2().setFechaRegistro(LocalDateTime.now());
-                tuple.getT2().setCitasNuevas(ConverterRemision.convertToJsonb(citasNuevas));
-                return tuple.getT2();
-            })
-            .flatMap(historialRemisionAdapter::insertRegistro)
-            .then(Mono.from(citaRepository
-                        .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
-            .then(registrarPacienteRemision(remisionRequest, true))
-            .then(registrarDatosRemision(remisionRequest, true))
-            .then(Mono.just(citasRequest.isEmpty())
-                    .flatMap(validarCitas-> {
-                        if (Boolean.FALSE.equals(validarCitas)){
-                            return planManejoRemisionAdapter
-                                    .registrarPlanManejo(remisionRequest, citasRequest,  ultimoId.get());
-                        }
-                        return Mono.just(Boolean.TRUE);
-                    }))
+            .flatMap(validacion ->{
+                if (Boolean.TRUE.equals(validacion)){
+                  return Mono.zip(
+                               citaRepository.findLastNumberIdCita(idRemision).defaultIfEmpty(0),
+                               historialRemisionAdapter.buildRegistroActualRemision(idRemision, fechaAplicacionNovedad))
+                        .map(tuple->{
+                            ultimoId.set(tuple.getT1());
+                            List<CitaHistorial> citasNuevas = ConverterRemision
+                                    .buildCitaHistorialFromRequest(citasRequest,remisionRequest,ultimoId.get());
+                            tuple.getT2().setMotivoNovedad(novedadRequest.getMotivoNovedad());
+                            tuple.getT2().setFechaAplicacionNovedad(novedadRequest.getFechaAplicarNovedad());
+                            tuple.getT2().setFechaRegistro(LocalDateTime.now());
+                            tuple.getT2().setCitasNuevas(ConverterRemision.convertToJsonb(citasNuevas));
+                            return tuple.getT2();
+                        })
+                        .flatMap(historialRemisionAdapter::insertRegistro)
+                            .then(Mono.from(citaRepository
+                                     .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
+                            .then(registrarPacienteRemision(remisionRequest, true))
+                            .then(registrarDatosRemision(remisionRequest, true))
+                            .then(Mono.just(citasRequest.isEmpty())
+                                 .flatMap(validarCitas-> {
+                                     if (Boolean.FALSE.equals(validarCitas)){
+                                         return planManejoRemisionAdapter
+                                                 .registrarPlanManejo(remisionRequest, citasRequest,  ultimoId.get());
+                                     }
+                                         return Mono.just(Boolean.TRUE);
+                                 }));
+                    }else {
+                        return Mono.just(Boolean.FALSE);
+                    }
+                })
             .then(Mono.just(Boolean.TRUE));
     }
 
@@ -190,25 +202,32 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                if (Boolean.FALSE.equals(exists)) {
                  return Mono.error(new ErrorValidacionIngresoRemision(
                          REMISION_NO_EXISTENTE.replace("?", idRemision)));
+               }else{
+                 return Mono.just(exists);
                }
-               return Mono.just(true);
 
            })
-           .then(citaRepository.validarEstadosToEgreso(
-                   idRemision,EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado())
-                .flatMap(valid -> {
-                      if (Boolean.TRUE.equals(valid)) {
-                            return Mono.error(new ErrorCitaProgreso(
-                                           REMISION_CITAS_PROGRESO.replace("?", idRemision)));
-                      }
-                      return Mono.just(true);
-                }))
-           .then(citaRepository.cancelarToEgreso(
-                   idRemision,EstadosCita.CANCELADA.getEstado(),
-                   EstadosCita.SIN_AGENDAR.getEstado(),EstadosCita.AGENDADA.getEstado()))
-           .then(remisionRepository.egresarRemisionById(idRemision))
-           .then(Mono.just(true))
-           .onErrorResume(Mono::error);
+           .flatMap(validacion ->{
+               if(Boolean.TRUE.equals(validacion)){
+                        return citaRepository.validarEstadosToEgreso(
+                                    idRemision,EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado())
+                        .flatMap(valid -> {
+                            if (Boolean.TRUE.equals(valid)) {
+                               return Mono.error(new ErrorCitaProgreso(
+                                                REMISION_CITAS_PROGRESO.replace("?", idRemision)));
+                            }else{
+                               return citaRepository.cancelarToEgreso(
+                                       idRemision,EstadosCita.CANCELADA.getEstado(),
+                                       EstadosCita.SIN_AGENDAR.getEstado(),EstadosCita.AGENDADA.getEstado())
+                               .then(remisionRepository.egresarRemisionById(idRemision))
+                                    .then(Mono.just(true))
+                                    .onErrorResume(Mono::error);
+                            }
+                        });
+               }else {
+                        return Mono.just(validacion);
+                    }
+                });
     }
 
     //datos paciente

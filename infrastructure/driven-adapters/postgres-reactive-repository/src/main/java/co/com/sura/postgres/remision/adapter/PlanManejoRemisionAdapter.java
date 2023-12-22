@@ -79,19 +79,19 @@ public class PlanManejoRemisionAdapter implements PlanManejoRemisionRepository {
                          Mono.just(citasRequests)))
 
                 .flatMapMany(tupleCita -> citaRepository.insertMultiplescitas(tupleCita.getT1())
-                        .thenMany(this.asignarTurnoCitas(Flux.fromIterable(tupleCita.getT1()))
-                                        .flatMap(citaRepository::save))
+                     .thenMany(this.asignarTurnoCitas(Flux.fromIterable(tupleCita.getT1()))
+                                      .flatMap(citaRepository::save))
                         .thenMany(Flux.fromIterable(tupleCita.getT2())))
 
                 .collectList()
-                .flatMapMany(citasRequests -> Mono.zip(
+             .flatMapMany(citasRequests -> Mono.zip(
                                 Mono.just(ConverterRemision.extraerTratamientoData(citasRequests)),
                                 Mono.just(ConverterRemision.extraerCanalizacionData(citasRequests)),
                                 Mono.just(ConverterRemision.extraerFototerapiaData(citasRequests)),
                                 Mono.just(ConverterRemision.extraerSecrecionData(citasRequests)),
                                 Mono.just(ConverterRemision.extraerSondajeData(citasRequests)),
                                 Mono.just(ConverterRemision.extraerSoporteNutricionalData(citasRequests)),
-                                Mono.just(ConverterRemision.extraerSoporteTomaMuestraData(citasRequests)),
+                                Mono.just(ConverterRemision.extraerTomaMuestraData(citasRequests)),
                                 Mono.just(ConverterRemision.extraerCuracionData(citasRequests))))
 
                 .flatMap(tupleProc->
@@ -106,7 +106,7 @@ public class PlanManejoRemisionAdapter implements PlanManejoRemisionRepository {
                 .then();
     }
     private Flux<CitaData> asignarTurnoCitas(Flux <CitaData> citas){
-        return    horarioTurnoRepository.findAll()
+        return horarioTurnoRepository.findAll()
                 .filter(HorarioTurnoData::getEsHorarioBase)
                 .collectList()
                 .flatMapMany(horariosTurno -> citas.map(cita->{

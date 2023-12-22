@@ -97,15 +97,14 @@ public class HistorialRemisionAdapter implements HistorialRemisionRepository {
                         datosAtencionPacienteRepository.findByIdRemision(idRemision),
                         diagnosticoRepository.findAllByIdRemision(idRemision).collectList()))
 
-                .map(tupleDatosRemision-> tupleDatosRemision.getT1()
+               .map(tupleDatosRemision-> tupleDatosRemision.getT1()
                         .toBuilder()
                         .paciente(tupleDatosRemision.getT2())
                         .ubicacionPaciente(tupleDatosRemision.getT3())
                         .datosAtencion(tupleDatosRemision.getT4())
                         .diagnosticos(tupleDatosRemision.getT5())
                         .build())
-
-                .flatMap(registroRemision-> Mono.zip(
+               .flatMap(registroRemision-> Mono.zip(
                         Mono.just(registroRemision),
                         citaRepository.findAllByIdRemision(idRemision)
                                 .filter(citaData -> citaData.getFechaProgramada().isAfter(fechaBusquedaCita))
@@ -113,11 +112,11 @@ public class HistorialRemisionAdapter implements HistorialRemisionRepository {
                                 .sort(Comparator.comparing(Cita::getFechaProgramada))
                                 .collectList()))
 
-                .map(tupleCita-> tupleCita.getT1().toBuilder()
+               .map(tupleCita-> tupleCita.getT1().toBuilder()
                         .citas(tupleCita.getT2())
                         .build())
 
-                .map(registroRemision -> Flux.fromIterable(registroRemision.getCitas())
+              .map(registroRemision -> Flux.fromIterable(registroRemision.getCitas())
                    .flatMapSequential(cita -> Mono.zip(
                          procedimientosCitasAdapter.consultarProcedimientosByIdCita(cita.getIdCita()),
                          tratamientoRepository.findByIdCita(cita.getIdCita())

@@ -1,6 +1,7 @@
 package co.com.sura.remision;
 
-import co.com.sura.RemisionTestData;
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.genericos.EstadosCita;
 import co.com.sura.postgres.agenda.repository.CitaRepository;
 import co.com.sura.postgres.remision.adapter.HistorialRemisionAdapter;
 import co.com.sura.postgres.remision.adapter.PlanManejoRemisionAdapter;
@@ -8,8 +9,11 @@ import co.com.sura.postgres.remision.adapter.RemisionRepositoryAdapter;
 import co.com.sura.postgres.remision.data.datospaciente.*;
 import co.com.sura.postgres.remision.repository.datospaciente.*;
 import co.com.sura.remision.dto.CitaRequest;
+import co.com.sura.remision.dto.NovedadRequest;
 import co.com.sura.remision.dto.RemisionRequest;
 import co.com.sura.remision.entity.Remision;
+import co.com.sura.remision.entity.datosremision.DatosAtencionPaciente;
+import co.com.sura.remision.entity.datosremision.Paciente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,49 +24,50 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static co.com.sura.constantes.Mensajes.REMISION_CITAS_PROGRESO;
+
 @ExtendWith(MockitoExtension.class)
 class RemisionRepositoryAdapterTest {
-
-    private  final String idRemision = "dfkj4540";
-    private  final String idCita = "dfkj4540-2";
+    private final String idRemision = "dfkj4540";
     @Mock
-    private  RemisionRepository remisionRepositoryMock;
+    private RemisionRepository remisionRepositoryMock;
     @Mock
-    private  UbicacionRepository ubicacionRepositoryMock;
+    private UbicacionRepository ubicacionRepositoryMock;
     @Mock
-    private  PacienteRepository pacienteRepositoryMock;
+    private PacienteRepository pacienteRepositoryMock;
     @Mock
-    private  PlanManejoRemisionAdapter planManejoRemisionAdapterMock;
+    private PlanManejoRemisionAdapter planManejoRemisionAdapterMock;
     @Mock
-    private  DatosAtencionPacienteRepository datosAtencionPacienteRepositoryMock;
+    private DatosAtencionPacienteRepository datosAtencionPacienteRepositoryMock;
     @Mock
-    private  RemisionDiagnosticoRepository remisionDiagnosticoRepositoryMock;
+    private RemisionDiagnosticoRepository remisionDiagnosticoRepositoryMock;
     @Mock
-    private  CitaRepository citaRepositoryMock;
+    private CitaRepository citaRepositoryMock;
     @Mock
-    private  HistorialRemisionAdapter historialRemisionAdapterMock;
+    private HistorialRemisionAdapter historialRemisionAdapterMock;
 
     private RemisionRepositoryAdapter remisionRepositoryAdapter;
 
     @BeforeEach
-    void  setUp(){
+    void setUp() {
         remisionRepositoryAdapter = new RemisionRepositoryAdapter(
-             remisionRepositoryMock,
-             ubicacionRepositoryMock,
-             pacienteRepositoryMock,
-             planManejoRemisionAdapterMock,
-             datosAtencionPacienteRepositoryMock,
-             remisionDiagnosticoRepositoryMock,
-             citaRepositoryMock,
-             historialRemisionAdapterMock
+                remisionRepositoryMock,
+                ubicacionRepositoryMock,
+                pacienteRepositoryMock,
+                planManejoRemisionAdapterMock,
+                datosAtencionPacienteRepositoryMock,
+                remisionDiagnosticoRepositoryMock,
+                citaRepositoryMock,
+                historialRemisionAdapterMock
         );
     }
 
     @Test
-    void consultarRemisiones(){
+    void consultarRemisiones() {
         List<Remision> remisionesData = new ArrayList<>();
         remisionesData.add(Remision.builder()
                 .idRemision(idRemision)
@@ -81,21 +86,22 @@ class RemisionRepositoryAdapterTest {
     }
 
     @Test
-    void crearRemisionCita(){
+    void crearRemisionCita() {
+        //Data request
         RemisionTestData remisionTestData = new RemisionTestData();
         RemisionRequest remisionRequest = remisionTestData.remisionRequest;
         List<CitaRequest> citaRequests = remisionTestData.citasRequest;
+
+        //Data repository
         RemisionData remisionData = remisionTestData.remisionData;
         DatosAtencionPacienteData datosAtencionPacienteData = remisionTestData.datosAtencionPacienteData;
         List<RemisionDiagnosticoData> remisionDiagnosticoDataList = remisionTestData.remisionDiagnosticosData;
         UbicacionData ubicacionData = remisionTestData.ubicacionData;
         PacienteData pacienteData = remisionTestData.pacienteData;
 
+        //mocks remision
         Mockito.when(remisionRepositoryMock.existsById(remisionRequest.getIdRemision()))
                 .thenReturn(Mono.just(Boolean.FALSE));
-
-        Mockito.when(pacienteRepositoryMock.existsById(remisionRequest.getNumeroIdentificacion()))
-                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mockito.when(remisionRepositoryMock.insertNuevaRemision(remisionRequest.getIdRemision()))
                 .thenReturn(Mono.just(Boolean.TRUE));
@@ -104,27 +110,313 @@ class RemisionRepositoryAdapterTest {
         Mockito.when(remisionRepositoryMock.save(remisionData))
                 .thenReturn(Mono.just(remisionData));
 
+        //mocks paciente
+        Mockito.when(pacienteRepositoryMock.existsById(remisionRequest.getNumeroIdentificacion()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        Mockito.when(pacienteRepositoryMock.save(pacienteData))
+                .thenReturn(Mono.just(pacienteData));
+
+        //mock datos atencion
         Mockito.when(datosAtencionPacienteRepositoryMock.save(datosAtencionPacienteData))
                 .thenReturn(Mono.just(datosAtencionPacienteData));
 
         Mockito.when(remisionDiagnosticoRepositoryMock.insertMultiplesDiagnosticos(remisionDiagnosticoDataList))
                 .thenReturn(Mono.empty());
-        Mockito.when(planManejoRemisionAdapterMock.registrarPlanManejo(remisionRequest,citaRequests,0))
+
+        Mockito.when(planManejoRemisionAdapterMock.registrarPlanManejo(remisionRequest, citaRequests, 0))
                 .thenReturn(Mono.empty());
 
         Mockito.when(ubicacionRepositoryMock.save(ubicacionData))
                 .thenReturn(Mono.just(ubicacionData));
 
-        Mockito.when(pacienteRepositoryMock.save(pacienteData))
-                .thenReturn(Mono.just(pacienteData));
 
-
+        //crear crear remision
         Mono<Boolean> response = remisionRepositoryAdapter.crearRemisionCita(
-                remisionRequest,citaRequests);
-
+                remisionRequest, citaRequests);
 
         StepVerifier.create(response)
                 .expectNext(Boolean.TRUE)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void crearRemisionCitaRemisionExistente() {
+        //Data request
+        RemisionTestData remisionTestData = new RemisionTestData();
+        RemisionRequest remisionRequest = remisionTestData.remisionRequest;
+        List<CitaRequest> citaRequests = remisionTestData.citasRequest;
+
+
+        //mocks remision
+        Mockito.when(remisionRepositoryMock.existsById(remisionRequest.getIdRemision()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+
+        //crear crear remision
+        Mono<Boolean> response = remisionRepositoryAdapter.crearRemisionCita(
+                remisionRequest, citaRequests);
+
+        StepVerifier.create(response)
+                .expectErrorMessage(Mensajes.REMISION_EXISTENTE.replace("?", remisionRequest.getIdRemision()))
+                .verify();
+    }
+    @Test
+    void crearRemisionCitaPacienteNoExistente() {
+        //Data request
+        RemisionTestData remisionTestData = new RemisionTestData();
+        RemisionRequest remisionRequest = remisionTestData.remisionRequest;
+        List<CitaRequest> citaRequests = remisionTestData.citasRequest;
+
+        //Data repository
+        RemisionData remisionData = remisionTestData.remisionData;
+        DatosAtencionPacienteData datosAtencionPacienteData = remisionTestData.datosAtencionPacienteData;
+        List<RemisionDiagnosticoData> remisionDiagnosticoDataList = remisionTestData.remisionDiagnosticosData;
+        UbicacionData ubicacionData = remisionTestData.ubicacionData;
+        PacienteData pacienteData = remisionTestData.pacienteData;
+
+        //mocks remision
+        Mockito.when(remisionRepositoryMock.existsById(remisionRequest.getIdRemision()))
+                .thenReturn(Mono.just(Boolean.FALSE));
+
+        Mockito.when(remisionRepositoryMock.insertNuevaRemision(remisionRequest.getIdRemision()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+
+        Mockito.when(remisionRepositoryMock.save(remisionData))
+                .thenReturn(Mono.just(remisionData));
+
+        //mocks paciente
+        Mockito.when(pacienteRepositoryMock.existsById(remisionRequest.getNumeroIdentificacion()))
+                .thenReturn(Mono.just(Boolean.FALSE));
+
+        Mockito.when(pacienteRepositoryMock.insertNuevoPaciente(pacienteData.getNumeroIdentificacion()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        Mockito.when(pacienteRepositoryMock.save(pacienteData))
+                .thenReturn(Mono.just(pacienteData));
+
+        //mock datos atencion
+        Mockito.when(datosAtencionPacienteRepositoryMock.save(datosAtencionPacienteData))
+                .thenReturn(Mono.just(datosAtencionPacienteData));
+
+        Mockito.when(remisionDiagnosticoRepositoryMock.insertMultiplesDiagnosticos(remisionDiagnosticoDataList))
+                .thenReturn(Mono.empty());
+
+        Mockito.when(planManejoRemisionAdapterMock.registrarPlanManejo(remisionRequest, citaRequests, 0))
+                .thenReturn(Mono.empty());
+
+        Mockito.when(ubicacionRepositoryMock.insertNuevaUbicacion(ubicacionData.getIdUbicacion()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        Mockito.when(ubicacionRepositoryMock.save(ubicacionData))
+                .thenReturn(Mono.just(ubicacionData));
+
+
+        //crear crear remision
+        Mono<Boolean> response = remisionRepositoryAdapter.crearRemisionCita(
+                remisionRequest, citaRequests);
+
+        StepVerifier.create(response)
+                .expectNext(Boolean.TRUE)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void actualizarRemisionCita() {
+        //Data request
+        RemisionTestData remisionTestData = new RemisionTestData();
+        RemisionRequest remisionRequest = remisionTestData.remisionRequest;
+        List<CitaRequest> citaRequests = remisionTestData.citasRequest;
+        NovedadRequest novedadRequest = NovedadRequest.builder()
+                .motivoNovedad("novedad")
+                .fechaAplicarNovedad(LocalDateTime.now())
+                .build();
+
+        //Data repository
+        RemisionData remisionData = remisionTestData.remisionData;
+        RegistroHistorialRemisionData  registroHistorialData = RegistroHistorialRemisionData
+                .builder()
+                .idRemision(remisionRequest.getIdRemision())
+                .fechaRegistro(LocalDateTime.now())
+                .build();
+        DatosAtencionPacienteData datosAtencionPacienteData = remisionTestData.datosAtencionPacienteData;
+        List<RemisionDiagnosticoData> remisionDiagnosticoDataList = remisionTestData.remisionDiagnosticosData;
+        UbicacionData ubicacionData = remisionTestData.ubicacionData;
+        PacienteData pacienteData = remisionTestData.pacienteData;
+
+        //mocks remision
+        Mockito.when(remisionRepositoryMock.existsById(remisionRequest.getIdRemision()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+
+
+        Mockito.when(remisionRepositoryMock.save(remisionData))
+                .thenReturn(Mono.just(remisionData));
+
+        //mocks paciente
+        Mockito.when(pacienteRepositoryMock.save(pacienteData))
+                .thenReturn(Mono.just(pacienteData));
+        //citas
+        Mockito.when(citaRepositoryMock.findLastNumberIdCita(remisionRequest.getIdRemision()))
+                        .thenReturn(Mono.just(1));
+
+        Mockito.when(citaRepositoryMock.deleteCitaDataByIdRemision(
+                remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()))
+                .thenReturn(Mono.empty());
+
+        Mockito.when(historialRemisionAdapterMock.buildRegistroActualRemision(
+                remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()))
+                .thenReturn(Mono.just( registroHistorialData));
+
+        Mockito.when(historialRemisionAdapterMock.insertRegistro(registroHistorialData))
+                .thenReturn(Mono.empty());
+        //mock datos atencion
+        Mockito.when(datosAtencionPacienteRepositoryMock.updateDatosAtencion(datosAtencionPacienteData))
+                .thenReturn(Mono.empty());
+
+        Mockito.when(remisionDiagnosticoRepositoryMock.updateMultiplesDiagnosticos(remisionDiagnosticoDataList))
+                .thenReturn(Mono.empty());
+
+        Mockito.when(ubicacionRepositoryMock.save(ubicacionData))
+                .thenReturn(Mono.just(ubicacionData));
+        //actualizar  remision
+        Mono<Boolean> response = remisionRepositoryAdapter.actualizarRemisionPorNovedad(
+                remisionRequest, citaRequests,novedadRequest);
+
+        StepVerifier.create(response)
+                .expectNext(Boolean.TRUE)
+                .expectComplete()
+                .verify();
+    }
+    @Test
+    void actualizarRemisionNoExistente() {
+        RemisionTestData remisionTestData = new RemisionTestData();
+        RemisionRequest remisionRequest = remisionTestData.remisionRequest;
+        List<CitaRequest> citaRequests = remisionTestData.citasRequest;
+        NovedadRequest novedadRequest = NovedadRequest.builder()
+                .motivoNovedad("novedad")
+                .fechaAplicarNovedad(LocalDateTime.now())
+                .build();
+
+        //mocks remision
+        Mockito.when(remisionRepositoryMock.existsById(remisionRequest.getIdRemision()))
+                .thenReturn(Mono.just(Boolean.FALSE));
+
+        Mono<Boolean> response = remisionRepositoryAdapter.actualizarRemisionPorNovedad(
+                remisionRequest, citaRequests,novedadRequest);
+
+        StepVerifier.create(response)
+                .expectErrorMessage(Mensajes.REMISION_NO_EXISTENTE.replace("?", remisionRequest.getIdRemision()))
+                .verify();
+    }
+
+    @Test
+    void egresarRemisionNoExistente(){
+
+        //mocks remision
+        Mockito.when(remisionRepositoryMock.validarEstadosRemisionToEgreso(idRemision))
+                .thenReturn(Mono.just(Boolean.FALSE));
+
+        Mono<Boolean> response = remisionRepositoryAdapter.egresarRemisionById(idRemision);
+        StepVerifier.create(response)
+                .expectErrorMessage(Mensajes.REMISION_NO_EXISTENTE.replace("?", idRemision))
+                .verify();
+    }
+    @Test
+    void egresarRemisionExistenteEstadosCitasInValidos(){
+
+        //mocks remision
+        Mockito.when(remisionRepositoryMock.validarEstadosRemisionToEgreso(idRemision))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+
+
+        //mocks citas
+        Mockito.when(citaRepositoryMock.validarEstadosToEgreso(
+                        idRemision, EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        Mono<Boolean> response = remisionRepositoryAdapter.egresarRemisionById(idRemision);
+
+        StepVerifier.create(response)
+                .expectErrorMessage(REMISION_CITAS_PROGRESO.replace("?", idRemision))
+                .verify();
+    }
+    @Test
+    void egresarRemisionExistenteEstadosCitasValidos(){
+
+
+        //mocks remision
+        Mockito.when(remisionRepositoryMock.validarEstadosRemisionToEgreso(idRemision))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        Mockito.when(remisionRepositoryMock.egresarRemisionById(idRemision))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        //mocks citas
+        Mockito.when(citaRepositoryMock.validarEstadosToEgreso(
+                idRemision, EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado()))
+                .thenReturn(Mono.just(Boolean.FALSE));
+
+        Mockito.when(citaRepositoryMock.cancelarToEgreso(
+                        idRemision,EstadosCita.CANCELADA.getEstado(),
+                        EstadosCita.SIN_AGENDAR.getEstado(),EstadosCita.AGENDADA.getEstado()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        Mono<Boolean> response = remisionRepositoryAdapter.egresarRemisionById(idRemision);
+
+        StepVerifier.create(response)
+                .expectNext(Boolean.TRUE)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void consultarDatosAtencionPaciente(){
+
+        DatosAtencionPacienteData datosAtencionPacientes = DatosAtencionPacienteData.builder()
+                .idRemision(idRemision)
+                .build();
+
+        Mockito.when(datosAtencionPacienteRepositoryMock.findByIdRemision(idRemision))
+                .thenReturn(Mono.just(datosAtencionPacientes));
+
+        Mono<DatosAtencionPaciente> response = remisionRepositoryAdapter
+                .consultarDatosAtencionPacienteByIdRemision(idRemision);
+
+
+        StepVerifier.create(response)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+    }
+    @Test
+    void consultarPacienteFromRemision(){
+
+        PacienteData paciente = PacienteData.builder()
+                .numeroIdentificacion("989898")
+                .idUbicacion("989898Ubicacion")
+                .build();
+
+        UbicacionData ubicacionData = UbicacionData
+                .builder()
+                .idUbicacion(paciente.getIdUbicacion())
+                .build();
+        Mockito.when(pacienteRepositoryMock.findPacienteByNumeroIdRemision(idRemision))
+                .thenReturn(Mono.just(paciente));
+
+        Mockito.when(ubicacionRepositoryMock.findById(paciente.getIdUbicacion()))
+                .thenReturn(Mono.just(ubicacionData));
+
+        Mono<Paciente> response = remisionRepositoryAdapter
+                .consultarPacienteFromRemision(idRemision);
+
+
+        StepVerifier.create(response)
+                .expectNextCount(1)
                 .expectComplete()
                 .verify();
     }

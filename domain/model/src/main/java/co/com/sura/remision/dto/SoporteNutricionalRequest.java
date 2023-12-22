@@ -2,6 +2,7 @@ package co.com.sura.remision.dto;
 
 import co.com.sura.remision.entity.datosremision.Medicamento;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 public class SoporteNutricionalRequest {
     private Medicamento medicamento;
     private Integer cantidadDosis;

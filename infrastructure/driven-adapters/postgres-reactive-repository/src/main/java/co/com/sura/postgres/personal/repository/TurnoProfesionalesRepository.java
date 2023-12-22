@@ -34,7 +34,7 @@ public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<Tu
             "AND public.turno_profesional.id_horario_turno = $2 " +
             "AND public.profesionales.activo= true " +
             "AND public.profesionales.id_regional= $3;")
-    Flux<ProfesionalData> findTurnoProfesionalByCiudadHorario(
+    Flux<ProfesionalData> findTurnoProfesionalByRegionalHorario(
             LocalDate fechaTurno,
             Integer idHorarioTurno,
             String idRegional
