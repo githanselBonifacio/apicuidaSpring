@@ -3,6 +3,8 @@ package co.com.sura.autoagendador.models;
 import co.com.sura.mapbox.entity.GeoUbicacion;
 import co.com.sura.mapbox.gateway.MapboxServiceRepository;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 import static co.com.sura.autoagendador.models.Helper.*;
 
 @Data
+@ToString
+@NoArgsConstructor
 public class AutoAgendador {
     private static final Integer DOS = 2;
     private static final Double UMBRAL = 0.5;
@@ -38,7 +42,7 @@ public class AutoAgendador {
     private Poblacion poblacionActual;
     private Double aptitudGlobalActual;
 
-    private final Random random;
+    private final Random random= new Random();
 
     @Autowired
     public AutoAgendador(
@@ -56,7 +60,7 @@ public class AutoAgendador {
         this.desplazamientos = new ArrayList<>();
         this.resultadoActual = new HashMap<>();
 
-        this.random = new Random();
+
         this.mapboxService =mapboxService;
     }
 
@@ -288,7 +292,7 @@ public class AutoAgendador {
         this.poblacionActual=new Poblacion();
         this.aptitudGlobalActual = 0.0;
     }
-    public void run (){
+    public Resultado run (){
         this.crearPoblacionInicial();
         for(var g = 0;g<this.numeroGeneraciones;g++){
             this.calcularAptitudPoblacion();
@@ -300,5 +304,6 @@ public class AutoAgendador {
                 this.poblacionActual = siguienteGeneracion.clone();
             }
         }
+        return this.mejorSolucion();
     }
 }

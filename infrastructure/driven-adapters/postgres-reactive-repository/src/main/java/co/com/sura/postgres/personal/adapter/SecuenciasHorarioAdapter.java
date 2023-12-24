@@ -78,7 +78,7 @@ public class SecuenciasHorarioAdapter implements SecuenciasHorarioRepository {
                         .hasElements()
                         .flatMap(hasElment ->{
                           if(Boolean.FALSE.equals(hasElment)){
-                                return eliminarTurnosMasivamente(turno);
+                                return this.eliminarTurnosMasivamente(turno);
                           }
                           return Mono.just(RespuestasFactory.crearResultadoActualizacionTurno(
                                  Mensajes.RESPUESTA_TURNO,turno.getIdProfesional(), turno.getFechaTurno()));
@@ -104,7 +104,7 @@ public class SecuenciasHorarioAdapter implements SecuenciasHorarioRepository {
                      .hasElements()
                      .flatMap(hasElment ->{
                         if(Boolean.FALSE.equals(hasElment)){
-                           return asignarTurnosMasivamente(turno);
+                           return this.asignarTurnosMasivamente(turno);
                         }
                         return Mono.just(RespuestasFactory.crearResultadoActualizacionTurno(
                                  Mensajes.RESPUESTA_TURNO,turno.getIdProfesional(), turno.getFechaTurno()));

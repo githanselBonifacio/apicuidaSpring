@@ -52,13 +52,13 @@ public class ProcedimientosCitasAdapter implements ProcedimientosCitaRepository 
     @Override
     public Mono<Procedimientos> consultarProcedimientosByIdCita(String idCita) {
         return Mono.zip(
-                        consultarCanalizacionesByCitas(idCita).collectList(),
-                        consultarCuracionesByCitas(idCita).collectList(),
-                        consultarFototerapiasByCitas(idCita).collectList(),
-                        consultarSecrecionesByCitas(idCita).collectList(),
-                        consultarSondajesByCitas(idCita).collectList(),
-                        consultarTomaMuestrasByCitas(idCita).collectList(),
-                        consultarSoporteNutricionalesByCitas(idCita).collectList())
+                        this.consultarCanalizacionesByCitas(idCita).collectList(),
+                        this.consultarCuracionesByCitas(idCita).collectList(),
+                        this.consultarFototerapiasByCitas(idCita).collectList(),
+                        this.consultarSecrecionesByCitas(idCita).collectList(),
+                        this.consultarSondajesByCitas(idCita).collectList(),
+                        this.consultarTomaMuestrasByCitas(idCita).collectList(),
+                        this.consultarSoporteNutricionalesByCitas(idCita).collectList())
                 .map(tuple->Procedimientos.builder()
                         .canalizaciones(tuple.getT1())
                         .curaciones(tuple.getT2())

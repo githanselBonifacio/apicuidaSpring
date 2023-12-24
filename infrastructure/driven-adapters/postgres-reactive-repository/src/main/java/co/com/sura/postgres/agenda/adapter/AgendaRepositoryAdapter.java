@@ -82,27 +82,25 @@ public class AgendaRepositoryAdapter implements AgendaRepository {
                         return Mono.error(new ErrorEstadoCitaNoValido(
                                Mensajes.ERROR_TURNO_DESAGENDADO_ESTADOS_CITAS));
                     }else{
-                        return Mono.just(true);
+                        return citaRepository.desagendarAllFromIdProfesional(
+                                turnoProfesional.getFechaTurno(),
+                                turnoProfesional.getIdHorarioTurno(),
+                                turnoProfesional.getIdProfesional(),
+                                EstadosCita.SIN_AGENDAR.getEstado())
+                                .then(turnoProfesionalesRepository.deleteByFechaTurnoIdHorarioProfesional(
+                                        turnoProfesional.getFechaTurno(),
+                                        turnoProfesional.getIdHorarioTurno(),
+                                        turnoProfesional.getIdProfesional()))
+                                .then(desplazamientoRepository.deleteByFechaTurnoProfesional(
+                                        turnoProfesional.getFechaTurno(),
+                                        turnoProfesional.getIdHorarioTurno(),
+                                        turnoProfesional.getIdRegional(),
+                                        turnoProfesional.getIdProfesional()
+                                ))
+                                .then(Mono.just(Boolean.TRUE))
+                                .onErrorResume(Mono::error);
                     }
-                })
-               .then(citaRepository.desagendarAllFromIdProfesional(
-                        turnoProfesional.getFechaTurno(),
-                        turnoProfesional.getIdHorarioTurno(),
-                        turnoProfesional.getIdProfesional(),
-                        EstadosCita.SIN_AGENDAR.getEstado()))
-
-                .then(turnoProfesionalesRepository.deleteByFechaTurnoIdHorarioProfesional(
-                        turnoProfesional.getFechaTurno(),
-                        turnoProfesional.getIdHorarioTurno(),
-                        turnoProfesional.getIdProfesional()))
-                .then(desplazamientoRepository.deleteByFechaTurnoProfesional(
-                        turnoProfesional.getFechaTurno(),
-                        turnoProfesional.getIdHorarioTurno(),
-                        turnoProfesional.getIdRegional(),
-                        turnoProfesional.getIdProfesional()
-                ))
-                .then(Mono.just(Boolean.TRUE))
-                .onErrorResume(Mono::error);
+                });
     }
 
     public Flux<Tarea> consultarTareasTurnoByProfesional(

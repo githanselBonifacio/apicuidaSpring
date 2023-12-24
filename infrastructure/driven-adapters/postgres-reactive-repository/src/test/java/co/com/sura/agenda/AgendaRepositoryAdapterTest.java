@@ -11,6 +11,7 @@ import co.com.sura.postgres.agenda.adapter.AgendaRepositoryAdapter;
 import co.com.sura.postgres.agenda.adapter.AgendamientoAutomaticoAdapter;
 import co.com.sura.postgres.agenda.data.CitaData;
 import co.com.sura.postgres.agenda.repository.CitaRepository;
+import co.com.sura.postgres.maestros.data.HorarioTurnoData;
 import co.com.sura.postgres.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.moviles.data.DesplazamientoRepository;
@@ -40,16 +41,14 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class AgendaRepositoryAdapterTest {
-
     private final LocalDate fechaTurno = LocalDate.now();
-
     private final LocalDateTime fechaProgramada = LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 10));
     private final String idProfesional = "454654654";
     private final String idRemision = "asfasf4as";
-
     private final String idCita = "asfasf4as-1";
     private final String idRegional = "427";
     private final Integer idHorarioTurno = 1;
+    private CitaData citaData;
     @Mock
     private TurnoProfesionalesRepository turnoProfesionalesRepositoryMock;
     @Mock
@@ -63,12 +62,32 @@ class AgendaRepositoryAdapterTest {
     @Mock
     private HorarioTurnoRepository horarioTurnoRepositoryMock;
 
-    @InjectMocks
+    @Mock
     private AgendamientoAutomaticoAdapter agendamientoAutomaticoAdapterMock;
+
 
     @InjectMocks
     private AgendaRepositoryAdapter agendaRepositoryAdapter;
 
+    @BeforeEach()
+    void setUp(){
+        this.citaData =  CitaData.builder()
+                .idCita(idRemision + "-1")
+                .idRemision(idRemision)
+                .duracion(600)
+                .idEstado(1)
+                .holgura(600)
+                .fechaInicio(fechaProgramada)
+                .fechaProgramada(fechaProgramada)
+                .especialidad("especialidad")
+                .idRegional("427")
+                .idHorarioTurno(idHorarioTurno)
+                .idProfesional(idProfesional)
+                .idConductor(null)
+                .latitud(0.0)
+                .longitud(0.0)
+                .build();
+    }
 
     @Test
     void asignarProfesionalTurno() {
@@ -100,23 +119,6 @@ class AgendaRepositoryAdapterTest {
                 .build();
 
         List<CitaData> citasData = new ArrayList<>();
-        CitaData citaData = CitaData.builder()
-                .idCita(idRemision + "-1")
-                .idRemision(idRemision)
-                .duracion(600)
-                .idEstado(1)
-                .holgura(600)
-                .fechaInicio(fechaProgramada)
-                .fechaProgramada(fechaProgramada)
-                .especialidad("especialidad")
-                .idRegional("427")
-                .idHorarioTurno(idHorarioTurno)
-                .idProfesional(idProfesional)
-                .idConductor(null)
-                .latitud(0.0)
-                .longitud(0.0)
-
-                .build();
         citasData.add(citaData);
 
         //mocks
@@ -147,24 +149,7 @@ class AgendaRepositoryAdapterTest {
     @Test
     void consultarTareasTurnoByProfesional() {
         List<CitaData> citasData = new ArrayList<>();
-        CitaData citaData = CitaData.builder()
-                .idCita(idRemision + "-1")
-                .idRemision(idRemision)
-                .duracion(600)
-                .idEstado(1)
-                .holgura(600)
-                .fechaInicio(fechaProgramada)
-                .fechaProgramada(fechaProgramada)
-                .especialidad("especialidad")
-                .idRegional("427")
-                .idHorarioTurno(idHorarioTurno)
-                .idProfesional(idProfesional)
-                .idConductor(null)
-                .latitud(0.0)
-                .longitud(0.0)
-                .build();
-
-        citasData.add(citaData);
+        citasData.add(this.citaData);
 
         ProfesionalData profesionalData = ProfesionalData.builder()
                 .idRegional(idRegional)
@@ -222,24 +207,8 @@ class AgendaRepositoryAdapterTest {
                 .build();
         profesionalDataList.add(profesionalData);
 
-        CitaData citaData = CitaData.builder()
-                .idCita(idCita)
-                .idRemision(idRemision)
-                .duracion(600)
-                .idEstado(1)
-                .holgura(600)
-                .fechaInicio(fechaProgramada)
-                .fechaProgramada(fechaProgramada)
-                .especialidad("especialidad")
-                .idRegional(idRegional)
-                .idHorarioTurno(idHorarioTurno)
-                .idProfesional(idProfesional)
-                .idConductor(null)
-                .latitud(0.0)
-                .longitud(0.0)
-                .build();
         List<CitaData> citas = new ArrayList<>();
-        citas.add(citaData);
+        citas.add(this.citaData);
 
         List<DesplazamientoData> desplazamientoDataList = new ArrayList<>();
         DesplazamientoData desplazamientoData = DesplazamientoData.builder()
@@ -381,25 +350,9 @@ class AgendaRepositoryAdapterTest {
 
     @Test
     void reprogramarCitaFromProfesional() {
-        CitaData citaData = CitaData.builder()
-                .idCita(idCita)
-                .idRemision(idRemision)
-                .duracion(600)
-                .idEstado(1)
-                .holgura(600)
-                .fechaInicio(fechaProgramada)
-                .fechaProgramada(fechaProgramada)
-                .especialidad("especialidad")
-                .idRegional(idRegional)
-                .idHorarioTurno(idHorarioTurno)
-                .idProfesional(idProfesional)
-                .idConductor(null)
-                .latitud(0.0)
-                .longitud(0.0)
-                .build();
 
         Mockito.when(citaRepositoryMock.findById(idCita))
-                .thenReturn(Mono.just(citaData));
+                .thenReturn(Mono.just(this.citaData));
 
         Mono<Boolean> response = agendaRepositoryAdapter.reprogramarCitaFromProfesional(
                 fechaProgramada, idCita, idProfesional, fechaTurno, idHorarioTurno, idRegional);
@@ -407,29 +360,21 @@ class AgendaRepositoryAdapterTest {
         StepVerifier.create(response)
                 .expectNext(Boolean.TRUE);
 
+
     }
 
     @Test
     void validarDisponibilidadFechaCita() {
-        CitaData citaData = CitaData.builder()
-                .idCita(idCita)
-                .idHorarioTurno(idHorarioTurno)
-                .duracion(600)
-                .holgura(600)
-                .idRegional(idRegional)
-                .fechaProgramada(fechaProgramada)
-                .idRemision(idRemision)
-                .build();
 
 
-          Mockito.when(citaRepositoryMock.findMasCercanaAnterior(
+        Mockito.when(citaRepositoryMock.findMasCercanaAnterior(
                 fechaProgramada,idCita,idHorarioTurno,idRegional,idProfesional))
-                .thenReturn(Mono.just(citaData));
+                .thenReturn(Mono.just(this.citaData));
 
         Mockito.when(citaRepositoryMock.findMasCercanaPosterior(
                          fechaProgramada.plusMinutes(10)
                         ,idCita,idHorarioTurno,idRegional,idProfesional))
-                .thenReturn(Mono.just(citaData));
+                .thenReturn(Mono.just(this.citaData));
 
         Mockito.when(desplazamientoRepositoryMock.findByIdCitaPartida(idCita))
                 .thenReturn(Mono.just(DesplazamientoData.builder().duracion(600).build()));
@@ -439,10 +384,28 @@ class AgendaRepositoryAdapterTest {
                 .thenReturn(Mono.just(DesplazamientoData.builder().duracion(600).build()));
 
         Mono<Boolean> response = agendaRepositoryAdapter.validarDisponibilidadFechaCita(
-                citaData, fechaProgramada, idProfesional);
+                this.citaData, fechaProgramada, idProfesional);
 
         StepVerifier.create(response)
                 .expectNext(Boolean.FALSE)
+                .verifyComplete();
+    }
+    @Test
+    void validarAgendamientoCitaEnHorarioTurno(){
+
+        Mockito.when(horarioTurnoRepositoryMock.findById(idHorarioTurno))
+                .thenReturn(Mono.just(HorarioTurnoData.builder()
+                                .id(idHorarioTurno)
+                                .horaInicio(LocalTime.of(6,0))
+                                .horaFin(LocalTime.of(13,59))
+                                .esHorarioBase(Boolean.TRUE)
+                        .build()));
+
+        Mono<Boolean> response = agendaRepositoryAdapter.validarAgendamientoCitaEnHorarioTurno(
+                this.citaData, fechaProgramada);
+
+        StepVerifier.create(response)
+                .expectNext(Boolean.TRUE)
                 .verifyComplete();
     }
 }

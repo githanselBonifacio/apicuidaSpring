@@ -12,17 +12,17 @@ import java.time.LocalDate;
 
 public interface PersonalCrudRepository {
     //profesionales
-    Flux<Profesional> consultarProfesionales();
-    Flux<Profesional>                consultarProfesionalesByRegional(String idRegional);
-    Mono<Profesional> crearProfesional(Profesional profesional);
-    Mono<Profesional>                actualizarProfesional(Profesional profesional);
+    Flux<Profesional>            consultarProfesionales();
 
-    Flux<Profesional> consultarProfesionalByTurnoRegional(LocalDate fechaTurno, String idRegional);
+    Mono<Profesional>             crearProfesional(Profesional profesional);
+    Mono<Profesional>             actualizarProfesional(Profesional profesional);
 
-    Flux<Profesional> consultarProfesionalFromTurnoRegional(
-            LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno);
+    Flux<Profesional>              consultarProfesionalByTurnoRegional(LocalDate fechaTurno, String idRegional);
 
-    Flux<Profesional>   consultarProfesionalesByIdRegional(String idRegional);
+    Flux<Profesional>               consultarProfesionalFromTurnoRegional(
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno);
+
+    Flux<Profesional>               consultarProfesionalesByIdRegional(String idRegional);
 
     //moviles
     Mono<Movil>                      crearMovil(Movil movil);

@@ -43,47 +43,12 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
     }
 
     @Override
-    public Flux<Profesional> consultarProfesionalesByRegional(String idRegional) {
-        return profesionalRepository.findByIdRegional(idRegional)
-                .map(ConverterPersonal::convertToProfesional)
-                .sort(Comparator.comparing(Profesional::getNombres));
-    }
-
-    @Override
-    public Mono<Profesional> crearProfesional(Profesional profesional) {
-        return profesionalRepository.existsById(profesional.getNumeroIdentificacion())
-                .flatMap(exist ->  {
-                    if (Boolean.TRUE.equals(exist)) {
-                        return Mono.error(new Throwable(Mensajes.PROFESIONAL_YA_EXISTE));
-                    }
-                    return profesionalRepository.insertProfesional(profesional.getNumeroIdentificacion())
-                            .then(profesionalRepository.save(ConverterPersonal.convertToProfesionalData(profesional)));
-                })
-                .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
-                .map(ConverterPersonal::convertToProfesional)
-                .onErrorResume(Mono::error);
-    }
-
-    @Override
-    public Mono<Profesional> actualizarProfesional(Profesional profesional) {
-        return Mono.just(profesional)
-                .then(profesionalRepository.existsById(profesional.getNumeroIdentificacion()))
-                .flatMap(exist ->{
-                    if (Boolean.FALSE.equals(exist)) {
-                        return Mono.error(new ErrorValidacionPersonal(Mensajes.PROFESIONAL_NO_EXISTE));
-                    }
-                    return profesionalRepository.save(ConverterPersonal.convertToProfesionalData(profesional));
-                })
-                .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
-                .map(ConverterPersonal::convertToProfesional)
-                .onErrorResume(Mono::error);
-    }
-    @Override
     public Flux<Profesional> consultarProfesionalesByIdRegional(String idRegional) {
         return profesionalRepository.findByIdRegional(idRegional)
-                .map(ConverterPersonal:: convertToProfesional);
-    }
+                .map(ConverterPersonal:: convertToProfesional)
+                .sort(Comparator.comparing(Profesional::getNombres));
 
+    }
 
 
     @Override
@@ -94,11 +59,55 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
 
     @Override
     public Flux<Profesional> consultarProfesionalFromTurnoRegional(
-            LocalDate fechaTurno, String idCiudad, Integer idHorarioTurno) {
-        return profesionalRepository.findFromTurnoRegional(fechaTurno,idCiudad,idHorarioTurno)
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno) {
+        return profesionalRepository.findFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno)
                 .map(ConverterPersonal:: convertToProfesional);
     }
+    @Override
+    public Mono<Profesional> crearProfesional(Profesional profesional) {
+        return profesionalRepository.existsById(profesional.getNumeroIdentificacion())
+                .flatMap(exist ->  {
+                    if (Boolean.TRUE.equals(exist)) {
+                        return Mono.error(new Throwable(Mensajes.PROFESIONAL_YA_EXISTE));
+                    }
+                    return profesionalRepository.insertProfesional(profesional.getNumeroIdentificacion())
+                            .then(profesionalRepository.save(ConverterPersonal.convertToProfesionalData(profesional)))
+                            .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
+                            .map(ConverterPersonal::convertToProfesional);
+                });
+    }
+
+    @Override
+    public Mono<Profesional> actualizarProfesional(Profesional profesional) {
+        return Mono.just(profesional)
+                .then(profesionalRepository.existsById(profesional.getNumeroIdentificacion()))
+                .flatMap(exist ->{
+                    if (Boolean.FALSE.equals(exist)) {
+                        return Mono.error(new ErrorValidacionPersonal(Mensajes.PROFESIONAL_NO_EXISTE));
+                    }
+                    return profesionalRepository.save(ConverterPersonal.convertToProfesionalData(profesional))
+                            .then(profesionalRepository.findById(profesional.getNumeroIdentificacion()))
+                            .map(ConverterPersonal::convertToProfesional);
+                });
+
+    }
+
     //moviles
+    @Override
+    public Flux<Movil> consultarMoviles() {
+        return movilRepository.findAll()
+                .map(ConverterPersonal::convertToMovil);
+    }
+    @Override
+    public Flux<Movil> consultarMovilesSinConductor() {
+        return movilRepository.findAllWithoutConductor()
+                .map(ConverterPersonal::convertToMovil);
+    }
+    @Override
+    public Flux<Movil> consultarMovilesByIdRegional(String idRegional) {
+        return movilRepository.findByIdRegional(idRegional)
+                .map(ConverterPersonal::convertToMovil);
+    }
     @Override
     public Mono<Movil> crearMovil(Movil movil) {
         return movilRepository.existsById(movil.getMatricula())
@@ -106,10 +115,10 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                     if (Boolean.TRUE.equals(exist)) {
                         return Mono.error(new Throwable(Mensajes.MOVIL_YA_EXISTE));
                     }
-                    return movilRepository.insertMovil(movil);
-                })
-                .then(movilRepository.findById(movil.getMatricula()))
-                .map(ConverterPersonal::convertToMovil);
+                    return movilRepository.insertMovil(movil)
+                            .then(movilRepository.findById(movil.getMatricula()))
+                            .map(ConverterPersonal::convertToMovil);
+                });
     }
 
     @Override
@@ -120,31 +129,19 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                     if (Boolean.FALSE.equals(exist)) {
                         return Mono.error(new Throwable(Mensajes.MOVIL_NO_EXISTE));
                     }
-                    return movilRepository.save(ConverterPersonal.convertToMovilData(movil));
-                })
-                .then(movilRepository.findById(movil.getMatricula()))
-                .map(ConverterPersonal::convertToMovil);
+                    return movilRepository.save(ConverterPersonal.convertToMovilData(movil))
+                            .then(movilRepository.findById(movil.getMatricula()))
+                            .map(ConverterPersonal::convertToMovil);
+                });
     }
 
-    @Override
-    public Flux<Movil> consultarMoviles() {
-        return movilRepository.findAll()
-                .map(ConverterPersonal::convertToMovil);
-    }
 
     //conductores
     @Override
-    public Flux<Movil> consultarMovilesSinConductor() {
-        return movilRepository.findAllWithoutConductor()
-                .map(ConverterPersonal::convertToMovil);
+    public Flux<Conductor> consultarConductores() {
+        return conductorRepository.findAll()
+                .map(ConverterPersonal::converToConductor);
     }
-
-    @Override
-    public Flux<Movil> consultarMovilesByIdRegional(String idRegional) {
-        return movilRepository.findByIdRegional(idRegional)
-                .map(ConverterPersonal::convertToMovil);
-    }
-
     @Override
     public Mono<Conductor> crearConductor(Conductor conductor) {
         return  conductorRepository.existsById(conductor.getNumeroIdentificacion())
@@ -153,10 +150,10 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                         return Mono.error(new Throwable(Mensajes.CONDUCTOR_YA_EXISTE));
                     }
                     return conductorRepository.insertConductor(conductor.getNumeroIdentificacion())
-                            .then(conductorRepository.save(ConverterPersonal.converToConductorData(conductor)));
-                })
-                .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
-                .map(ConverterPersonal::converToConductor);
+                            .then(conductorRepository.save(ConverterPersonal.converToConductorData(conductor)))
+                            .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
+                            .map(ConverterPersonal::converToConductor);
+                });
     }
 
     @Override
@@ -167,15 +164,10 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                     if (Boolean.FALSE.equals(exist)) {
                         return Mono.error(new Throwable(Mensajes.CONDUCTOR_NO_EXISTE));
                     }
-                    return conductorRepository.save(ConverterPersonal.converToConductorData(conductor));
-                })
-                .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
-                .map(ConverterPersonal::converToConductor);
+                    return conductorRepository.save(ConverterPersonal.converToConductorData(conductor))
+                            .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
+                            .map(ConverterPersonal::converToConductor);
+                });
     }
 
-    @Override
-    public Flux<Conductor> consultarConductores() {
-        return conductorRepository.findAll()
-                .map(ConverterPersonal::converToConductor);
-    }
 }

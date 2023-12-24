@@ -5,9 +5,9 @@ import co.com.sura.postgres.farmacia.adapter.FarmaciaAdapter;
 import co.com.sura.postgres.remision.repository.datospaciente.PacienteRepository;
 import co.com.sura.postgres.remision.repository.procedimientos.SoporteNutricionalRepository;
 import co.com.sura.postgres.remision.repository.tratamientos.TratamientoRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,15 +29,8 @@ import java.util.List;
     private  SoporteNutricionalRepository soporteNutricionalRepositoryMock;
     @Mock
     private  TratamientoRepository tratamientoRepositoryMock;
-
+    @InjectMocks
     private FarmaciaAdapter farmaciaAdapter;
-
-    @BeforeEach
-    void setUp(){
-        farmaciaAdapter = new FarmaciaAdapter(
-                pacienteRepositoryMock,soporteNutricionalRepositoryMock,tratamientoRepositoryMock
-        );
-    }
 
     @Test
     void consultarAllPacienteWithMedicamentosToFarmacia(){

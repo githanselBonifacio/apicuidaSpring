@@ -6,9 +6,9 @@ import co.com.sura.maestros.gateway.MaestroRepository;
 import co.com.sura.postgres.maestros.adapter.MaestroRepositoryAdapter;
 import co.com.sura.postgres.maestros.data.*;
 import co.com.sura.postgres.maestros.repository.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,7 +20,6 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
  class MaestrosRepositoryAdapterTest {
-
 
     @Mock
     private MaestroRepository maestroRepositoryMock;
@@ -34,16 +33,9 @@ import java.util.List;
     private  EstadoCitaRepository estadoCitaRepositoryMock;
     @Mock
     private  ProfesionRepository profesionRepositoryMock;
-
+    @InjectMocks
     private MaestroRepositoryAdapter maestroRepositoryAdapter;
-    @BeforeEach
-    void setUp() {
 
-        maestroRepositoryAdapter = new MaestroRepositoryAdapter(
-                regionalesRepositoryMock,horarioTurnoRepositoryMock,tipoIdentificacionRepositoryMock,
-                estadoCitaRepositoryMock,profesionRepositoryMock
-        );
-    }
     @Test
     void consultarRegional(){
 

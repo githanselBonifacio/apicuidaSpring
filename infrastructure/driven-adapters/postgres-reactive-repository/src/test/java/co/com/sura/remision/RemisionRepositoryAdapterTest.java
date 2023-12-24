@@ -14,16 +14,15 @@ import co.com.sura.remision.dto.RemisionRequest;
 import co.com.sura.remision.entity.Remision;
 import co.com.sura.remision.entity.datosremision.DatosAtencionPaciente;
 import co.com.sura.remision.entity.datosremision.Paciente;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,21 +49,9 @@ class RemisionRepositoryAdapterTest {
     @Mock
     private HistorialRemisionAdapter historialRemisionAdapterMock;
 
+    @InjectMocks
     private RemisionRepositoryAdapter remisionRepositoryAdapter;
 
-    @BeforeEach
-    void setUp() {
-        remisionRepositoryAdapter = new RemisionRepositoryAdapter(
-                remisionRepositoryMock,
-                ubicacionRepositoryMock,
-                pacienteRepositoryMock,
-                planManejoRemisionAdapterMock,
-                datosAtencionPacienteRepositoryMock,
-                remisionDiagnosticoRepositoryMock,
-                citaRepositoryMock,
-                historialRemisionAdapterMock
-        );
-    }
 
     @Test
     void consultarRemisiones() {

@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
  class HistorialRepositoryAdapterTest {
 
     private final String idRemision = "asf546";
-    private final String mumeroIdentificacion ="154565415";
     @Mock
     private  RemisionRepository remisionRepositoryMock;
     @Mock
@@ -70,8 +69,6 @@ import java.util.stream.Collectors;
         );
     }
 
-
-
     @Test
     void consultarHistoricoRemision(){
         List<RegistroHistorialRemisionData> registroHistorialRemisionData = new ArrayList<>();
@@ -94,6 +91,7 @@ import java.util.stream.Collectors;
     @Test
     void consultarDatosRemision(){
 
+        String mumeroIdentificacion = "154565415";
         RemisionData remisionData = RemisionData.builder()
                 .idRemision(idRemision)
                 .numeroIdentificacionPaciente(mumeroIdentificacion)

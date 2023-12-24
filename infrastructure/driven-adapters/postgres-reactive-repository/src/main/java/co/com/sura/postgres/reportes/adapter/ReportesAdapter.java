@@ -45,7 +45,7 @@ public class ReportesAdapter implements ReportesRepository {
         Mono<Regional> regionalResult = regionalesRepository.findById(idRegional)
                 .map(ConverterMaestros::convertToRegional);
 
-        Mono<List<ItemReporteAnual>> itemsReporteAnual = consultarItemsReporteAnual(anio, idRegional)
+        Mono<List<ItemReporteAnual>> itemsReporteAnual = this.consultarItemsReporteAnual(anio, idRegional)
                 .collectList();
 
         return Mono.zip(regionalResult, itemsReporteAnual)

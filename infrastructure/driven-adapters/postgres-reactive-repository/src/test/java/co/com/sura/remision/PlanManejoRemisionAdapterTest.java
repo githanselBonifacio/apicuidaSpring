@@ -13,9 +13,9 @@ import co.com.sura.postgres.remision.repository.tratamientos.TratamientoReposito
 import co.com.sura.remision.dto.*;
 import co.com.sura.remision.entity.datosremision.Medicamento;
 import co.com.sura.remision.entity.procedimientos.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,23 +54,9 @@ class PlanManejoRemisionAdapterTest {
     @Mock
     private  SoporteNutricionalRepository soporteNutricionalRepositoryMock;
 
+    @InjectMocks
     private PlanManejoRemisionAdapter planManejoRemisionAdapter;
 
-    @BeforeEach
-    void setUp(){
-        planManejoRemisionAdapter = new PlanManejoRemisionAdapter(
-                horarioTurnoRepositoryMock,
-                citaRepositoryMock,
-                tratamientoRepositoryMock,
-                canalizacionRepositoryMock,
-                secrecionRepositoryMock,
-                curacionRepositoryMock,
-                fototerapiaRepositoryMock,
-                sondajeRepositoryMock,
-                tomaMuestraRepositoryMock,
-                soporteNutricionalRepositoryMock
-        );
-    }
 
     @Test
     void registrarPlanManejo(){
