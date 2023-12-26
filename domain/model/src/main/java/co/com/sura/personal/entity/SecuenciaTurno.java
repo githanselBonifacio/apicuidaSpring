@@ -22,8 +22,8 @@ public class SecuenciaTurno {
     private List<ItemDiaTurno> itemsDiaTurno;
 
     public static SecuenciaTurno agruparItemsDiaTurno(List<SecuenciaTurno> listSecuenciaTurno){
-        var secuenciaTurno = listSecuenciaTurno.get(0);
-        var itemsDiaTurno = new ArrayList<ItemDiaTurno>();
+        SecuenciaTurno secuenciaTurno = listSecuenciaTurno.get(0);
+        ArrayList<ItemDiaTurno> itemsDiaTurno = new ArrayList<>();
         listSecuenciaTurno
                 .stream()
                 .flatMap(st -> st.getItemsDiaTurno().stream())
@@ -31,11 +31,11 @@ public class SecuenciaTurno {
                 .sorted(Comparator.comparing(ItemDiaTurno::getNumeroDia))
                 .collect(Collectors.groupingBy(ItemDiaTurno::getNumeroDia))
                 .forEach((numeroDia, items) -> {
-                    var horariosTurno = items.stream()
+                    List<HorarioTurno> horariosTurno = items.stream()
                             .flatMap(item -> item.getHorariosTurno().stream())
                             .sorted(Comparator.comparing(HorarioTurno::getHoraInicio))
                             .collect(Collectors.toList());
-                    var itemDiaTurno = RemisionFactory
+                    ItemDiaTurno itemDiaTurno = RemisionFactory
                             .crearItemDiaTurno(numeroDia,items.get(0).getNombreDia(),horariosTurno);
                     itemsDiaTurno.add(itemDiaTurno);
                 });

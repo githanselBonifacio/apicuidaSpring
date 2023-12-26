@@ -264,8 +264,8 @@ class RemisionRepositoryAdapterTest {
         Mockito.when(datosAtencionPacienteRepositoryMock.updateDatosAtencion(datosAtencionPacienteData))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(remisionDiagnosticoRepositoryMock.updateMultiplesDiagnosticos(remisionDiagnosticoDataList))
-                .thenReturn(Mono.empty());
+        Mockito.when(remisionDiagnosticoRepositoryMock.saveAll(remisionDiagnosticoDataList))
+                .thenReturn(Flux.empty());
 
         Mockito.when(ubicacionRepositoryMock.save(ubicacionData))
                 .thenReturn(Mono.just(ubicacionData));

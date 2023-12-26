@@ -48,4 +48,5 @@ public class Converter {
    public static <T> T converToEntity(Object entity,Class<T> clazz ){
        return deserializarJson(convertirObjetoAJson(entity), clazz);
    }
+
 }

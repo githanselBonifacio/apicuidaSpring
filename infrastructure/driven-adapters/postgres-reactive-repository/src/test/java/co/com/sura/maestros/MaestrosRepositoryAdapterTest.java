@@ -39,8 +39,8 @@ import java.util.List;
     @Test
     void consultarRegional(){
 
-        List<RegionalesData> regionales = new ArrayList<>();
-        regionales.add(RegionalesData.builder()
+        List<RegionalData> regionales = new ArrayList<>();
+        regionales.add(RegionalData.builder()
                         .id("427")
                 .build());
 
@@ -59,7 +59,7 @@ import java.util.List;
     @Test
     void consultarRegionalById(){
         String idRegional = "427";
-        RegionalesData regional = RegionalesData.builder()
+        RegionalData regional = RegionalData.builder()
                 .id(idRegional)
                 .build();
 

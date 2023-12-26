@@ -1,5 +1,7 @@
 package co.com.sura.web.personal;
 
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.genericos.Response;
 import co.com.sura.genericos.ResultadoActualizacionTurno;
 import co.com.sura.moviles.entity.Movil;
@@ -70,7 +72,22 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void getProfesionalesError(){
+        Mockito.when(personalCrudRepositoryMock.consultarProfesionales())
+                .thenReturn(Flux.error(Exception::new));
 
+        Response<?> response = webClient.get()
+                .uri("/personal/profesionales")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void getProfesionalesByRegional(){
         List<Profesional> profesionales = new ArrayList<>();
@@ -80,7 +97,7 @@ import java.util.List;
                 .result(profesionales)
                 .build();
 
-        Mockito.when(personalCrudRepositoryMock.consultarProfesionalesByRegional(idRegional))
+        Mockito.when(personalCrudRepositoryMock.consultarProfesionalesByIdRegional(idRegional))
                 .thenReturn(Flux.fromIterable(profesionales));
 
         Response<List<Profesional>> response = webClient.get()
@@ -94,7 +111,22 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void getProfesionalesByRegionalError(){
+        Mockito.when(personalCrudRepositoryMock.consultarProfesionalesByIdRegional(idRegional))
+                .thenReturn(Flux.error(Exception::new));
 
+        Response<?> response = webClient.get()
+                .uri("/personal/profesionales/"+idRegional)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarProfesionalesTurnos(){
         List<ProfesionalWithTurno> profesionales = new ArrayList<>();
@@ -123,6 +155,25 @@ import java.util.List;
 
     }
     @Test
+    void consultarProfesionalesTurnosError(){
+        Mockito.when(secuenciasHorarioRepositoryMock.consultarHorariosProfesionales(fechaTurno.toString(),idRegional))
+                .thenReturn(Flux.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/personal/horarioTurno")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void actualizarTurnoProfesional(){
         List<TurnoProfesional> turnosProfesionales = new ArrayList<>();
         turnosProfesionales.add(TurnoProfesional.builder().idProfesional("98594").build());
@@ -143,7 +194,25 @@ import java.util.List;
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.getResult());
     }
+    @Test
+    void actualizarTurnoProfesionalError(){
+        List<TurnoProfesional> turnosProfesionales = new ArrayList<>();
+        turnosProfesionales.add(TurnoProfesional.builder().idProfesional("98594").build());
 
+        Mockito.when(secuenciasHorarioRepositoryMock.actualizarHorarioTurnoProfesionales(turnosProfesionales))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.put()
+                .uri("/personal/actualizarTurnoProfesional")
+                .bodyValue(turnosProfesionales)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_ACTUALIZAR_TURNO_PROFESIONAL, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void crearProfesional(){
         Profesional profesional = Profesional.builder().numeroIdentificacion("98989").build();
@@ -167,6 +236,24 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
     @Test
+    void crearProfesionalError(){
+        Profesional profesional = Profesional.builder().numeroIdentificacion("98989").build();
+
+        Mockito.when(personalCrudRepositoryMock.crearProfesional(profesional))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/personal/crearProfesional")
+                .bodyValue(profesional)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_CREAR_PROFESIONAL, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void actualizarProfesional(){
         Profesional profesional = Profesional.builder().numeroIdentificacion("98989").build();
 
@@ -188,7 +275,24 @@ import java.util.List;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void actualizarProfesionalError(){
+        Profesional profesional = Profesional.builder().numeroIdentificacion("98989").build();
 
+        Mockito.when(personalCrudRepositoryMock.actualizarProfesional(profesional))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.put()
+                .uri("/personal/actualizarProfesional")
+                .bodyValue(profesional)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_ACTTUALIZAR_PROFESIONAL, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void getConductores(){
         List<Conductor> conductor = new ArrayList<>();
@@ -212,7 +316,22 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void getConductoresError(){
 
+        Mockito.when(personalCrudRepositoryMock.consultarConductores())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/personal/conductores")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void crearConductor(){
         Conductor conductor = Conductor.builder().numeroIdentificacion("98989").build();
@@ -236,6 +355,24 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
     @Test
+    void crearConductorError(){
+        Conductor conductor = Conductor.builder().numeroIdentificacion("98989").build();
+
+        Mockito.when(personalCrudRepositoryMock.crearConductor(conductor))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/personal/crearConductor")
+                .bodyValue(conductor)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_CREAR_CONDUCTOR, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void actualizarConductor(){
         Conductor conductor = Conductor.builder().numeroIdentificacion("98989").build();
 
@@ -257,7 +394,24 @@ import java.util.List;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void actualizarConductorError(){
+        Conductor conductor = Conductor.builder().numeroIdentificacion("98989").build();
 
+        Mockito.when(personalCrudRepositoryMock.actualizarConductor(conductor))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.put()
+                .uri("/personal/actualizarConductor")
+                .bodyValue(conductor)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_ACTUALIZAR_CONDUCTOR, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void consultarMoviles(){
         List<Movil> moviles = new ArrayList<>();
@@ -281,7 +435,21 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void consultarMovilesError(){
+        Mockito.when(personalCrudRepositoryMock.consultarMoviles())
+                .thenReturn(Flux.error(Exception::new));
 
+        Response<?> response = webClient.get()
+                .uri("/personal/moviles")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void crearMovil(){
         Movil movil = Movil.builder().marca("marca").build();
@@ -305,6 +473,24 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
     @Test
+    void crearMovilError(){
+        Movil movil = Movil.builder().marca("marca").build();
+
+        Mockito.when(personalCrudRepositoryMock.crearMovil(movil))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/personal/crearMovil")
+                .bodyValue(movil)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_CREAR_MOVIL, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void actualizarMovil(){
         Movil movil = Movil.builder().marca("marca").build();
 
@@ -325,6 +511,24 @@ import java.util.List;
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
+    }
+    @Test
+    void actualizarMovilError(){
+        Movil movil = Movil.builder().marca("marca").build();
+
+        Mockito.when(personalCrudRepositoryMock.actualizarMovil(movil))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.put()
+                .uri("/personal/actualizarMovil")
+                .bodyValue(movil)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_ACTUALIZAR_MOVIL, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
     }
     @Test
     void consultarMovilesSinConductor(){
@@ -350,6 +554,21 @@ import java.util.List;
 
     }
     @Test
+    void consultarMovilesSinConductorError(){
+        Mockito.when(personalCrudRepositoryMock.consultarMovilesSinConductor())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/personal/movilesSinConductor")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void consultarMovilesByIdRegional(){
         List<Movil> moviles = new ArrayList<>();
         moviles.add(Movil.builder().marca("marca").build());
@@ -372,7 +591,22 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void consultarMovilesByIdRegionalError(){
 
+        Mockito.when(personalCrudRepositoryMock.consultarMovilesByIdRegional(idRegional))
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/personal/movilesByRegional/"+idRegional)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void consultarSecuenciasTurno(){
         List<SecuenciaTurno> secuenciaTurnos = new ArrayList<>();
@@ -396,7 +630,22 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void consultarSecuenciasTurnoError(){
 
+        Mockito.when(secuenciasHorarioRepositoryMock.consultarSecuencias())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/personal/secuenciasTurno")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void eliminarTurnosProfesionalesAccionMasiva(){
         List<EliminarTurnoProfesionalRequest> eliminarTurnoProfesionalRequests = new ArrayList<>();
@@ -426,7 +675,27 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void eliminarTurnosProfesionalesAccionMasivaError(){
+        List<EliminarTurnoProfesionalRequest> eliminarTurnoProfesionalRequests = new ArrayList<>();
+        eliminarTurnoProfesionalRequests.add(EliminarTurnoProfesionalRequest.builder().build());
 
+        Mockito.when(secuenciasHorarioRepositoryMock
+                        .eliminarTurnosProfesionalesAccionMasiva(eliminarTurnoProfesionalRequests))
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/personal/eliminarTurnosProfesionalesAccionMasiva")
+                .bodyValue(eliminarTurnoProfesionalRequests)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void asignarTurnosProfesionalesAccionMasiva(){
         List<TurnoProfesional> turnoProfesionales = new ArrayList<>();
@@ -456,7 +725,27 @@ import java.util.List;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
 
     }
+    @Test
+    void asignarTurnosProfesionalesAccionMasivaError(){
+        List<TurnoProfesional> turnoProfesionales = new ArrayList<>();
+        turnoProfesionales.add(TurnoProfesional.builder().build());
 
+        Mockito.when(secuenciasHorarioRepositoryMock
+                        .asignarTurnosProfesionalesAccionMasiva(turnoProfesionales))
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/personal/asignarTurnosProfesionalesAccionMasiva")
+                .bodyValue(turnoProfesionales)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void configurarSecuenciaTurno(){
         SecuenciaTurno secuenciaTurno = SecuenciaTurno.builder().descripcion("SS0").build();
@@ -475,6 +764,27 @@ import java.util.List;
 
         Assertions.assertNotNull(response);
         Assertions.assertTrue( response.getResult());
+
+    }
+
+    @Test
+    void configurarSecuenciaTurnoError(){
+        SecuenciaTurno secuenciaTurno = SecuenciaTurno.builder().descripcion("SS0").build();
+
+        Mockito.when(secuenciasHorarioRepositoryMock
+                        .configurarSecuenciaTurno(secuenciaTurno))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/personal/secuenciasTurno")
+                .bodyValue(secuenciaTurno)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
 
     }
 }

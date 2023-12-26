@@ -18,7 +18,6 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/remision")
 public class RemisionController {
 

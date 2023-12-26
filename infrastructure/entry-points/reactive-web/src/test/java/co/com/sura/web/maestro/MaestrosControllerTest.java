@@ -1,5 +1,7 @@
 package co.com.sura.web.maestro;
 
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.genericos.Response;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.maestros.entity.*;
@@ -61,6 +63,21 @@ class MaestrosControllerTest {
 
     }
     @Test
+    void consultarRegionalError(){
+        Mockito.when(maestroRepositoryMock.consultarRegional())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/maestros/regionales")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void consultarRegionalById(){
         String idRegional = "427";
         Regional regional = Regional.builder().build();
@@ -82,6 +99,24 @@ class MaestrosControllerTest {
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(),response.getResult());
+
+    }
+    @Test
+    void consultarRegionalByIdError(){
+        String idRegional = "427";
+        Mockito.when(maestroRepositoryMock.consultarRegionalById(idRegional))
+                .thenReturn(Mono.error(Exception::new));
+
+        String url = "/maestros/regionales/"+idRegional;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
 
     }
 
@@ -110,14 +145,32 @@ class MaestrosControllerTest {
 
     }
     @Test
+    void consultarHorarioTurnoError(){
+
+        Mockito.when(maestroRepositoryMock.consultarHorarioTurno())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/maestros/horarioTurno")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+
+    }
+    @Test
     void consultarHorarioTurnoById(){
         Integer idHorarioTurno = 1;
+
         HorarioTurno horarioTurno = HorarioTurno.builder().build();
 
         Response<HorarioTurno> respuestaEsperada = Response.<HorarioTurno>builder()
                 .result(horarioTurno)
                 .build();
-
         Mockito.when(maestroRepositoryMock.consultarHorarioTurnoById(idHorarioTurno))
                 .thenReturn(Mono.just(horarioTurno));
 
@@ -131,6 +184,25 @@ class MaestrosControllerTest {
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(),response.getResult());
+
+    }
+    @Test
+    void consultarHorarioTurnoByIdError(){
+        Integer idHorarioTurno = 1;
+
+        Mockito.when(maestroRepositoryMock.consultarHorarioTurnoById(idHorarioTurno))
+                .thenReturn(Mono.error(Exception::new));
+
+        String url = "/maestros/horarioTurno/"+idHorarioTurno;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
 
     }
 
@@ -158,7 +230,22 @@ class MaestrosControllerTest {
         Assertions.assertEquals(respuestaEsperada.getResult(),response.getResult());
 
     }
+    @Test
+    void consultarTipoIdentificacionError(){
+        Mockito.when(maestroRepositoryMock.consultarTipoIdentificacion())
+                .thenReturn(Flux.error(Exception::new));
 
+        Response<?> response = webClient.get()
+                .uri("/maestros/tipoIdentificacion")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarTipoIdentificacionById(){
         Integer idTipoIdentificacion = 1;
@@ -181,6 +268,26 @@ class MaestrosControllerTest {
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(),response.getResult());
+
+    }
+    @Test
+    void consultarTipoIdentificacionByIdError(){
+        Integer idTipoIdentificacion = 1;
+
+
+        Mockito.when(maestroRepositoryMock.consultarTipoIdentificacionById(idTipoIdentificacion))
+                .thenReturn(Mono.error(Exception::new));
+
+        String url = "/maestros/tipoIdentificacion/"+idTipoIdentificacion;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
 
     }
     @Test
@@ -209,6 +316,25 @@ class MaestrosControllerTest {
     }
 
     @Test
+    void consultarEstadocitaError(){
+
+        Mockito.when(maestroRepositoryMock.consultarEstadosCita())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/maestros/estadosCita")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+
+    }
+
+    @Test
     void consultarProfesiones(){
 
         List<Profesion> profesiones = new ArrayList<>();
@@ -232,5 +358,21 @@ class MaestrosControllerTest {
         Assertions.assertEquals(respuestaEsperada.getResult(),response.getResult());
 
     }
+    @Test
+    void consultarProfesionesError(){
 
+        Mockito.when(maestroRepositoryMock.consultarProfesiones())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/maestros/profesiones")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
 }

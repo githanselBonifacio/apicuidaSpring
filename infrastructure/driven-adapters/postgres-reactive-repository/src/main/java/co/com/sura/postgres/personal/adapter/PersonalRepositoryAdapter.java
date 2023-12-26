@@ -115,7 +115,7 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                     if (Boolean.TRUE.equals(exist)) {
                         return Mono.error(new Throwable(Mensajes.MOVIL_YA_EXISTE));
                     }
-                    return movilRepository.insertMovil(movil)
+                    return movilRepository.save(ConverterPersonal.convertToMovilData(movil))
                             .then(movilRepository.findById(movil.getMatricula()))
                             .map(ConverterPersonal::convertToMovil);
                 });

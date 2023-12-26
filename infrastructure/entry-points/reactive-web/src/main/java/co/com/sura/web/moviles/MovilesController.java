@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/moviles")
 public class MovilesController {
     @Autowired

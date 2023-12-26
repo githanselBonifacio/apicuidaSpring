@@ -57,7 +57,7 @@ class PersonalUserCaseTest {
         profesionales.add(Profesional.builder().build());
         profesionales.add(Profesional.builder().build());
 
-        Mockito.when(personalCrudRepositoryMock.consultarProfesionalesByRegional(idRegional))
+        Mockito.when(personalCrudRepositoryMock.consultarProfesionalesByIdRegional(idRegional))
                 .thenReturn(Flux.fromIterable(profesionales));
 
         Flux<Profesional> consultaProfesional = personalUseCaseMock

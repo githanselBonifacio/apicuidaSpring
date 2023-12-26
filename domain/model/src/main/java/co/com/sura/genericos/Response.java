@@ -1,6 +1,5 @@
 package co.com.sura.genericos;
 
-import com.google.gson.Gson;
 import lombok.*;
 
 @Data

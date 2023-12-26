@@ -28,7 +28,7 @@ public class ReporteCancelacionCitaMensual{
             .groupBy(RegistroCancelacionCitaMensual::getDia)
             .flatMap(grouped -> grouped.collectMultimap(RegistroCancelacionCitaMensual::getDia)
               .map(list -> {
-                 var registros = list.values().stream()
+                 List<RegistroCancelacionCita> registros = list.values().stream()
                       .flatMap(Collection::stream)
                       .map(r-> r.getRegistros().get(0))
                       .collect(Collectors.toList());

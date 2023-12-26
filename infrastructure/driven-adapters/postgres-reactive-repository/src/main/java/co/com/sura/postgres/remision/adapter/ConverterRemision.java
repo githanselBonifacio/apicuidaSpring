@@ -185,12 +185,12 @@ public class ConverterRemision extends Converter {
         return citasRequest
                 .stream()
                 .map(ConverterRemision:: convertirCitaData)
-                .peek(citaData -> citaData.setIdRemision(remisionRequest.getIdRemision()))
-                .peek(citaData -> citaData.setIdRegional(remisionRequest.getRegional().getIdRegional()))
-                .peek(citaData -> citaData.setLatitud(remisionRequest
-                        .getDatosAtencionPaciente().getUbicacion().getLatitud()))
-                .peek(citaData -> citaData.setLongitud(remisionRequest
-                        .getDatosAtencionPaciente().getUbicacion().getLongitud()))
+                .map(citaData -> citaData.toBuilder()
+                        .idRemision(remisionRequest.getIdRemision())
+                        .idRegional(remisionRequest.getRegional().getIdRegional())
+                        .latitud(remisionRequest.getDatosAtencionPaciente().getUbicacion().getLatitud())
+                        .longitud(remisionRequest.getDatosAtencionPaciente().getUbicacion().getLongitud())
+                        .build())
                 .collect(Collectors.toList());
     }
     public static List<Tratamiento> builTratamientosFromRequest(CitaRequest citaRequest){
@@ -289,7 +289,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getTratamientos()
                         .stream()
                         .map(ConverterRemision::extraerTratamientoData)
-                        .peek(tratamientoData -> tratamientoData.setIdCita(citaRequest.getIdCita()))
+                        .map(tratamientoData -> tratamientoData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
@@ -324,7 +326,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getProcedimientos().getCanalizaciones()
                         .stream()
                         .map(ConverterRemision:: convertirCanalizacionData)
-                        .peek(canalizacionData -> canalizacionData.setIdCita(citaRequest.getIdCita()))
+                        .map(canalizacionData -> canalizacionData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
@@ -340,7 +344,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getProcedimientos().getFototerapias()
                         .stream()
                         .map(ConverterRemision:: convertirFototerapiaData)
-                        .peek(fototerapiaData -> fototerapiaData.setIdCita(citaRequest.getIdCita()))
+                        .map(fototerapiaData -> fototerapiaData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
@@ -356,7 +362,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getProcedimientos().getSecreciones()
                         .stream()
                         .map(ConverterRemision::extraerSecrecionData)
-                        .peek(secrecionData -> secrecionData.setIdCita(citaRequest.getIdCita()))
+                        .map(secrecionData->secrecionData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
@@ -378,7 +386,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getProcedimientos().getSondajes()
                         .stream()
                         .map(ConverterRemision:: convertirSondajeData)
-                        .peek(sondajeData -> sondajeData.setIdCita(citaRequest.getIdCita()))
+                        .map(sondajeData -> sondajeData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
@@ -431,7 +441,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getProcedimientos().getSoporteNutricionales()
                         .stream()
                         .map(ConverterRemision::extraerSoporteNutricionalData)
-                        .peek(soporteNutricionalData -> soporteNutricionalData.setIdCita(citaRequest.getIdCita()))
+                        .map(soporteNutricionalData -> soporteNutricionalData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
@@ -451,7 +463,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getProcedimientos().getTomaMuestras()
                         .stream()
                         .map(ConverterRemision:: extraerTomaMuestra)
-                        .peek(tomaMuestraData ->  tomaMuestraData.setIdCita(citaRequest.getIdCita()))
+                        .map(tomaMuestraData -> tomaMuestraData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());
@@ -473,7 +487,9 @@ public class ConverterRemision extends Converter {
                 .map(citaRequest -> citaRequest.getProcedimientos().getCuraciones()
                         .stream()
                         .map(ConverterRemision::extraerCuracionData)
-                        .peek(curacionData ->  curacionData.setIdCita(citaRequest.getIdCita()))
+                        .map(curacionData -> curacionData.toBuilder()
+                                .idCita(citaRequest.getIdCita())
+                                .build())
                         .collect(Collectors.toList()))
                 .flatMap(Collection::parallelStream)
                 .collect(Collectors.toList());

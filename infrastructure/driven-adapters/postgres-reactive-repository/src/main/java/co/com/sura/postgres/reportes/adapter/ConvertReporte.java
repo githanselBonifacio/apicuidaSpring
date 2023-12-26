@@ -1,7 +1,7 @@
 package co.com.sura.postgres.reportes.adapter;
 
 import co.com.sura.postgres.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.maestros.data.RegionalesData;
+import co.com.sura.postgres.maestros.data.RegionalData;
 import co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCita;
 import co.com.sura.reportes.entity.turnos.ItemReporteAnual;
 import co.com.sura.reportes.entity.turnos.ItemReporteMensual;
@@ -71,7 +71,7 @@ public class ConvertReporte extends Converter {
 
     public static ReporteTurnoData buildReporteTurnoData(
             LocalDate fechaTurno,
-            Pair<RegionalesData, HorarioTurnoData> pair,
+            Pair<RegionalData, HorarioTurnoData> pair,
             Tuple5<List<CitaData>, Integer, Integer, Integer, Integer> tuple){
 
         var horasAsignadasCitas = CitaData.duracionTotalCitas(tuple.getT1());

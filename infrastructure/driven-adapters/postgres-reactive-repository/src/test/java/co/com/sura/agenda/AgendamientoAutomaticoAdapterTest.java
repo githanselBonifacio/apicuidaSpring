@@ -10,7 +10,7 @@ import co.com.sura.postgres.agenda.adapter.AgendamientoAutomaticoAdapter;
 import co.com.sura.postgres.agenda.data.CitaData;
 import co.com.sura.postgres.agenda.repository.CitaRepository;
 import co.com.sura.postgres.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.maestros.data.RegionalesData;
+import co.com.sura.postgres.maestros.data.RegionalData;
 import co.com.sura.postgres.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.moviles.data.DesplazamientoData;
@@ -292,7 +292,7 @@ class AgendamientoAutomaticoAdapterTest {
 
         //maestros
         Mockito.when(regionalesRepositoryMock.findById(idRegional))
-                .thenReturn(Mono.just(RegionalesData.builder()
+                .thenReturn(Mono.just(RegionalData.builder()
                                 .id(idRegional)
                                 .latitud(11.8)
                                 .longitud(-7.8)

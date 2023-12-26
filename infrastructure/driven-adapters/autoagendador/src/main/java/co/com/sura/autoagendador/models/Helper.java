@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class Helper {
+     private  Helper() {
+            throw new IllegalStateException("Utility class");
 
+    }
 
     public static Individuo intercambiarElementos(
             List<List<CitaGenetic>> citasGen, Pair<Integer,Integer> pos1, Pair<Integer,Integer> pos2) {

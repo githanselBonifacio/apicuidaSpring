@@ -22,8 +22,6 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.List;
-
-
 @Repository
 @EnableR2dbcRepositories
 public class ReportesAdapter implements ReportesRepository {
@@ -117,9 +115,8 @@ public class ReportesAdapter implements ReportesRepository {
     //querys
     //reporte turno
     private Flux<ItemReporteAnual> consultarItemsReporteAnual(Integer anio, String idRegional){
-        return transactionalOperator
-                .execute(status -> r2dbcEntityTemplate.getDatabaseClient()
-                        .sql(QueryReportes.FIND_REPORTE_ANUAL_BY_YEAR_REGIONAL.getQuery())
+        return transactionalOperator.execute(status -> r2dbcEntityTemplate.getDatabaseClient()
+                        .sql(QueryReportes.FIND_REPORTE_ANUAL_BY_YEAR_REGIONAL)
                         .bind("$1",anio)
                         .bind("$2",idRegional)
                         .map(ConvertReporte::buildItemReporteAnualFromRow)
@@ -127,9 +124,8 @@ public class ReportesAdapter implements ReportesRepository {
     }
 
     private Flux<ItemReporteMensual> consultarItemsReporteMensual(Integer anio,Integer mes, String idRegional){
-        return transactionalOperator
-                .execute(status -> r2dbcEntityTemplate.getDatabaseClient()
-                        .sql(QueryReportes.FIND_REPORTE_MENSUAL_BY_YEAR_REGIONAL.getQuery())
+        return transactionalOperator.execute(status -> r2dbcEntityTemplate.getDatabaseClient()
+                        .sql(QueryReportes.FIND_REPORTE_MENSUAL_BY_YEAR_REGIONAL)
                         .bind("$1",mes)
                         .bind("$2",anio)
                         .bind("$3",idRegional)
@@ -141,7 +137,7 @@ public class ReportesAdapter implements ReportesRepository {
     private Flux<RegistroCancelacionCitaAnual> consultarRegistroCancelacionCitaAnual(Integer anio, String idRegional){
         return transactionalOperator
                 .execute(status  ->r2dbcEntityTemplate.getDatabaseClient()
-                .sql(QueryReportes.FIND_MOTIVOS_CANCELACION_ANUAL.getQuery())
+                .sql(QueryReportes.FIND_MOTIVOS_CANCELACION_ANUAL)
                 .bind("$1",idRegional)
                 .bind("$2",anio)
                 .map(ConvertReporte::buildRegistroCancelacionCitaAnualFromRow)
@@ -152,7 +148,7 @@ public class ReportesAdapter implements ReportesRepository {
             Integer anio,Integer numeroMes, String idRegional){
         return transactionalOperator
                 .execute(status  ->r2dbcEntityTemplate.getDatabaseClient()
-                        .sql(QueryReportes.FIND_MOTIVOS_CANCELACION_MENSUAL.getQuery())
+                        .sql(QueryReportes.FIND_MOTIVOS_CANCELACION_MENSUAL)
                         .bind("$1",idRegional)
                         .bind("$2",numeroMes)
                         .bind("$3",anio)

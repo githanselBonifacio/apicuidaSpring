@@ -17,8 +17,8 @@ import static co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCi
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Data
+@ToString
 @EqualsAndHashCode(callSuper=false)
 @SuperBuilder(toBuilder = true)
 public class ReporteCancelacionCitaAnual {
@@ -31,7 +31,7 @@ public class ReporteCancelacionCitaAnual {
            .groupBy(RegistroCancelacionCitaAnual::getMes)
            .flatMap(grouped -> grouped.collectMultimap(RegistroCancelacionCitaAnual::getMes)
            .map(list -> {
-                var registros = list.values().stream()
+                List<RegistroCancelacionCita> registros = list.values().stream()
                       .flatMap(Collection::stream)
                       .map(r-> r.getRegistros().get(0))
                       .collect(Collectors.toList());

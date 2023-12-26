@@ -2,6 +2,8 @@ package co.com.sura.web.farmacia;
 
 
 import co.com.sura.agenda.entity.PacienteTratamientoCita;
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.farmacia.FarmaciaUseCase;
 import co.com.sura.farmacia.gateway.FarmaciaRepository;
 import co.com.sura.genericos.Response;
@@ -63,7 +65,23 @@ import java.util.List;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void getProfesionalesbyTurnoRegionalError(){
 
+        Mockito.when(farmaciaRepositoryMock.consultarAllPacienteWithMedicamentosToFarmacia())
+                .thenReturn(Flux.error(Exception::new));
+
+
+        Response<?> response = webClient.get()
+                .uri("/farmacia/tratamientosFarmacia")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void consultarMedicamentosToFarmaciaWithFilter(){
         LocalDate fechaTurno = LocalDate.now();
@@ -96,7 +114,32 @@ import java.util.List;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarMedicamentosToFarmaciaWithFilterError(){
+        LocalDate fechaTurno = LocalDate.now();
+        String idRegional = "427";
+        Integer idHorarioTurno = 1;
 
+        Mockito.when(farmaciaRepositoryMock.consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
+                        fechaTurno,idHorarioTurno,idRegional
+                ))
+                .thenReturn(Flux.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/farmacia/tratamientosFarmaciaWithFilter")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idHorarioTurno", idHorarioTurno)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void notificarMedicamentosToFarmacia(){
         String identificacionPaciente = "9898998";
@@ -117,5 +160,27 @@ import java.util.List;
 
         Assertions.assertNotNull(respuesta);
         Assertions.assertTrue(respuesta.getResult());
+    }
+
+    @Test
+    void notificarMedicamentosToFarmaciaError(){
+        String identificacionPaciente = "9898998";
+        List<PacienteTratamientoCita> pacientesTratamiento = new ArrayList<>();
+        pacientesTratamiento.add(PacienteTratamientoCita.builder()
+                .numeroIdentificacion(identificacionPaciente).build());
+
+        Mockito.when(farmaciaRepositoryMock.notificarMedicamentosToFarmacia(pacientesTratamiento))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/farmacia/notificarFarmacia")
+                .bodyValue(pacientesTratamiento)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
     }
 }

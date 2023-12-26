@@ -38,31 +38,6 @@ public interface RemisionDiagnosticoRepository extends ReactiveCrudRepository<Re
         );
     }
 
-    @Query("UPDATE remision_diagnostico SET codigo=$1, id_remision=$2, nombre_diagnostico= $3" +
-            " WHERE id_remision=$1  AND codigo=$2;" )
-    Mono<Void> updateDiagnosticoQuery(
-            @Param("$1") String codigo,
-            @Param("$2") String idRemision,
-            @Param("$3") String nombreDiagnostico
-    );
-
-    @Transactional
-    default Mono<Void> updateMultiplesDiagnosticos(List<RemisionDiagnosticoData> remisionDiagnosticoData) {
-        Flux<RemisionDiagnosticoData> diagnosticoDataFlux = Flux.fromIterable(remisionDiagnosticoData);
-
-        return diagnosticoDataFlux
-                .flatMap(this::updateDiagnostico)
-                .then();
-    }
-
-    default Mono<Void> updateDiagnostico(RemisionDiagnosticoData remisionDiagnosticoData){
-        return  updateDiagnosticoQuery(
-                remisionDiagnosticoData.getCodigo(),
-                remisionDiagnosticoData.getIdRemision(),
-                remisionDiagnosticoData.getNombreDiagnostico()
-
-        );
-    }
     @Query(" DELETE FROM remision_diagnostico WHERE id_remision = $1")
     Mono<Void> deleteByIdRemision(String idRemision);
 

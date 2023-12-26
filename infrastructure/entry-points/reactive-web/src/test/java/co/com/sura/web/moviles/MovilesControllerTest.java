@@ -1,5 +1,7 @@
 package co.com.sura.web.moviles;
 
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.genericos.Response;
 import co.com.sura.moviles.MovilesUseCase;
 import co.com.sura.moviles.entity.Desplazamiento;
@@ -67,5 +69,30 @@ import java.util.List;
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
+    }
+    @Test
+    void getDesplazamientoByTurnoRegionalError(){
+        LocalDate fechaTurno = LocalDate.now();
+        String idRegional = "427";
+        Integer idHorarioTurno = 1;
+
+        Mockito.when(movilRepositoryMock.consultarDesplazamientoRegional(fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Flux.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/moviles/desplazamientoVisita")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idHorarioTurno", idHorarioTurno)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
     }
 }

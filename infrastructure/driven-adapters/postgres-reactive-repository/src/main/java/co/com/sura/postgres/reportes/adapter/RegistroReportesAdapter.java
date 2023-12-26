@@ -1,7 +1,7 @@
 package co.com.sura.postgres.reportes.adapter;
 
 import co.com.sura.postgres.maestros.data.HorarioTurnoData;
-import co.com.sura.postgres.maestros.data.RegionalesData;
+import co.com.sura.postgres.maestros.data.RegionalData;
 import co.com.sura.postgres.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.moviles.data.DesplazamientoData;
@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple5;
 
 import java.time.LocalDate;
@@ -55,10 +56,11 @@ public class RegistroReportesAdapter {
     }
 
     @Scheduled(cron = "0 0 1 * * *",  zone = "America/Bogota")
-    public void actualizarReporteTurno() {
+    public Mono<Boolean> actualizarReporteTurno() {
         var zone = ZoneId.of("America/Bogota");
         var fecha = LocalDate.now(zone).minusDays(1);
         this.insertarRegistroReporteTurno(fecha);
+        return Mono.just(Boolean.TRUE);
     }
 
     public void insertarRegistroReporteTurno(LocalDate fechaTurno){
@@ -70,14 +72,14 @@ public class RegistroReportesAdapter {
 
                                         .map(horarioTurnoData->  Pair.with(regionalesData,horarioTurnoData)))
 
-                                .flatMap(pair-> consultarRegistroData(fechaTurno,pair)
+                                .flatMap(pair-> this.consultarRegistroData(fechaTurno,pair)
                                         .map(tuple-> ConvertReporte.buildReporteTurnoData(fechaTurno, pair, tuple)))
 
                                 .flatMap(this.reportesTurnoRepository::save))
                 .subscribe();
     }
     public Flux<Tuple5<List<CitaData>, Integer, Integer, Integer, Integer>> consultarRegistroData(
-            LocalDate fechaTurno, Pair<RegionalesData,HorarioTurnoData> pair){
+            LocalDate fechaTurno, Pair<RegionalData,HorarioTurnoData> pair){
       return Flux.zip(
               citaRepository.findAllByFechaTurnoRegional(fechaTurno, pair.getValue0().getId(),pair.getValue1().getId())
                         .collectList(),

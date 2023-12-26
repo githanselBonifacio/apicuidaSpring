@@ -103,7 +103,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
        if(esNovedad){
            return   Mono.from(remisionRepository.save(remisionData))
                   .then(Mono.from(datosAtencionPacienteRepository.updateDatosAtencion(datosAtencionPacienteData)))
-                   .then(Mono.from(remisionDiagnosticoRepository.updateMultiplesDiagnosticos(diagnosticosData)))
+                   .then(Mono.from(remisionDiagnosticoRepository.saveAll(diagnosticosData)))
                    .then();
 
        }else {

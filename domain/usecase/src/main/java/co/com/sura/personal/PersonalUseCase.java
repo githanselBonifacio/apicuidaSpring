@@ -31,7 +31,7 @@ public class PersonalUseCase {
         return personalRepository.consultarProfesionales();
     }
     public Flux<Profesional> consultarProfesionalByRegional(String idRegional){
-        return personalRepository.consultarProfesionalesByRegional(idRegional);
+        return personalRepository.consultarProfesionalesByIdRegional(idRegional);
     }
     public Mono<Profesional> crearProfesional(Profesional profesional) {
         return personalRepository.crearProfesional(profesional);

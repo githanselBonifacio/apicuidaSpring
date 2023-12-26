@@ -371,8 +371,8 @@ class PersonalRepositoryAdapterTest {
         Mockito.when(movilRepositoryMock.existsById(this.movilData.getMatricula()))
                 .thenReturn(Mono.just(Boolean.FALSE));
 
-        Mockito.when(movilRepositoryMock.insertMovil(this.movil))
-                .thenReturn(Mono.empty());
+        Mockito.when(movilRepositoryMock.save(this.movilData))
+                .thenReturn(Mono.just(this.movilData));
 
 
         Mockito.when(movilRepositoryMock.findById(this.movilData.getMatricula()))

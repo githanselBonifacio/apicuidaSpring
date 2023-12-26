@@ -1,5 +1,7 @@
 package co.com.sura.web.reportes;
 
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.genericos.Response;
 import co.com.sura.reportes.ReportesUseCase;
 import co.com.sura.reportes.entity.cancelacioncitas.ReporteCancelacionCitaAnual;
@@ -72,7 +74,28 @@ class ReportesControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarReporteAnualError(){
 
+        Mockito.when(reportesRepositoryMock.consultarReporteAnual(anio,idRegional))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/reportes/turno/anual")
+                .queryParam("anio", anio)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarReporteMensual(){
         ReporteTurnoMensual reporteTurnoMensual = ReporteTurnoMensual.builder()
@@ -101,7 +124,27 @@ class ReportesControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarReporteMensualError(){
 
+        Mockito.when(reportesRepositoryMock.consultarReporteMensual(anio,numeroMes,idRegional))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/reportes/turno/mensual")
+                .queryParam("anio", anio)
+                .queryParam("numeroMes", numeroMes)
+                .queryParam("idRegional", idRegional);
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarReporteCancelacionCitaAnual(){
         ReporteCancelacionCitaAnual reporteCancelacionCitaAnual = ReporteCancelacionCitaAnual
@@ -132,6 +175,26 @@ class ReportesControllerTest {
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
     @Test
+    void consultarReporteCancelacionCitaAnualError(){
+
+        Mockito.when(reportesRepositoryMock.consultaReporteCancelacionCitasAnual(anio,idRegional))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/reportes/cancelacionCitas/anual")
+                .queryParam("anio", anio)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void consultarReporteCancelacionCitaMensual(){
         ReporteCancelacionCitaMensual reporteCancelacionCitaMensual = ReporteCancelacionCitaMensual.builder()
                 .reportes(new ArrayList<>())
@@ -160,4 +223,27 @@ class ReportesControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarReporteCancelacionCitaMensualError(){
+
+        Mockito.when(reportesRepositoryMock.consultaReporteCancelacionCitasMensual(anio,numeroMes,idRegional))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/reportes/cancelacionCitas/mensual")
+                .queryParam("anio", anio)
+                .queryParam("numeroMes", numeroMes)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
+
 }

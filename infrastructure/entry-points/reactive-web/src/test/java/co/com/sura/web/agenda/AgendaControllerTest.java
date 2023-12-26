@@ -6,6 +6,8 @@ import co.com.sura.agenda.entity.Cita;
 import co.com.sura.agenda.gateway.AgendaRepository;
 import co.com.sura.agenda.gateway.AgendamientoAutomaticoRepository;
 import co.com.sura.agenda.gateway.GestionEstadosCitasRepository;
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.genericos.Response;
 import co.com.sura.moviles.entity.Desplazamiento;
 import co.com.sura.personal.entity.Profesional;
@@ -89,6 +91,25 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void getProfesionalesbyTurnoRegionalError(){
+        Mockito.when(personalCrudRepositoryMock.consultarProfesionalByTurnoRegional(fechaTurno,idRegional))
+                .thenReturn(Flux.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/profesionalesByTurnoRegional")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
 
     @Test
     void getProfesionalesfromTurnoRegional(){
@@ -117,7 +138,26 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void getProfesionalesfromTurnoRegionalError(){
+        Mockito.when(personalCrudRepositoryMock.consultarProfesionalFromTurnoRegional(fechaTurno,idRegional,idHorarioTurno))
+                .thenReturn(Flux.error(Exception::new));
 
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/profesionalesFromTurnoRegional")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional)
+                .queryParam("idHorarioTurno", idHorarioTurno);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void consultarProfesionalesByRegional(){
         List<Profesional> profesionales = new ArrayList<>();
@@ -142,7 +182,22 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarProfesionalesByRegionalError(){
+        Mockito.when(personalCrudRepositoryMock.consultarProfesionalesByIdRegional(idRegional))
+                .thenReturn(Flux.error(Exception::new));
 
+        String url = "/agenda/profesionales/"+idRegional;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void asignarProfesionalTurno(){
         TurnoProfesional turnoProfesional = TurnoProfesional.builder()
@@ -169,6 +224,29 @@ import java.util.*;
         Assertions.assertTrue(response.getResult());
     }
     @Test
+    void asignarProfesionalTurnoErro(){
+        TurnoProfesional turnoProfesional = TurnoProfesional.builder()
+                .idProfesional("989897")
+                .fechaTurno(fechaTurno)
+                .idHorarioTurno(idHorarioTurno)
+                .build();
+
+        Mockito.when(agendaRepositoryMock.asignarProfesionalTurno(turnoProfesional))
+                .thenReturn(Mono.error(Exception::new));
+
+        String url = "/agenda/asignarProfesionalTurno";
+        Response<?> response = webClient.post()
+                .uri(url)
+                .bodyValue(turnoProfesional)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void desasignarProfesionalTurno(){
         TurnoProfesional turnoProfesional = TurnoProfesional.builder()
                 .idProfesional("989897")
@@ -193,7 +271,30 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.getResult());
     }
+    @Test
+    void desasignarProfesionalTurnoError(){
 
+        TurnoProfesional turnoProfesional = TurnoProfesional.builder()
+                .idProfesional("989897")
+                .fechaTurno(fechaTurno)
+                .idHorarioTurno(idHorarioTurno)
+                .build();
+
+        Mockito.when(agendaRepositoryMock.desasignarProfesionalTurno(turnoProfesional))
+                .thenReturn(Mono.error(Exception::new));
+
+        String url = "/agenda/desasignarProfesionalTurno";
+        Response<?> response = webClient.post()
+                .uri(url)
+                .bodyValue(turnoProfesional)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.NO_DESASIGNO_PROFESIONAL_TURNO, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void desagendarTurnoCompleto(){
 
@@ -218,7 +319,29 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.getResult());
     }
+    @Test
+    void desagendarTurnoCompletoError(){
 
+        Mockito.when(agendamientoAutomaticoRepositoryMock.desagendarTurnoCompleto(
+                        fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/desagendarTurnoCompleto")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional)
+                .queryParam("idHorarioTurno", idHorarioTurno);
+
+        Response<?> response = webClient.put()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void autoagendarTurnoCompleto(){
 
@@ -243,7 +366,28 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.getResult());
     }
+    @Test
+    void autoagendarTurnoCompletoError(){
+        Mockito.when(agendamientoAutomaticoRepositoryMock.autoagendarTurnoCompleto(
+                        fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Mono.error(Exception::new));
 
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/autoagendarTurnoCompleto")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional)
+                .queryParam("idHorarioTurno", idHorarioTurno);
+
+        Response<?> response = webClient.put()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_AUTOAGENDADO, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void consultarActividadesProfesionalesRegionalHorario(){
         List<Actividad> actividades = new ArrayList<>();
@@ -274,6 +418,31 @@ import java.util.*;
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
     @Test
+    void consultarActividadesProfesionalesRegionalHorarioError(){
+
+
+        Mockito.when(agendaRepositoryMock.consultarActividadesByProfesionalesRegionalHorarioTurno(
+                        fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Flux.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/agenda/actividadesByprofesionalesRegionalHorario")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional)
+                .queryParam("idHorarioTurno", idHorarioTurno);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
+    @Test
     void getDesplazamientoByIdCitaPartida(){
         List<Desplazamiento> desplazamientos = new ArrayList<>();
         desplazamientos.add(Desplazamiento.builder().idCitaPartida("88sdf49-4").build());
@@ -302,7 +471,28 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void getDesplazamientoByIdCitaPartidaError(){
+        Mockito.when(agendaRepositoryMock.consultarDesplazamientoRegional(
+                        fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Flux.error(Exception::new));
 
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/agenda/desplazamientoVisita")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional)
+                .queryParam("idHorarioTurno", idHorarioTurno);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void getCitasByTurnoRegional(){
         List<Cita> citas = new ArrayList<>();
@@ -332,7 +522,28 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void getCitasByTurnoRegionalError(){
+        Mockito.when(agendaRepositoryMock.consultarCitasByTurnoRegional(
+                        fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Flux.error(Exception::new));
 
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/agenda/citas")
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idRegional", idRegional)
+                .queryParam("idHorarioTurno", idHorarioTurno);
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void reprogramarCita(){
         Cita cita = Cita.builder()
@@ -358,7 +569,31 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertTrue( response.getResult());
     }
+    @Test
+    void reprogramarCitaError(){
+        Cita cita = Cita.builder()
+                .idCita(idCita)
+                .idProfesional(idProfesional)
+                .fechaProgramada(fechaProgramada)
+                .idHorarioTurno(idHorarioTurno)
+                .idRegional(idRegional)
+                .build();
+        Mockito.when(agendaRepositoryMock.reprogramarCitaFromProfesional(
+                        fechaProgramada,idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Mono.error(Exception::new));
 
+
+        Response<?> response = webClient.put()
+                .uri("/agenda/reprogramarCita")
+                .bodyValue(cita)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.NO_REPROGRAMO_HORA_CITA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void confirmarCita(){
 
@@ -381,6 +616,26 @@ import java.util.*;
         Assertions.assertTrue( response.getResult());
     }
     @Test
+    void confirmarCitaError(){
+        Mockito.when(gestionEstadosCitasRepositoryMock.confirmarCita(
+                        idCita))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/agenda/confirmarCita")
+                .queryParam("idCita", idCita);
+
+        Response<?> response = webClient.put()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void iniciarAtencionCita(){
 
         Mockito.when(gestionEstadosCitasRepositoryMock.iniciarAtencionCita(
@@ -401,7 +656,27 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertTrue( response.getResult());
     }
+    @Test
+    void iniciarAtencionCitaError(){
 
+        Mockito.when(gestionEstadosCitasRepositoryMock.iniciarAtencionCita(
+                        idCita))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/agenda/iniciarAtencionCita")
+                .queryParam("idCita", idCita);
+
+        Response<?> response = webClient.put()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void finalizarAtencionCita(){
 
@@ -422,6 +697,27 @@ import java.util.*;
 
         Assertions.assertNotNull(response);
         Assertions.assertTrue( response.getResult());
+    }
+    @Test
+    void finalizarAtencionCitaError(){
+        Mockito.when(gestionEstadosCitasRepositoryMock.finalizarAtencionCita(
+                        idCita))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/agenda/finalizarAtencionCita")
+                .queryParam("idCita", idCita);
+
+        Response<?> response = webClient.put()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
     }
     @Test
     void asignarProfesionalCita(){
@@ -448,6 +744,32 @@ import java.util.*;
         Assertions.assertTrue( response.getResult());
     }
     @Test
+    void asignarProfesionalCitaError(){
+
+        Cita cita = Cita.builder()
+                .idCita(idCita)
+                .idProfesional(idProfesional)
+                .fechaProgramada(fechaProgramada)
+                .idHorarioTurno(idHorarioTurno)
+                .idRegional(idRegional)
+                .build();
+
+        Mockito.when(gestionEstadosCitasRepositoryMock.agendarToProfesional(
+                        idCita,idProfesional,fechaProgramada,idHorarioTurno,idRegional))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.put()
+                .uri("/agenda/asignarProfesionalCita")
+                .bodyValue(cita)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.NO_ASIGNO_PROFESIONAL_CITA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
     void desasignarProfesionalCita(){
 
         Mockito.when(gestionEstadosCitasRepositoryMock.desagendarToProfesional(
@@ -472,7 +794,30 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertTrue( response.getResult());
     }
+    @Test
+    void desasignarProfesionalCitaError(){
+        Mockito.when(gestionEstadosCitasRepositoryMock.desagendarToProfesional(
+                        idCita,idProfesional,fechaTurno,idHorarioTurno,idRegional))
+                .thenReturn(Mono.error(Exception::new));
 
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/agenda/desasignarProfesionalCita")
+                .queryParam("idCita", idCita)
+                .queryParam("idProfesional", idProfesional)
+                .queryParam("fechaTurno", fechaTurno)
+                .queryParam("idHorarioTurno", idHorarioTurno)
+                .queryParam("idRegional", idRegional);
+
+        Response<?> response = webClient.put()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void consultarTratamientosByCita(){
         List<Tratamiento> tratamientos = new ArrayList<>();
@@ -499,7 +844,25 @@ import java.util.*;
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarTratamientosByCitaError(){
+        Mockito.when(agendaRepositoryMock.consultarTratamientoByCitas(idCita))
+                .thenReturn(Flux.error(Exception::new));
 
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/tratamientos")
+                .queryParam("idCita", idCita);
+
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
     @Test
     void consultarProcedimientosByIdCita(){
         Procedimientos procedimientos = Procedimientos.builder().build();
@@ -525,5 +888,24 @@ import java.util.*;
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
+    }
+    @Test
+    void consultarProcedimientosByIdCitaError(){
+        Mockito.when(agendaRepositoryMock.consultarProcedimientosByIdCita(idCita))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/procedimientos")
+                .queryParam("idCita", idCita);
+
+
+        Response<?> response = webClient.get()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
     }
 }

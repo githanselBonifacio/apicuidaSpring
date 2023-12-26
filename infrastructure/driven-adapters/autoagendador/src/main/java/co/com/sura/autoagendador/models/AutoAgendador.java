@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,7 +44,7 @@ public class AutoAgendador {
     private Poblacion poblacionActual;
     private Double aptitudGlobalActual;
 
-    private final Random random= new Random();
+    private final Random random= new SecureRandom();
 
     @Autowired
     public AutoAgendador(

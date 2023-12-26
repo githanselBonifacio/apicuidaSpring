@@ -2,6 +2,7 @@ subprojects {
     apply plugin: "java"
     apply plugin: "jacoco"
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.sonarqube'
 
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -52,7 +53,17 @@ subprojects {
     jacoco {
         toolVersion = '0.8.7'
     }
-
+    sonarqube {
+        properties {
+            property "sonar.sources", "."
+            property "sonar.exclusions", "**/src/test/java/**, **/resources/**"
+            property "sonar.projectKey", "apicuida"
+            property "sonar.scm.provider", "git"
+            property "sonar.scm.disabled", "true"
+            property "sonar.host.url", "http://localhost:9000"
+            property "sonar.login", "c0734b5d5f38b3ea005e3b05a8bf4a66d8e8c6a3"
+        }
+    }
     jacocoTestReport {
         dependsOn test
         reports {

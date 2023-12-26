@@ -4,12 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
 import java.lang.reflect.ParameterizedType;
 import java.util.function.Function;
 
-import static reactor.core.publisher.Flux.fromIterable;
 
 public abstract class AdapterOperations<E, D, I, R extends ReactiveCrudRepository<D, I>> {
 

@@ -1,9 +1,6 @@
 package co.com.sura.postgres.maestros.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -16,8 +13,9 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 @Table(name = "regionales")
-public class RegionalesData {
+public class RegionalData {
     @Id
     @Column("id_regional")
     private String id;

@@ -1,5 +1,7 @@
 package co.com.sura.web.remision;
 
+import co.com.sura.constantes.Mensajes;
+import co.com.sura.constantes.StatusCode;
 import co.com.sura.genericos.Response;
 import co.com.sura.remision.RemisionUseCase;
 import co.com.sura.remision.dto.CitaRequest;
@@ -74,7 +76,32 @@ class RemisionControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.getResult());
     }
+    @Test
+    void crearRemisionError(){
+        RemisionRequest remisionRequest = RemisionRequest.builder().build();
+        List<CitaRequest> citasRequest = new ArrayList<>();
+        CrearRemisionCitasRequest crearRemisionCitasRequest = CrearRemisionCitasRequest
+                .builder()
+                .remision(remisionRequest)
+                .citas(citasRequest)
+                .build();
+        citasRequest.add(CitaRequest.builder().build());
+        Mockito.when(remisionCrudRepositoryMock.crearRemisionCita(remisionRequest,citasRequest))
+                .thenReturn(Mono.error(new Exception(Mensajes.ERROR_CREAR_REMISION)));
 
+
+        Response<?> response = webClient.post()
+                .uri("/remision/crearRemisionCitas")
+                .bodyValue(crearRemisionCitasRequest)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void actualizarRemisionPorNovedad(){
         RemisionRequest remisionRequest = RemisionRequest.builder().build();
@@ -107,7 +134,36 @@ class RemisionControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.getResult());
     }
+    @Test
+    void actualizarRemisionPorNovedadError(){
+        RemisionRequest remisionRequest = RemisionRequest.builder().build();
+        List<CitaRequest> citasRequest = new ArrayList<>();
+        citasRequest.add(CitaRequest.builder().build());
+        NovedadRequest novedadRequest = NovedadRequest.builder().build();
 
+        CrearRemisionCitasRequest crearRemisionCitasRequest = CrearRemisionCitasRequest
+                .builder()
+                .remision(remisionRequest)
+                .novedad(novedadRequest)
+                .citas(citasRequest)
+                .build();
+
+        Mockito.when(remisionCrudRepositoryMock.actualizarRemisionPorNovedad(
+                        remisionRequest,citasRequest,novedadRequest))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/remision/actualizarRemisionPorNovedad")
+                .bodyValue(crearRemisionCitasRequest)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarRemisiones(){
         List<Remision> remisiones = new ArrayList<>();
@@ -132,7 +188,26 @@ class RemisionControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarRemisionesError(){
 
+        Mockito.when(remisionCrudRepositoryMock.consultarRemisiones())
+                .thenReturn(Flux.error(Exception::new));
+
+
+
+        Response<?> response = webClient.get()
+                .uri("/remision")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarDatosAtencionPacienteByRemision(){
         DatosAtencionPaciente datosAtencionPaciente = DatosAtencionPaciente.builder().build();
@@ -156,7 +231,26 @@ class RemisionControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarDatosAtencionPacienteByRemisionError(){
+        DatosAtencionPaciente datosAtencionPaciente = DatosAtencionPaciente.builder().build();
 
+        Mockito.when(remisionCrudRepositoryMock.consultarDatosAtencionPacienteByIdRemision(idRemision))
+                .thenReturn(Mono.error(Exception::new));
+
+
+        String url = "/remision/datosAtencionPaciente/"+idRemision;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarPacienteFromRemision(){
         Paciente paciente = Paciente.builder().build();
@@ -180,7 +274,26 @@ class RemisionControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarPacienteFromRemisionError(){
 
+        Mockito.when(remisionCrudRepositoryMock.consultarPacienteFromRemision(idRemision))
+                .thenReturn(Mono.error(Exception::new));
+
+
+        String url = "/remision/pacienteRemision/"+idRemision;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarHistorialRemisionById(){
         List<RegistroHistorialRemision> historialRemision = new ArrayList<>();
@@ -205,7 +318,24 @@ class RemisionControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
     }
+    @Test
+    void consultarHistorialRemisionByIdError(){
 
+        Mockito.when(historialRemisionRepositoryMock.consultarHistoricoRemision(idRemision))
+                .thenReturn(Flux.error(Exception::new));
+
+        String url = "/remision/historial/"+idRemision;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
     @Test
     void consultarAllDataRemisionById(){
         RegistroHistorialRemision historialRemision = RegistroHistorialRemision.builder().idRemision(idRemision).build();
@@ -219,7 +349,7 @@ class RemisionControllerTest {
                 .thenReturn(Mono.just(historialRemision));
 
 
-   String url = "/remision/"+idRemision;
+        String url = "/remision/"+idRemision;
         Response<RegistroHistorialRemision> response = webClient.get()
                 .uri(url)
                 .exchange()
@@ -229,6 +359,25 @@ class RemisionControllerTest {
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
+    }
+    @Test
+    void consultarAllDataRemisionByIdError(){
+
+        Mockito.when(historialRemisionRepositoryMock.consultarDatosRemision(idRemision))
+                .thenReturn(Mono.error(Exception::new));
+
+
+        String url = "/remision/"+idRemision;
+        Response<?> response = webClient.get()
+                .uri(url)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
     }
     @Test
     void egresarRemisionById(){
@@ -250,4 +399,26 @@ class RemisionControllerTest {
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.getResult());
     }
+    @Test
+    void egresarRemisionByIdError(){
+
+        Mockito.when(remisionCrudRepositoryMock.egresarRemisionById(idRemision))
+                .thenReturn(Mono.error(Exception::new));
+
+        UriComponentsBuilder builderUrl = UriComponentsBuilder
+                .fromPath("/remision/egresar")
+                .queryParam("idRemision", idRemision);
+
+        Response<?> response = webClient.put()
+                .uri(builderUrl.build().toUri())
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_EGRESAR_REMISION, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
+
 }

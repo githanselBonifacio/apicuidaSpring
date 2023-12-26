@@ -11,7 +11,6 @@ import co.com.sura.genericos.Response;
 import co.com.sura.maestro.CrudMaestroUseCase;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +20,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/maestros")
 public class MaestroController {
 
@@ -33,8 +31,8 @@ public class MaestroController {
     public Mono<Response<List<Regional>>> consultarRegional(){
         return crudMaestroUseCase.consultarRegionales()
                 .collectList()
-                .map(ciudades -> ResponseFactory.createStatus(
-                        ciudades,
+                .map(regionales -> ResponseFactory.createStatus(
+                        regionales,
                         StatusCode.STATUS_200,
                         Mensajes.PETICION_EXITOSA,
                         Mensajes.PETICION_EXITOSA,
@@ -72,8 +70,8 @@ public class MaestroController {
     public Mono<Response<List<HorarioTurno>>> consultarHorarioTurno(){
         return crudMaestroUseCase.consultarHorarioTurno()
                 .collectList()
-                .map(ciudades -> ResponseFactory.createStatus(
-                        ciudades,
+                .map(regionales -> ResponseFactory.createStatus(
+                        regionales,
                         StatusCode.STATUS_200,
                         Mensajes.PETICION_EXITOSA,
                         Mensajes.PETICION_EXITOSA,
