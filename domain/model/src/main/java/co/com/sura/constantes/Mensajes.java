@@ -37,7 +37,8 @@ public class Mensajes {
     public static final String ERROR_FECHA_CITA="Cita no se puede agendar, la fecha ya esta ocupada";
     public static final String ERROR_FECHA_CITA_HORARIO="Cita no se puede agendar, la fecha esta por fuera del horario del turno";
 
-
+    public static final String SE_CANCELO_CITA = "La  cita fue cancelada de manera exitosa";
+    public static final String ERROR_CANCELAR_CITA = "No se canceló la cita de manera exitosa";
     public static final String CITA_NO_EXISTE ="La cita no existe";
     public static final String SE_DESASIGNO_PROFESIONAL_CITA="Se ha desagendado la cita  al profesional exitosamente";
     public static final String NO_DESASIGNO_PROFESIONAL_CITA="Se presentó un error y no se pudo desagendar la cita";

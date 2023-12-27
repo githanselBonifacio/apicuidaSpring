@@ -331,6 +331,26 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    @PutMapping(value = "cancelarCita")
+    public Mono<Response<Boolean>> cancelarCita(
+            @RequestParam String idCita,
+            @RequestParam Integer idMotivoCancelacion){
+
+        return agendaUseCase.cancelarCita(idCita,idMotivoCancelacion)
+                .map(seCancelo->ResponseFactory.createStatus(
+                        seCancelo,
+                        StatusCode.STATUS_200,
+                        Mensajes.SE_CANCELO_CITA,
+                        Mensajes.SE_CANCELO_CITA,
+                        Mensajes.PETICION_EXITOSA))
+                .onErrorResume(e ->Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_CANCELAR_CITA,
+                        e.getMessage(),
+                        e.getMessage()
+                )));
+    }
     @PutMapping(value = "/asignarProfesionalCita")
     public Mono<Response<Boolean>> asignarProfesionalCita(
             @RequestBody Cita cita){

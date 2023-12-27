@@ -120,6 +120,9 @@ public class AgendaUseCase  {
     public Mono<Boolean> finalizarAtencionCita(String idCita){
         return gestionEstadosCitasRepository.finalizarAtencionCita(idCita);
     }
+    public Mono<Boolean> cancelarCita(String idCita, Integer idMotivoCancelacion){
+        return gestionEstadosCitasRepository.cancelarCita(idCita,idMotivoCancelacion);
+    }
     //tratamientos
     public Flux<Tratamiento> consultarTratamientosByCita(String idCita){
         return agendaRepository.consultarTratamientoByCitas(idCita);

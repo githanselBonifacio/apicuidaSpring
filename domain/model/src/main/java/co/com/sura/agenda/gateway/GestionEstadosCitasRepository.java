@@ -18,4 +18,6 @@ public interface GestionEstadosCitasRepository {
     Mono<Boolean> iniciarAtencionCita(String idCita);
     Mono<Boolean> finalizarAtencionCita(String idCita);
 
+    Mono<Boolean> cancelarCita(String idCita,Integer idMotivoCancelacion);
+
 }

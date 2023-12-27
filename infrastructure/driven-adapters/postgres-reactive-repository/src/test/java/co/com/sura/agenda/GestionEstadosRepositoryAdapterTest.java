@@ -14,6 +14,7 @@ import co.com.sura.postgres.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.personal.repository.ProfesionalRepository;
+import co.com.sura.postgres.reportes.repository.RegistroCancelacionCitaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,8 @@ import static org.mockito.Mockito.when;
     private  DesplazamientoRepository desplazamientoRepositoryMock;
     @Mock
     private  HorarioTurnoRepository horarioTurnoRepositoryMock;
+    @Mock
+    private RegistroCancelacionCitaRepository registroCancelacionCitaRepositoryMock;
 
     private GestionEstadosCitaAdapter gestionEstadosCitaAdapter;
 
@@ -60,8 +63,8 @@ import static org.mockito.Mockito.when;
                 citaRepositoryMock,
                 agendamientoAutomaticoAdapterMock,
                 desplazamientoRepositoryMock,
-                horarioTurnoRepositoryMock
-        );
+                horarioTurnoRepositoryMock,
+                registroCancelacionCitaRepositoryMock);
         this.citaData = CitaData.builder()
                 .idCita(idCita)
                 .fechaProgramada(fechaProgramada)

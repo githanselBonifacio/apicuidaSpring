@@ -12,6 +12,8 @@ import co.com.sura.postgres.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.agenda.data.CitaData;
+import co.com.sura.postgres.reportes.data.RegistroCancelacionCitaData;
+import co.com.sura.postgres.reportes.repository.RegistroCancelacionCitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -26,16 +28,20 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
     private final DesplazamientoRepository desplazamientoRepository;
     private final HorarioTurnoRepository horarioTurnoRepository;
 
+    private final RegistroCancelacionCitaRepository registroCancelacionCitaRepository;
+
     @Autowired
     public GestionEstadosCitaAdapter(CitaRepository citaRepository,
                                      AgendamientoAutomaticoAdapter agendamientoAutomaticoAdapter,
                                      DesplazamientoRepository desplazamientoRepository,
-                                     HorarioTurnoRepository horarioTurnoRepository) {
+                                     HorarioTurnoRepository horarioTurnoRepository,
+                                     RegistroCancelacionCitaRepository registroCancelacionCitaRepository) {
         this.citaRepository = citaRepository;
         this.agendamientoAutomaticoAdapter = agendamientoAutomaticoAdapter;
         this.desplazamientoRepository = desplazamientoRepository;
 
         this.horarioTurnoRepository = horarioTurnoRepository;
+        this.registroCancelacionCitaRepository = registroCancelacionCitaRepository;
     }
 
     @Override
@@ -85,6 +91,35 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
     @Override
     public Mono<Boolean> finalizarAtencionCita(String idCita) {
         return this.actualizarEstadoCita(idCita,EstadosCita.EN_PROGRESO,EstadosCita.FINALIZADA);
+    }
+
+    @Override
+    public Mono<Boolean> cancelarCita(String idCita, Integer idMotivoCancelacion) {
+        return citaRepository.findById(idCita)
+                .switchIfEmpty(Mono.error(new ExceptionNegocio(Mensajes.CITA_NO_EXISTE)))
+                .flatMap(citaData -> Mono.zip(
+                                    Mono.just(  citaData.getIdEstado()==EstadosCita.AGENDADA.getEstado() ||
+                                        citaData.getIdEstado()==EstadosCita.SIN_AGENDAR.getEstado()),
+                                    Mono.just(citaData)))
+
+                .flatMap(tupla->{
+                    if (Boolean.TRUE.equals(tupla.getT1())){
+                        return citaRepository.updateEstado(idCita,EstadosCita.CANCELADA.getEstado())
+                                .then(registroCancelacionCitaRepository.save(
+                                        RegistroCancelacionCitaData.builder()
+                                                .idCita(idCita)
+                                                .fechaTurno(tupla.getT2().getFechaProgramada().toLocalDate())
+                                                .idMotivoCancelacion(idMotivoCancelacion)
+                                                .build()))
+                                .then(Mono.just(Boolean.TRUE));
+                    }else{
+                        return Mono.error(
+                                new ErrorEstadoCitaNoValido(Mensajes.ERROR_ESTADO_CITA+
+                                        EstadosCita.getNombreEstado(EstadosCita.AGENDADA)+" o "+
+                                        EstadosCita.getNombreEstado(EstadosCita.SIN_AGENDAR)));
+                    }
+                });
+
     }
 
     private Mono<Boolean> validarReprogramacionCitaEnHorarioTurno(CitaData cita){

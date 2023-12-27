@@ -16,7 +16,7 @@ public abstract class AdapterOperations<E, D, I, R extends ReactiveCrudRepositor
     private Function<D, E> toEntityFn;
 
     @SuppressWarnings("unchecked")
-    public AdapterOperations(R repository, ModelMapper mapper, Function<D, E> toEntityFn) {
+    protected AdapterOperations(R repository, ModelMapper mapper, Function<D, E> toEntityFn) {
         this.repository = repository;
         this.mapper = mapper;
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
@@ -45,9 +45,6 @@ public abstract class AdapterOperations<E, D, I, R extends ReactiveCrudRepositor
                 .map(this::toEntity);
     }
 
- /*   public Flux<E> findByExample(E entity) {
-        return doQueryMany(() -> repository.findAll(Example.of(toData(entity))));
-    }*/
 
     protected Flux<E> doQueryMany(Flux<D> query) {
         return query
