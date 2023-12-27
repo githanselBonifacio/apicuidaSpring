@@ -20,9 +20,9 @@ public class FarmaciaUseCase {
         return farmaciaRepository.consultarAllPacienteWithMedicamentosToFarmacia();
     }
     public Flux<PacienteTratamientoCita> consultarAllTratamientosToFarmaciaWithFilter(
-            LocalDate fechaTurno, Integer idHorario, String idRegional){
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno){
         return farmaciaRepository.consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
-                fechaTurno,idHorario,idRegional);
+                fechaTurno,idRegional, idHorarioTurno);
     }
     public Mono<Boolean> notificarMedicamentosToFarmacia (List<PacienteTratamientoCita> tratamientoCitasList){
         return farmaciaRepository.notificarMedicamentosToFarmacia(tratamientoCitasList);

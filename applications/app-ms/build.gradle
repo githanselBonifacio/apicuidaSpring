@@ -5,12 +5,10 @@ dependencies {
     implementation project(':domain-model')
     implementation project(':domain-usecase')
     implementation project(":entry-points-reactive-web")
-//    implementation project(":entry-points-subs-events")
-    implementation project(":entry-points-async-command-handlers")
-    //implementation project(":driven-adapters-rest-adapter")
+
+
     implementation project(":driven-adapters-postgres-reactive-repository")
-   // implementation project(":driven-adapters-async-event-bus")
-    //implementation project(":helpers-integration-soap-commons")
+
     //Compile Dependencies
     implementation('org.springframework.boot:spring-boot-starter')
     implementation('org.springframework.boot:spring-boot-devtools')

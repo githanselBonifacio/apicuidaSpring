@@ -53,14 +53,14 @@ public class FarmaciaAdapter implements FarmaciaRepository {
 
     @Override
     public Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
-            LocalDate turno, Integer idHorario, String idRegional) {
-        return pacienteRepository.findAllTratamientosPacientesByTurnoRegionalHorario(turno,idHorario,idRegional)
+            LocalDate fechaTurno, String idRegional,Integer idHorarioTurno) {
+        return pacienteRepository.findAllTratamientosPacientesByTurnoRegionalHorario(fechaTurno,idRegional,idHorarioTurno)
                 .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
                             return pacienteTratamientoCita;
                         }
                 ).mergeWith(pacienteRepository.findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
-                                turno,idHorario,idRegional)
+                                fechaTurno,idRegional,idHorarioTurno)
                         .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
                             return pacienteTratamientoCita;
@@ -73,19 +73,17 @@ public class FarmaciaAdapter implements FarmaciaRepository {
     public Mono<Boolean> notificarMedicamentosToFarmacia(List<PacienteTratamientoCita> tratamientoCitasList) {
         return Flux.fromIterable(tratamientoCitasList)
                 .flatMap(pacienteTratamientoCita -> {
+                    Mono<Void> notificarTratamiento= Mono.empty();
+                    Mono<Void> notificarSoporteNotricional= Mono.empty();
                     if (pacienteTratamientoCita.getIdTratamiento() != null) {
-                        tratamientoRepository.updateNotificar(pacienteTratamientoCita.getIdTratamiento());
+                         notificarTratamiento =  tratamientoRepository.updateNotificar(pacienteTratamientoCita.getIdTratamiento());
+                    } else if (pacienteTratamientoCita.getIdSoporteNutricional() != null) {
+                         notificarSoporteNotricional= soporteNutricionalRepository
+                                .updateNotificar(pacienteTratamientoCita.getIdSoporteNutricional());
                     }
-                    return Mono.empty();
+                    return notificarTratamiento
+                            .then(notificarSoporteNotricional);
                 })
-                .thenMany(Flux.fromIterable(tratamientoCitasList)
-                        .flatMap(pacienteProcedimientoCita -> {
-                            if (pacienteProcedimientoCita.getIdSoporteNutricional() != null) {
-                               soporteNutricionalRepository
-                                       .updateNotificar(pacienteProcedimientoCita.getIdSoporteNutricional());
-                            }
-                            return Mono.empty();
-                        }))
                 .then(Mono.just(Boolean.TRUE));
     }
 }

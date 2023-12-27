@@ -61,9 +61,8 @@ import java.util.List;
     void consultarAllPacienteWithMedicamentosToFarmaciaByFilter(){
         String numeroIdentificacion = "989898";
         LocalDate fecha = LocalDate.now();
-        Integer idHorarioTurno =1;
         String idRegional = "427";
-
+        Integer idHorarioTurno = 1;
         List<PacienteTratamientoCita> pacienteTratamientoCitas = new ArrayList<>();
         pacienteTratamientoCitas.add(PacienteTratamientoCita.builder()
                 .numeroIdentificacion(numeroIdentificacion)
@@ -72,15 +71,15 @@ import java.util.List;
                 .build());
 
         Mockito.when(pacienteRepositoryMock.findAllTratamientosPacientesByTurnoRegionalHorario(
-                fecha,idHorarioTurno,idRegional))
+                fecha,idRegional,idHorarioTurno))
                 .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
 
         Mockito.when(pacienteRepositoryMock.findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
-                        fecha,idHorarioTurno,idRegional))
+                        fecha,idRegional,idHorarioTurno))
                 .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
 
         Flux<PacienteTratamientoCita> response = farmaciaAdapter
-                .consultarAllPacienteWithMedicamentosToFarmaciaByFilter( fecha,idHorarioTurno,idRegional);
+                .consultarAllPacienteWithMedicamentosToFarmaciaByFilter( fecha,idRegional,idHorarioTurno);
 
 
         StepVerifier.create(response)
@@ -105,12 +104,17 @@ import java.util.List;
                 .notificado(Boolean.FALSE)
                 .build());
 
+        Mockito.when(tratamientoRepositoryMock.updateNotificar(pacienteTratamientoCitas.get(0)
+                        .getIdTratamiento()))
+                .thenReturn(Mono.empty());
+        Mockito.when(soporteNutricionalRepositoryMock.updateNotificar(pacienteTratamientoCitas.get(1)
+                        .getIdSoporteNutricional()))
+                .thenReturn(Mono.empty());
+
         Mono<Boolean> response = farmaciaAdapter.notificarMedicamentosToFarmacia(pacienteTratamientoCitas);
 
-
         StepVerifier.create(response)
-                .expectNextMatches(b->b.equals(Boolean.TRUE))
-                .expectComplete()
-                .verify();
+                .expectNext(Boolean.TRUE)
+                .verifyComplete();
     }
 }

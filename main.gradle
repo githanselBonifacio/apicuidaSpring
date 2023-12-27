@@ -61,7 +61,7 @@ subprojects {
             property "sonar.scm.provider", "git"
             property "sonar.scm.disabled", "true"
             property "sonar.host.url", "http://localhost:9000"
-            property "sonar.login", "c0734b5d5f38b3ea005e3b05a8bf4a66d8e8c6a3"
+            property "sonar.login", "6157ae3e9f104e9bcaa9e23d981f80feca8b9a81"
         }
     }
     jacocoTestReport {

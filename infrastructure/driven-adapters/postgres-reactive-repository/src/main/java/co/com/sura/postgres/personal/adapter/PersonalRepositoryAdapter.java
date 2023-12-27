@@ -115,8 +115,8 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                     if (Boolean.TRUE.equals(exist)) {
                         return Mono.error(new Throwable(Mensajes.MOVIL_YA_EXISTE));
                     }
-                    return movilRepository.save(ConverterPersonal.convertToMovilData(movil))
-                            .then(movilRepository.findById(movil.getMatricula()))
+                    return movilRepository.insertMovil(movil.getMatricula())
+                            .then(movilRepository.save(ConverterPersonal.convertToMovilData(movil)))
                             .map(ConverterPersonal::convertToMovil);
                 });
     }
@@ -130,7 +130,6 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                         return Mono.error(new Throwable(Mensajes.MOVIL_NO_EXISTE));
                     }
                     return movilRepository.save(ConverterPersonal.convertToMovilData(movil))
-                            .then(movilRepository.findById(movil.getMatricula()))
                             .map(ConverterPersonal::convertToMovil);
                 });
     }
@@ -151,7 +150,6 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                     }
                     return conductorRepository.insertConductor(conductor.getNumeroIdentificacion())
                             .then(conductorRepository.save(ConverterPersonal.converToConductorData(conductor)))
-                            .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
                             .map(ConverterPersonal::converToConductor);
                 });
     }
@@ -165,7 +163,6 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
                         return Mono.error(new Throwable(Mensajes.CONDUCTOR_NO_EXISTE));
                     }
                     return conductorRepository.save(ConverterPersonal.converToConductorData(conductor))
-                            .then(conductorRepository.findById(conductor.getNumeroIdentificacion()))
                             .map(ConverterPersonal::converToConductor);
                 });
     }

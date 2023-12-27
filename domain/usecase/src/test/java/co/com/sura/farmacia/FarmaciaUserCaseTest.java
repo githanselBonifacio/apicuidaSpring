@@ -52,11 +52,11 @@ class FarmaciaUserCaseTest {
         String idRegional = "427";
         Integer idHorarioTurno = 1;
         Mockito.when(farmaciaRepositoryMock.consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
-                        fechaTurno, idHorarioTurno, idRegional))
+                        fechaTurno, idRegional,idHorarioTurno))
                 .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
 
         Flux<PacienteTratamientoCita> consultaTratamientos = farmaciaUseCaseMock
-                .consultarAllTratamientosToFarmaciaWithFilter( fechaTurno, idHorarioTurno, idRegional);
+                .consultarAllTratamientosToFarmaciaWithFilter( fechaTurno, idRegional,idHorarioTurno);
 
         StepVerifier.create(consultaTratamientos)
                 .expectNextCount(2)

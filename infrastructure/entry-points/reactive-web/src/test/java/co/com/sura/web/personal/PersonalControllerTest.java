@@ -692,7 +692,7 @@ import java.util.List;
                 .returnResult().getResponseBody();
 
         Assertions.assertNotNull(response);
-        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
         Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
 
     }
@@ -742,7 +742,7 @@ import java.util.List;
                 .returnResult().getResponseBody();
 
         Assertions.assertNotNull(response);
-        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
         Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
 
     }

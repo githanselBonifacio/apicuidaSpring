@@ -63,12 +63,11 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "FROM pacientes " +
             "INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
             "INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
-            "INNER JOIN turno_cita ON turno_cita.id_cita = citas.id_cita " +
-            "and turno_cita.fecha_turno = $1 and turno_cita.id_horario_turno= $2 "+
-            "INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $3 "+
-            "WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
+            "INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $2 "+
+            "WHERE citas.fecha_programada::Date = $1 and citas.id_horario_turno = $3 and citas.id_estado = 3 or " +
+            " citas.id_estado = 4 or citas.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllTratamientosPacientesByTurnoRegionalHorario(
-            LocalDate turno,Integer idHorario, String idRegional);
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno);
 
 
     @Query("SELECT pacientes.numero_identificacion,pacientes.tipo_identificacion, " +
@@ -79,12 +78,10 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             " FROM pacientes" +
             " INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
             " INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
-            " INNER JOIN turno_cita ON turno_cita.id_cita = citas.id_cita " +
-            " and turno_cita.fecha_turno = $1 and turno_cita.id_horario_turno= $2 "+
-            " INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $3 "+
+            " INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $2 "+
             " INNER JOIN soporte_nutricionales ON soporte_nutricionales.id_cita = citas.id_cita " +
-            " WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
+            " WHERE citas.fecha_programada::Date = $1 and citas.id_horario_turno = $3 and citas.id_estado = 3 or " +
+            " citas.id_estado = 4 or citas.id_estado = 6 ;")
     Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
-            LocalDate turno,Integer idHorario, String idRegional
-    );
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno);
 }

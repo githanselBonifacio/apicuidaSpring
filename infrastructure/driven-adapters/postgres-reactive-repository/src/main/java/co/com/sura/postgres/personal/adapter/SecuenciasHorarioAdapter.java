@@ -1,6 +1,7 @@
 package co.com.sura.postgres.personal.adapter;
 
 import co.com.sura.constantes.Mensajes;
+import co.com.sura.exception.ExceptionNegocio;
 import co.com.sura.postgres.personal.repository.ItemSecuenciaTurnoRepository;
 import co.com.sura.postgres.personal.repository.ProfesionalRepository;
 import co.com.sura.postgres.personal.repository.TurnoProfesionalesRepository;
@@ -29,6 +30,7 @@ import java.util.List;
 
 @Repository
 public class SecuenciasHorarioAdapter implements SecuenciasHorarioRepository {
+    private static final Integer TURNOS_MAXIMOS = 150;
     private final CitaRepository citaRepository;
     private final ProfesionalRepository profesionalRepository;
     private final TurnoProfesionalesRepository turnoProfesionalesRepository;
@@ -72,6 +74,11 @@ public class SecuenciasHorarioAdapter implements SecuenciasHorarioRepository {
     @Override
     public Flux<ResultadoActualizacionTurno> eliminarTurnosProfesionalesAccionMasiva(
             List<EliminarTurnoProfesionalRequest> turnoRequest) {
+
+        if(turnoRequest.size()>TURNOS_MAXIMOS){
+            return Flux.error(new ExceptionNegocio(
+                    String.format(Mensajes.ERROR_DEMASIADOS_TURNOS,TURNOS_MAXIMOS,turnoRequest.size())));
+        }
         return Flux.fromIterable(turnoRequest)
                 .flatMap(turno ->citaRepository
                         .findAllByTurnoProfesional(turno.getFechaTurno(),turno.getIdProfesional())
@@ -98,11 +105,15 @@ public class SecuenciasHorarioAdapter implements SecuenciasHorarioRepository {
 
     @Override
     public Flux<ResultadoActualizacionTurno> asignarTurnosProfesionalesAccionMasiva(List<TurnoProfesional> turnos) {
+        if(turnos.size()>TURNOS_MAXIMOS){
+            return Flux.error(new ExceptionNegocio(
+                    String.format(Mensajes.ERROR_DEMASIADOS_TURNOS,TURNOS_MAXIMOS,turnos.size())));
+        }
         return Flux.fromIterable(turnos)
                 .flatMap(turno-> citaRepository
                      .findAllByTurnoProfesional(turno.getFechaTurno(),turno.getIdProfesional())
                      .hasElements()
-                     .flatMap(hasElment ->{
+                     .flatMapMany(hasElment ->{
                         if(Boolean.FALSE.equals(hasElment)){
                            return this.asignarTurnosMasivamente(turno);
                         }

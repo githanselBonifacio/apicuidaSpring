@@ -95,8 +95,7 @@ import java.util.List;
                 .build();
 
         Mockito.when(farmaciaRepositoryMock.consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
-                fechaTurno,idHorarioTurno,idRegional
-                ))
+                fechaTurno,idRegional,idHorarioTurno))
                 .thenReturn(Flux.fromIterable(pacienteTratamiento));
 
         UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/farmacia/tratamientosFarmaciaWithFilter")
@@ -121,7 +120,7 @@ import java.util.List;
         Integer idHorarioTurno = 1;
 
         Mockito.when(farmaciaRepositoryMock.consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
-                        fechaTurno,idHorarioTurno,idRegional
+                        fechaTurno,idRegional,idHorarioTurno
                 ))
                 .thenReturn(Flux.error(Exception::new));
 

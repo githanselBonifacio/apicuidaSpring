@@ -8,18 +8,14 @@ import co.com.sura.genericos.Response;
 import co.com.sura.web.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@CrossOrigin(value = "http://localhost:4200")
 @RequestMapping("/farmacia")
 public class FarmaciaController {
 
@@ -51,7 +47,7 @@ public class FarmaciaController {
             @RequestParam String idRegional,
             @RequestParam Integer idHorarioTurno
     ){
-        return farmaciaUseCase.consultarAllTratamientosToFarmaciaWithFilter(fechaTurno,idHorarioTurno,idRegional)
+        return farmaciaUseCase.consultarAllTratamientosToFarmaciaWithFilter(fechaTurno,idRegional,idHorarioTurno)
                 .collectList()
                 .map(pacientes -> ResponseFactory.createStatus(
                         pacientes,

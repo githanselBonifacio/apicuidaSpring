@@ -18,6 +18,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin(value = "http://localhost:4200")
 @RequestMapping("/remision")
 public class RemisionController {
 

@@ -265,9 +265,6 @@ class PersonalRepositoryAdapterTest {
         Mockito.when(conductorRepositoryMock.save(this.conductorData))
                 .thenReturn(Mono.just(this.conductorData));
 
-        Mockito.when(conductorRepositoryMock.findById(this.conductorData.getNumeroIdentificacion()))
-                .thenReturn(Mono.just(this.conductorData));
-
         Mono<Conductor> response = personalRepositoryAdapter
                 .crearConductor(this.conductor)
                 .thenReturn(this.conductor);
@@ -296,9 +293,6 @@ class PersonalRepositoryAdapterTest {
                 .thenReturn(Mono.just(Boolean.TRUE));
 
         Mockito.when(conductorRepositoryMock.save(this.conductorData))
-                .thenReturn(Mono.just(this.conductorData));
-
-        Mockito.when(conductorRepositoryMock.findById(this.conductorData.getNumeroIdentificacion()))
                 .thenReturn(Mono.just(this.conductorData));
 
         Mono<Conductor> response = personalRepositoryAdapter
@@ -371,11 +365,11 @@ class PersonalRepositoryAdapterTest {
         Mockito.when(movilRepositoryMock.existsById(this.movilData.getMatricula()))
                 .thenReturn(Mono.just(Boolean.FALSE));
 
+
+        Mockito.when(movilRepositoryMock.insertMovil(this.movilData.getMatricula()))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
         Mockito.when(movilRepositoryMock.save(this.movilData))
-                .thenReturn(Mono.just(this.movilData));
-
-
-        Mockito.when(movilRepositoryMock.findById(this.movilData.getMatricula()))
                 .thenReturn(Mono.just(this.movilData));
 
         Mono<Movil> response = personalRepositoryAdapter
@@ -411,8 +405,6 @@ class PersonalRepositoryAdapterTest {
         Mockito.when(movilRepositoryMock.save(this.movilData))
                 .thenReturn(Mono.just(this.movilData));
 
-        Mockito.when(movilRepositoryMock.findById(this.movilData.getMatricula()))
-                .thenReturn(Mono.just(this.movilData));
 
         Mono<Movil> response = personalRepositoryAdapter
                 .actualizarMovil(this.movil)

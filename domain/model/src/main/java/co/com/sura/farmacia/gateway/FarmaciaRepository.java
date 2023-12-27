@@ -11,7 +11,7 @@ public interface FarmaciaRepository {
     //farmacia
     Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmacia();
     Flux<PacienteTratamientoCita>    consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
-            LocalDate fechaTurno, Integer idHorario, String idRegional);
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno);
 
     Mono<Boolean> notificarMedicamentosToFarmacia(
             List<PacienteTratamientoCita> tratamientoCitasList);

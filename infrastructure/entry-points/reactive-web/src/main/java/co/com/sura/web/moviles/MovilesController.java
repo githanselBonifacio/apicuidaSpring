@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@CrossOrigin(value = "http://localhost:4200")
 @RequestMapping("/moviles")
 public class MovilesController {
     @Autowired
