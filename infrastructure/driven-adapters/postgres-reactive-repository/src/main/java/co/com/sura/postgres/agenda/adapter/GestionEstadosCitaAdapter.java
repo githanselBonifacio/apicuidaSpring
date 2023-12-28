@@ -1,5 +1,6 @@
 package co.com.sura.postgres.agenda.adapter;
 
+import co.com.sura.agenda.entity.Cita;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.agenda.gateway.GestionEstadosCitasRepository;
 import co.com.sura.exception.ErrorEstadoCitaNoValido;
@@ -16,9 +17,11 @@ import co.com.sura.postgres.reportes.data.RegistroCancelacionCitaData;
 import co.com.sura.postgres.reportes.repository.RegistroCancelacionCitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository {
@@ -80,6 +83,21 @@ public class GestionEstadosCitaAdapter implements GestionEstadosCitasRepository 
     @Override
     public Mono<Boolean> confirmarCita(String idCita) {
         return this.actualizarEstadoCita(idCita,EstadosCita.AGENDADA,EstadosCita.CONFIRMADA);
+
+    }
+
+    @Override
+    public Mono<Integer> confirmarTodasCitasTurno(List<Cita> citas) {
+        return Flux.fromIterable(citas)
+                .filter(cita->cita.getIdEstado()==EstadosCita.AGENDADA.getEstado())
+                .map(ConverterAgenda::convertToCitaData)
+                .map(citaData -> citaData.toBuilder()
+                        .idEstado(EstadosCita.CONFIRMADA.getEstado())
+                        .build())
+                .flatMap(citaRepository::save)
+                .count()
+                .map(Long::intValue)
+                .defaultIfEmpty(0);
 
     }
 

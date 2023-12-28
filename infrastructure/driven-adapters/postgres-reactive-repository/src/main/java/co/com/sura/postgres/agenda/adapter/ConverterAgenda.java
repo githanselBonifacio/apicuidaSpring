@@ -88,6 +88,24 @@ public class ConverterAgenda extends Converter {
                 .longitud(cita.getLongitud())
                 .build();
     }
+    public static CitaData convertToCitaData (Cita cita){
+        return CitaData.builder()
+                .idCita(cita.getIdCita())
+                .idRemision(cita.getIdRemision())
+                .duracion(cita.getDuracion())
+                .holgura(cita.getHolgura())
+                .fechaInicio(cita.getFechaInicio())
+                .fechaProgramada(cita.getFechaProgramada())
+                .especialidad(cita.getEspecialidad())
+                .idRegional(cita.getIdRegional())
+                .idHorarioTurno(cita.getIdHorarioTurno())
+                .idEstado(cita.getIdEstado())
+                .idConductor(cita.getIdConductor())
+                .idProfesional(cita.getIdProfesional())
+                .longitud(cita.getLongitud())
+                .latitud(cita.getLatitud())
+                .build();
+    }
 
     public static CitaHistorial convertToCitaHistorial(CitaData citaData){
         return CitaHistorial.builder()

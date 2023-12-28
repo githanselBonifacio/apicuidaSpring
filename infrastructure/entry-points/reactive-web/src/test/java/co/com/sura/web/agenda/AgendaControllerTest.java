@@ -224,7 +224,7 @@ import java.util.*;
         Assertions.assertTrue(response.getResult());
     }
     @Test
-    void asignarProfesionalTurnoErro(){
+    void asignarProfesionalTurnoError(){
         TurnoProfesional turnoProfesional = TurnoProfesional.builder()
                 .idProfesional("989897")
                 .fechaTurno(fechaTurno)
@@ -633,6 +633,55 @@ import java.util.*;
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getDetail());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+    }
+    @Test
+    void confirmarCitaTurno(){
+
+        List<Cita> citas = new ArrayList<>();
+        citas.add(Cita.builder()
+                .idEstado(2)
+                .build());
+        citas.add(Cita.builder()
+                .idEstado(4)
+                .build());
+        Mockito.when(gestionEstadosCitasRepositoryMock.confirmarTodasCitasTurno(citas))
+                .thenReturn(Mono.just(1));
+
+
+        Response<Boolean> response = webClient.post()
+                .uri("/agenda/confirmarCitasTurno")
+                .bodyValue(citas)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<Response<Boolean>>(){})
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertTrue( response.getResult());
+    }
+    @Test
+    void confirmarCitaTurnoError(){
+        List<Cita> citas = new ArrayList<>();
+        citas.add(Cita.builder()
+                .idEstado(2)
+                .build());
+        citas.add(Cita.builder()
+                .idEstado(4)
+                .build());
+
+        Mockito.when(gestionEstadosCitasRepositoryMock.confirmarTodasCitasTurno(citas))
+                .thenReturn(Mono.error(Exception::new));
+
+        Response<?> response = webClient.post()
+                .uri("/agenda/confirmarCitasTurno")
+                .bodyValue(citas)
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.ERROR_TURNO_CONFIRMADO, response.getDetail());
         Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
     }
     @Test

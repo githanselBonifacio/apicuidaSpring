@@ -279,6 +279,25 @@ import java.util.List;
     }
 
     @Test
+    void confirmarCitasTurno(){
+        List<Cita> citas = new ArrayList<>();
+        citas.add(Cita.builder()
+                        .idEstado(2)
+                .build());
+        citas.add(Cita.builder()
+                .idEstado(4)
+                .build());
+
+        Mockito.when(gestionEstadosCitasRepositoryMock.confirmarTodasCitasTurno(citas))
+                .thenReturn(Mono.just(1));
+
+        Mono<Integer> seConfirmoCita= agendaUseCaseMock.confirmarCitasTurno(citas);
+        StepVerifier.create(seConfirmoCita)
+                .expectNext(1)
+                .expectComplete()
+                .verify();
+    }
+    @Test
     void iniciarAtencionCita(){
         Mockito.when(gestionEstadosCitasRepositoryMock.iniciarAtencionCita(idCita))
                 .thenReturn(Mono.just(Boolean.TRUE));
@@ -304,6 +323,18 @@ import java.util.List;
                 .verify();
     }
 
+    @Test
+    void cancelarCita(){
+        Mockito.when(gestionEstadosCitasRepositoryMock.cancelarCita(idCita,1))
+                .thenReturn(Mono.just(Boolean.TRUE));
+
+        Mono<Boolean> seFinalizoAtencion= agendaUseCaseMock.cancelarCita(idCita,1);
+
+        StepVerifier.create(seFinalizoAtencion)
+                .expectNext(Boolean.TRUE)
+                .expectComplete()
+                .verify();
+    }
     @Test
     void consultarProcedimietosByIdCita(){
        Procedimientos procedimientos = Procedimientos.builder().build();

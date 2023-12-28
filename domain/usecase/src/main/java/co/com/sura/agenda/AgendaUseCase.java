@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AgendaUseCase  {
 
@@ -74,6 +75,9 @@ public class AgendaUseCase  {
         return agendamientoAutomaticoRepository.autoagendarTurnoCompleto(fechaTurno,idHorarioTurno,idRegional);
      }
 
+     public Mono<Integer> confirmarCitasTurno(List<Cita> citas){
+        return gestionEstadosCitasRepository.confirmarTodasCitasTurno(citas);
+     }
     public Flux<Desplazamiento> consultarDesplazamientoByTurnoRegional(
             LocalDate fechaProgramada, Integer idHorarioTurno,String idRegional){
         return agendaRepository.consultarDesplazamientoRegional(

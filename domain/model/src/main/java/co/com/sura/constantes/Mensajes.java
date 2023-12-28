@@ -46,6 +46,8 @@ public class Mensajes {
     public static final String NO_DESASIGNO_PROFESIONAL_CITA="Se presentó un error y no se pudo desagendar la cita";
 
     public static final String ERROR_ESTADO_CITA="La cita debe estar en estado ";
+    public static final String TURNO_CONFIRMADO="Se han confirmado %s citas con exito";
+    public static final String ERROR_TURNO_CONFIRMADO="Error al confirmar las citas";
 
     public static final String ESTADO_CITA_ACTUALIZADO="Se ha actualizó estado de cita con exito";
     public static final String ERROR_CONFIRMAR_CITA="La cita debe estar agendada";

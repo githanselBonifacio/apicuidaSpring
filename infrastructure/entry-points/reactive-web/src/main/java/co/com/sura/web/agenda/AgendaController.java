@@ -289,6 +289,24 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    @PostMapping(value = "/confirmarCitasTurno")
+    public Mono<Response<Boolean>> confirmarCitasTurno(@RequestBody List<Cita> citas){
+        return agendaUseCase.confirmarCitasTurno(citas)
+                .map(citasConfirmadas->ResponseFactory.createStatus(
+                        Boolean.TRUE,
+                        StatusCode.STATUS_200,
+                        String.format(Mensajes.TURNO_CONFIRMADO,citasConfirmadas),
+                        String.format(Mensajes.TURNO_CONFIRMADO,citasConfirmadas),
+                        Mensajes.PETICION_EXITOSA
+                ))
+                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
+                        null,
+                        StatusCode.STATUS_500,
+                        Mensajes.ERROR_TURNO_CONFIRMADO,
+                        e.getMessage(),
+                        e.getMessage()
+                )));
+    }
     @PutMapping(value = "/iniciarAtencionCita")
     public Mono<Response<Boolean>> iniciarAtencionCita(@RequestParam String idCita){
         return agendaUseCase.iniciarAtencionCita(idCita)

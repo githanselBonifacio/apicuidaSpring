@@ -1,9 +1,11 @@
 package co.com.sura.agenda.gateway;
 
+import co.com.sura.agenda.entity.Cita;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface GestionEstadosCitasRepository {
 
@@ -15,6 +17,8 @@ public interface GestionEstadosCitasRepository {
                                           Integer idHorarioTurno, String idRegional);
 
     Mono<Boolean> confirmarCita(String idCita);
+
+    Mono<Integer> confirmarTodasCitasTurno(List<Cita> citas);
     Mono<Boolean> iniciarAtencionCita(String idCita);
     Mono<Boolean> finalizarAtencionCita(String idCita);
 

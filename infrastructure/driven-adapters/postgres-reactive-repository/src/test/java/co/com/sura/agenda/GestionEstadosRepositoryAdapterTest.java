@@ -1,5 +1,6 @@
 package co.com.sura.agenda;
 
+import co.com.sura.agenda.entity.Cita;
 import co.com.sura.autoagendador.models.AutoAgendador;
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.genericos.EstadosCita;
@@ -14,6 +15,7 @@ import co.com.sura.postgres.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.moviles.data.DesplazamientoRepository;
 import co.com.sura.postgres.personal.repository.ProfesionalRepository;
+import co.com.sura.postgres.reportes.data.RegistroCancelacionCitaData;
 import co.com.sura.postgres.reportes.repository.RegistroCancelacionCitaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,10 @@ import reactor.test.StepVerifier;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,7 +143,31 @@ import static org.mockito.Mockito.when;
               .expectNext(Boolean.TRUE)
               .verifyComplete();
   }
+    @Test
+    void confirmarCitaTurnoCitaValida(){
 
+        CitaData citaData = CitaData.builder()
+                .idEstado(EstadosCita.AGENDADA.getEstado())
+                .build();
+
+        List<Cita> citas = new ArrayList<>();
+        citas.add(Cita.builder()
+                .idEstado(EstadosCita.AGENDADA.getEstado())
+                .build());
+        citas.add(Cita.builder()
+                .idEstado(EstadosCita.FINALIZADA.getEstado())
+                .build());
+        //mocks citas
+        Mockito.when(citaRepositoryMock.save(any(CitaData.class)))
+                .thenReturn(Mono.just(citaData));
+
+        Mono<Integer> response = gestionEstadosCitaAdapter.confirmarTodasCitasTurno(citas);
+
+        StepVerifier.create(response)
+                .expectNext(1)
+                .verifyComplete();
+
+    }
     @Test
     void iniciarAtencionCita(){
 
@@ -196,4 +225,57 @@ import static org.mockito.Mockito.when;
 
     }
 
+    @Test
+    void cancelarCitaEstadoNoValido(){
+        Integer idMotivoCancelacion = 1;
+        //mocks citas
+        when(citaRepositoryMock.findById(idCita))
+                .thenReturn(Mono.just(this.citaData.toBuilder()
+                        .idEstado(EstadosCita.CONFIRMADA.getEstado())
+                        .build()));
+
+        Mono<Boolean> response = gestionEstadosCitaAdapter.cancelarCita(idCita,idMotivoCancelacion);
+
+        StepVerifier.create(response)
+                .expectErrorMessage(Mensajes.ERROR_ESTADO_CITA+
+                        EstadosCita.getNombreEstado(EstadosCita.AGENDADA)+" o "+
+                        EstadosCita.getNombreEstado(EstadosCita.SIN_AGENDAR))
+                .verify();
+    }
+    @Test
+    void cancelarCitaNoExiste(){
+        Integer idMotivoCancelacion = 1;
+        when(citaRepositoryMock.findById(idCita))
+                .thenReturn(Mono.empty());
+        Mono<Boolean> response = gestionEstadosCitaAdapter.cancelarCita(idCita,idMotivoCancelacion);
+
+        StepVerifier.create(response)
+                .expectErrorMessage(Mensajes.CITA_NO_EXISTE)
+                .verify();
+    }
+    @Test
+    void cancelarCitaEstadoValido(){
+        Integer idMotivoCancelacion = 1;
+        RegistroCancelacionCitaData registroCancelacionCita = RegistroCancelacionCitaData.builder()
+                .fechaTurno(fechaProgramada.toLocalDate())
+                .idMotivoCancelacion(idMotivoCancelacion)
+                .idCita(idCita)
+                .build();
+        //mocks citas
+        when(citaRepositoryMock.findById(idCita))
+                .thenReturn(Mono.just(this.citaData.toBuilder()
+                        .idEstado(EstadosCita.SIN_AGENDAR.getEstado())
+                        .build()));
+
+        when(citaRepositoryMock.updateEstado(idCita,EstadosCita.CANCELADA.getEstado()))
+                .thenReturn(Mono.empty());
+        when(registroCancelacionCitaRepositoryMock.save(registroCancelacionCita))
+                .thenReturn(Mono.just(registroCancelacionCita));
+
+        Mono<Boolean> response = gestionEstadosCitaAdapter.cancelarCita(idCita,idMotivoCancelacion);
+
+        StepVerifier.create(response)
+                .expectNext(Boolean.TRUE)
+                .verifyComplete();
+    }
 }
