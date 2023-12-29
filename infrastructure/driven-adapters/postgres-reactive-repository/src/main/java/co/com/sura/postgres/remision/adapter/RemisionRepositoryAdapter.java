@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -175,8 +176,8 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                             return tuple.getT2();
                         })
                         .flatMap(historialRemisionAdapter::insertRegistro)
-                            .then(Mono.from(citaRepository
-                                     .deleteCitaDataByIdRemision(idRemision, novedadRequest.getFechaAplicarNovedad())))
+                            .then(Mono.from(this.eliminarCitasByFechaAplicacionNovedad(
+                                    idRemision, novedadRequest.getFechaAplicarNovedad())))
                             .then(registrarPacienteRemision(remisionRequest, true))
                             .then(registrarDatosRemision(remisionRequest, true))
                             .then(Mono.just(citasRequest.isEmpty())
@@ -254,4 +255,14 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 .then(remisionRepository.deleteById(idRemision));
     }
 
+    private Mono<Void> eliminarCitasByFechaAplicacionNovedad(String idRemision, LocalDateTime fechaAplicacionNovedad){
+        return citaRepository.findAllByIdRemision(idRemision)
+                .filter(citaData -> citaData.getIdEstado()==EstadosCita.SIN_AGENDAR.getEstado() ||
+                        citaData.getIdEstado()==EstadosCita.AGENDADA.getEstado())
+                .filter(citaData -> fechaAplicacionNovedad.isAfter(citaData.getFechaProgramada()))
+                .flatMap(citaData -> citaRepository.delete(citaData)
+                        .then(planManejoRemisionAdapter.eliminarPlanManejoByidCita(citaData.getIdCita())))
+                .then();
+
+    }
 }

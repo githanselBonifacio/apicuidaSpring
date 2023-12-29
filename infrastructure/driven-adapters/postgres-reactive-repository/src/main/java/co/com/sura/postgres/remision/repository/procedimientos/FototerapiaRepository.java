@@ -11,4 +11,7 @@ public interface FototerapiaRepository extends ReactiveCrudRepository<Fototerapi
 
     @Query("DELETE From fototerapias WHERE id_cita LIKE concat($1 ,'-%')")
     Mono<Void> deleteByIDRemision(String idRemision);
+
+    @Query("DELETE From fototerapias WHERE id_cita = $1")
+    Mono<Void> deleteByIdCita(String idCita);
 }

@@ -130,6 +130,18 @@ public class PlanManejoRemisionAdapter implements PlanManejoRemisionRepository {
                 .then(fototerapiaRepository.deleteByIDRemision(idRemision))
                 .then(curacionRepository.deleteByIDRemision(idRemision))
                 .then(secrecionRepository.deleteByIDRemision(idRemision))
-                .then(canalizacionRepository.deleteByIDRemision(idRemision));
+                .then(canalizacionRepository.deleteByIDRemision(idRemision))
+                .then(tratamientoRepository.deleteByIDRemision(idRemision));
+    }
+
+    public Mono<Void> eliminarPlanManejoByidCita(String idCita){
+        return soporteNutricionalRepository.deleteByIdCita(idCita)
+                .then(tomaMuestraRepository.deleteByIdCita(idCita))
+                .then(sondajeRepository.deleteByIdCita(idCita))
+                .then(fototerapiaRepository.deleteByIdCita(idCita))
+                .then(curacionRepository.deleteByIdCita(idCita))
+                .then(secrecionRepository.deleteByIdCita(idCita))
+                .then(canalizacionRepository.deleteByIdCita(idCita))
+                .then(tratamientoRepository.deleteByIdCita(idCita));
     }
 }

@@ -147,8 +147,5 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
     @Query(value = "SELECT  MAX(SPLIT_PART(id_cita, '-', 2)::int) as mc FROM citas WHERE id_remision = $1")
     Mono<Integer> findLastNumberIdCita(String idRemision);
 
-    @Query("CALL public.delete_cita_data(:idRemision,:fechaAplicacionNovedad)")
-    Mono<Void> deleteCitaDataByIdRemision(
-            @Param("idRemision") String idRemision,
-            @Param("fechaAplicacionNovedad") LocalDateTime fechaAplicacionNovedad);
+
 }

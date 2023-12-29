@@ -12,4 +12,7 @@ public interface CanalizacionRepository extends ReactiveCrudRepository<Canalizac
 
     @Query("DELETE From canalizaciones WHERE id_cita LIKE concat($1 ,'-%')")
     Mono<Void> deleteByIDRemision(String idRemision);
+
+    @Query("DELETE From canalizaciones WHERE id_cita = $1")
+    Mono<Void> deleteByIdCita(String idCita);
 }

@@ -13,4 +13,10 @@ public interface TratamientoRepository extends ReactiveCrudRepository<Tratamient
             "SET notificado = true " +
             "WHERE id_tratamiento=$1")
     Mono<Void> updateNotificar(Integer idTratamiento);
+
+    @Query("DELETE From tratamientos WHERE id_cita LIKE concat($1 ,'-%')")
+    Mono<Void> deleteByIDRemision(String idRemision);
+    @Query("DELETE From tratamientos WHERE id_cita = $1")
+    Mono<Void> deleteByIdCita(String idCita);
+
 }

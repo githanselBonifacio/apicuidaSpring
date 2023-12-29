@@ -11,4 +11,7 @@ public interface SecrecionRepository extends ReactiveCrudRepository<SecrecionDat
 
     @Query("DELETE From secreciones WHERE id_cita LIKE concat($1 ,'-%')")
     Mono<Void> deleteByIDRemision(String idRemision);
+
+    @Query("DELETE From secreciones WHERE id_cita = $1")
+    Mono<Void> deleteByIdCita(String idCita);
 }

@@ -11,4 +11,7 @@ public interface SondajeRepository extends ReactiveCrudRepository<SondajeData,In
 
     @Query("DELETE From sondajes WHERE id_cita LIKE concat($1 ,'-%')")
     Mono<Void> deleteByIDRemision(String idRemision);
+
+    @Query("DELETE From sondajes WHERE id_cita = $1")
+    Mono<Void> deleteByIdCita(String idCita);
 }
