@@ -21,8 +21,9 @@ public interface CitaRepository extends ReactiveCrudRepository<CitaData,String> 
     Mono<Boolean> validarEstadosToEgreso(String idRemision, Integer idEstadoConfirmada, Integer idEstadoProgreso);
 
 
-    @Query("SELECT * FROM citas WHERE fecha_programada::Date = $1 AND id_regional=$2 AND id_horario_turno = $3")
-    Flux<CitaData> findAllByFechaTurnoRegional(LocalDate fechaTurno, String idRegional, Integer idHorarioTurno);
+    @Query("SELECT * FROM citas WHERE fecha_programada::Date = $1 AND id_regional=$2")
+    Flux<CitaData> findAllByFechaTurnoRegional(LocalDate fechaTurno, String idRegional);
+
 
     @Query("SELECT citas.*, " +
             "remisiones.numero_identificacion_paciente," +

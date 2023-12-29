@@ -26,6 +26,10 @@ public interface DesplazamientoRepository extends ReactiveCrudRepository<Desplaz
             "AND public.desplazamientos.id_horario_turno = $3 ")
     Flux<DesplazamientoData> findByFechaProgramada(LocalDate fechaProgramada, String idRegional,Integer idHorarioTurno);
 
+    @Query("SELECT * FROM public.desplazamientos " +
+            "WHERE public.desplazamientos.fecha_programada::date = $1 " +
+            "AND public.desplazamientos.id_regional = $2;")
+    Flux<DesplazamientoData> findByFechaProgramadaRegional(LocalDate fechaProgramada, String idRegional);
 
     @Query("SELECT * " +
             "FROM public.desplazamientos " +

@@ -3,9 +3,7 @@ package co.com.sura.reportes;
 import co.com.sura.genericos.EstadosCita;
 import co.com.sura.postgres.agenda.data.CitaData;
 import co.com.sura.postgres.agenda.repository.CitaRepository;
-import co.com.sura.postgres.maestros.data.HorarioTurnoData;
 import co.com.sura.postgres.maestros.data.RegionalData;
-import co.com.sura.postgres.maestros.repository.HorarioTurnoRepository;
 import co.com.sura.postgres.maestros.repository.RegionalesRepository;
 import co.com.sura.postgres.moviles.data.DesplazamientoData;
 import co.com.sura.postgres.moviles.data.DesplazamientoRepository;
@@ -24,13 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
 
 @ExtendWith(MockitoExtension.class)
-public class InsertRegistrosRepositoryAdapterTest {
+class InsertRegistrosRepositoryAdapterTest {
 
     @Mock
     private  RegionalesRepository regionalesRepositoryMock;
@@ -42,8 +39,6 @@ public class InsertRegistrosRepositoryAdapterTest {
     private  DesplazamientoRepository desplazamientoRepositoryMock;
     @Mock
     private  TurnoProfesionalesRepository turnoProfesionalesRepositoryMock;
-    @Mock
-    private  HorarioTurnoRepository horarioTurnoRepositoryMock;
     @Mock
     private  RegistroHistorialRepository registroHistorialRepositoryMock;
     @Mock
@@ -68,11 +63,6 @@ public class InsertRegistrosRepositoryAdapterTest {
         RegionalData regionalData = RegionalData.builder()
                 .id(idRegional)
                 .build();
-        HorarioTurnoData horarioTurnoData = HorarioTurnoData.builder()
-                .id(idHorarioTurno)
-                .esHorarioBase(Boolean.TRUE)
-                .duracionHoras(8)
-                .build();
 
         CitaData citaData = CitaData.builder()
                 .fechaInicio(fechaturno.atStartOfDay())
@@ -93,7 +83,6 @@ public class InsertRegistrosRepositoryAdapterTest {
         ReporteTurnoData reporteTurnoData = ReporteTurnoData.builder()
                 .fechaTurno(fechaturno)
                 .idRegional(idRegional)
-                .idHorarioTurno(idHorarioTurno)
                 .build();
         //mocks
         Mockito.when(reportesTurnoRepositoryMock.deleteByFechaturno(fechaturno))
@@ -105,10 +94,8 @@ public class InsertRegistrosRepositoryAdapterTest {
         Mockito.when(regionalesRepositoryMock.findAll())
                 .thenReturn(Flux.fromIterable(Collections.singletonList(regionalData)));
 
-        Mockito.when(horarioTurnoRepositoryMock.findAll())
-                .thenReturn(Flux.fromIterable(Collections.singletonList(horarioTurnoData)));
 
-        Mockito.when(citaRepositoryMock.findAllByFechaTurnoRegional(fechaturno,idRegional,idHorarioTurno))
+        Mockito.when(citaRepositoryMock.findAllByFechaTurnoRegional(fechaturno,idRegional))
                 .thenReturn(Flux.fromIterable(Collections.singletonList(citaData)));
 
         Mockito.when(remisionRepositoryMock.countAllByFechaAdmisionIdRegional(fechaturno,idRegional))
@@ -117,10 +104,10 @@ public class InsertRegistrosRepositoryAdapterTest {
         Mockito.when(registroHistorialRepositoryMock.countByFechaNovedadRegional(fechaturno,idRegional))
                 .thenReturn(Mono.just(numeroNovedades));
 
-        Mockito.when(turnoProfesionalesRepositoryMock.countByFechaTurno(fechaturno,idRegional,idHorarioTurno))
+        Mockito.when(turnoProfesionalesRepositoryMock.countByFechaTurno(fechaturno,idRegional))
                 .thenReturn(Mono.just(numeroProfesionalesTurno));
 
-        Mockito.when(desplazamientoRepositoryMock.findByFechaProgramada(fechaturno,idRegional,idHorarioTurno))
+        Mockito.when(desplazamientoRepositoryMock.findByFechaProgramadaRegional(fechaturno,idRegional))
                 .thenReturn(Flux.fromIterable(Collections.singletonList(desplazamientoData)));
 
         Mono<Boolean> response = reportesAdapter.actualizarReporteTurno();

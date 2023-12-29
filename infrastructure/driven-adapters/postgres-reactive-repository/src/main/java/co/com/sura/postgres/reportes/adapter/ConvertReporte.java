@@ -1,6 +1,6 @@
 package co.com.sura.postgres.reportes.adapter;
 
-import co.com.sura.postgres.maestros.data.HorarioTurnoData;
+import co.com.sura.genericos.Numeros;
 import co.com.sura.postgres.maestros.data.RegionalData;
 import co.com.sura.reportes.entity.cancelacioncitas.RegistroCancelacionCita;
 import co.com.sura.reportes.entity.turnos.ItemReporteAnual;
@@ -11,7 +11,6 @@ import co.com.sura.postgres.Converter;
 import co.com.sura.postgres.agenda.data.CitaData;
 import co.com.sura.postgres.reportes.data.ReporteTurnoData;
 import io.r2dbc.spi.Row;
-import org.javatuples.Pair;
 import reactor.util.function.Tuple5;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -71,29 +70,30 @@ public class ConvertReporte extends Converter {
 
     public static ReporteTurnoData buildReporteTurnoData(
             LocalDate fechaTurno,
-            Pair<RegionalData, HorarioTurnoData> pair,
-            Tuple5<List<CitaData>, Integer, Integer, Integer, Integer> tuple){
+            RegionalData regionalData,
+            Tuple5<List<CitaData>, Integer, Integer, Integer, Double> tuple){
+
 
         var horasAsignadasCitas = CitaData.duracionTotalCitas(tuple.getT1());
         var horasCompletadasCitas = CitaData.horasCompletadasCitas(tuple.getT1());
         var citasCompletadas = CitaData.citasCompletadas(tuple.getT1());
         var citasCanceladas =  CitaData.citasCanceladas(tuple.getT1());
 
-        Double capacidad = CitaData.capacidadTurno((horasAsignadasCitas + tuple.getT5()),
-                (tuple.getT4().doubleValue() * pair.getValue1().getDuracionHoras()));
+        var horasAsignadasProfesionales = horasAsignadasCitas + tuple.getT5();
+        Double capacidad = CitaData.capacidadTurno((horasAsignadasProfesionales),
+                (tuple.getT4().doubleValue() * Numeros.HORAS_POR_PROFESIONAL_TURNO));
 
         return ReporteTurnoData.builder()
                 .fechaTurno(fechaTurno)
-                .idRegional(pair.getValue0().getId())
-                .idHorarioTurno(pair.getValue1().getId())
+                .idRegional(regionalData.getId())
                 .citasAsignadas(tuple.getT1().size())
                 .citasCompletadas(citasCompletadas)
                 .citasCanceladas(citasCanceladas)
                 .totalRemisiones(tuple.getT2())
                 .totalNovedades(tuple.getT3())
                 .totalProfesionales(tuple.getT4())
-                .horasProfesionales((double)tuple.getT4()*pair.getValue1().getDuracionHoras())
-                .horasAsignadas(horasAsignadasCitas)
+                .horasProfesionales((double)tuple.getT4()*Numeros.HORAS_POR_PROFESIONAL_TURNO)
+                .horasAsignadas(horasAsignadasProfesionales)
                 .horasCompletadas(horasCompletadasCitas)
                 .capacidadActual(capacidad)
                 .build();

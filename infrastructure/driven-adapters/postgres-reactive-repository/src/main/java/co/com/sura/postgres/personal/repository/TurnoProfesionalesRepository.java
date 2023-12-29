@@ -18,13 +18,9 @@ public interface TurnoProfesionalesRepository  extends ReactiveCrudRepository<Tu
     Mono<Boolean> eliminarByIdProfesionalFechaTurno(LocalDate fechaTurno, String idProfesional);
 
 
-    @Query("SELECT COUNT(*) FROM public.turno_profesional " +
-            "INNER JOIN  public.profesionales ON public.profesionales.numero_identificacion = " +
-            "public.turno_profesional.id_profesional " +
-            "AND public.turno_profesional.id_regional = $2 " +
-            "AND public.turno_profesional.id_horario_turno = $3 " +
-            "WHERE fecha_turno = $1 ")
-    Mono<Integer> countByFechaTurno(LocalDate fechaTurno , String idRegional, Integer idHorarioTurno);
+    @Query("SELECT COUNT(*)" +
+            "FROM public.turno_profesional WHERE fecha_turno=$1 and id_regional=$2;")
+    Mono<Integer> countByFechaTurno(LocalDate fechaTurno , String idRegional);
 
     @Query("SELECT public.profesionales.* " +
             "FROM public.turno_profesional " +

@@ -64,10 +64,11 @@ public class DesplazamientoData {
                 .idHorarioTurno(citaPartida.getIdHorarioTurno())
                 .build();
     }
-    public static Mono<Integer> calcularHorasTotalesDesplazamientoTurno(Flux<DesplazamientoData> desplazamientos){
+    public static Mono<Double> calcularHorasTotalesDesplazamientoTurno(Flux<DesplazamientoData> desplazamientos){
         return desplazamientos
                 .map(DesplazamientoData::getDuracion)
                 .reduce(0,Integer::sum)
-                .map(duracionTotal-> (duracionTotal/ Numeros.SEGUNDOS_EN_HORAS));
+                .map(duracionTotal-> (duracionTotal/ Numeros.SEGUNDOS_EN_HORAS))
+                .map(Integer::doubleValue);
     }
 }

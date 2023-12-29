@@ -28,13 +28,10 @@ public class ReporteTurnoData {
     @Column("id_regional")
     private String idRegional;
 
-    @Column("id_horario_turno")
-    private Integer idHorarioTurno;
-
-    @Column("total_profesionales")
+    @Column("total_remisiones")
     private Integer totalRemisiones;
 
-    @Column("total_remisiones")
+    @Column("total_profesionales")
     private Integer totalProfesionales;
 
     @Column("total_novedades")

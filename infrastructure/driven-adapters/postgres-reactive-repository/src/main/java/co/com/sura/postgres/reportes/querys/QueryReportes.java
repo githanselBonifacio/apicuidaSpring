@@ -9,8 +9,7 @@ public class QueryReportes {
             "SUM(total_remisiones)  AS \"totalRemisiones\", " +
             "SUM(total_novedades)   AS \"totalNovedades\", " +
 
-            "CASE WHEN SUM(horas_asignadas) = 0 THEN 0 ELSE (SUM(horas_completadas) / " +
-            "NULLIF(SUM(horas_asignadas), 0)) * 100 END AS \"cumplimientoCitasPromedio\""+
+           "SUM(citas_completadas)::float / NULLIF(SUM(citas_asignadas),0)*100 AS \"cumplimientoCitasPromedio\"" +
 
             "FROM reportes_turno " +
             "WHERE EXTRACT(YEAR FROM fecha_turno)= $1 AND id_regional = $2 " +
@@ -25,8 +24,7 @@ public class QueryReportes {
             "SUM(total_remisiones)  AS \"totalRemisiones\", " +
             "SUM(total_novedades)   AS \"totalNovedades\", " +
 
-            "CASE WHEN SUM(horas_completadas) = 0 THEN 0 ELSE (SUM(horas_completadas) / " +
-            "NULLIF(SUM(horas_asignadas), 0)) * 100 END AS \"cumplimientoCitasPromedio\""+
+            "SUM(citas_completadas)::float / NULLIF(SUM(citas_asignadas),0)*100 AS \"cumplimientoCitasPromedio\"" +
 
             "FROM reportes_turno " +
             "WHERE EXTRACT(MONTH FROM fecha_turno)= $1 AND " +
