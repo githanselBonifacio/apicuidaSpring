@@ -2,6 +2,7 @@ package co.com.sura.remision;
 
 import co.com.sura.constantes.Mensajes;
 import co.com.sura.genericos.EstadosCita;
+import co.com.sura.postgres.agenda.data.CitaData;
 import co.com.sura.postgres.agenda.repository.CitaRepository;
 import co.com.sura.postgres.remision.adapter.HistorialRemisionAdapter;
 import co.com.sura.postgres.remision.adapter.PlanManejoRemisionAdapter;
@@ -250,9 +251,12 @@ class RemisionRepositoryAdapterTest {
         Mockito.when(citaRepositoryMock.findLastNumberIdCita(remisionRequest.getIdRemision()))
                         .thenReturn(Mono.just(1));
 
-        Mockito.when(citaRepositoryMock.deleteCitaDataByIdRemision(
-                remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()))
-                .thenReturn(Mono.empty());
+        Mockito.when(citaRepositoryMock.findAllByIdRemision(remisionRequest.getIdRemision()))
+                .thenReturn(Flux.fromIterable(new ArrayList<>(){{add(CitaData.builder()
+                        .idCita(idRemision+"-1")
+                        .idEstado(EstadosCita.SIN_AGENDAR.getEstado())
+                        .fechaProgramada(LocalDateTime.now())
+                        .build());}}));
 
         Mockito.when(historialRemisionAdapterMock.buildRegistroActualRemision(
                 remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()))

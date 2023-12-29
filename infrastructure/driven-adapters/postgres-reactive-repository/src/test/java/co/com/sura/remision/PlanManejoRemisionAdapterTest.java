@@ -264,6 +264,8 @@ class PlanManejoRemisionAdapterTest {
         Mockito.when(canalizacionRepositoryMock.deleteByIDRemision(idRemision))
                 .thenReturn(Mono.empty());
 
+        Mockito.when(tratamientoRepositoryMock.deleteByIDRemision(idRemision))
+                .thenReturn(Mono.empty());
         Mono<Void> response  = planManejoRemisionAdapter.eliminarPlanManejoByidRemision(idRemision);
 
         StepVerifier.create(response)
