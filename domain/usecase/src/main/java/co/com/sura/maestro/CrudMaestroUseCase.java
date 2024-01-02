@@ -1,11 +1,7 @@
 package co.com.sura.maestro;
 
-import co.com.sura.maestros.entity.EstadoCita;
-import co.com.sura.maestros.entity.HorarioTurno;
+import co.com.sura.maestros.entity.*;
 import co.com.sura.maestros.gateway.MaestroRepository;
-import co.com.sura.maestros.entity.Profesion;
-import co.com.sura.maestros.entity.Regional;
-import co.com.sura.maestros.entity.TipoIdentificacion;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -46,4 +42,6 @@ public class CrudMaestroUseCase {
 
     //profesiones
     public Flux<Profesion> consultarProfesiones(){return  maestroRepository.consultarProfesiones();}
+    public Flux<MotivoCancelacionCita> consultarMotivosCancelacionCita(){
+        return  maestroRepository.consultarMotivosCancelacionCita();}
 }

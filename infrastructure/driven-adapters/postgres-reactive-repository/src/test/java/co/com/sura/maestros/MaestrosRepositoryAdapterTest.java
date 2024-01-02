@@ -33,6 +33,9 @@ import java.util.List;
     private  EstadoCitaRepository estadoCitaRepositoryMock;
     @Mock
     private  ProfesionRepository profesionRepositoryMock;
+
+    @Mock MotivoCancelacionCitaRepository motivoCancelacionCitaRepositoryMock;
+
     @InjectMocks
     private MaestroRepositoryAdapter maestroRepositoryAdapter;
 
@@ -197,5 +200,22 @@ import java.util.List;
                 .verify();
 
     }
+    @Test
+    void consultarMotivoCancelacionCita(){
+        List<MotivoCancelacionCitaData> motivoCancelacionCitaData = new ArrayList<>();
+        motivoCancelacionCitaData.add(MotivoCancelacionCitaData.builder()
+                .build());
 
+        Mockito.when(motivoCancelacionCitaRepositoryMock.findAll())
+                .thenReturn(Flux.fromIterable(motivoCancelacionCitaData));
+
+        Flux<MotivoCancelacionCita> response = maestroRepositoryAdapter.consultarMotivosCancelacionCita();
+
+
+        StepVerifier.create(response)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+
+    }
 }

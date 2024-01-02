@@ -375,4 +375,46 @@ class MaestrosControllerTest {
         Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
 
     }
+
+    @Test
+    void consultarMotivoCancelacionCita(){
+
+        List<MotivoCancelacionCita> motivoCancelacionCitas = new ArrayList<>();
+        motivoCancelacionCitas.add(MotivoCancelacionCita.builder().build());
+
+        Response<List<MotivoCancelacionCita>> respuestaEsperada = Response.<List<MotivoCancelacionCita>>builder()
+                .result(motivoCancelacionCitas)
+                .build();
+
+        Mockito.when(maestroRepositoryMock.consultarMotivosCancelacionCita())
+                .thenReturn(Flux.fromIterable(motivoCancelacionCitas));
+
+        Response<List<MotivoCancelacionCita>> response = webClient.get()
+                .uri("/maestros/motivosCancelacionCita")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<Response<List<MotivoCancelacionCita>>>() {})
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(respuestaEsperada.getResult(),response.getResult());
+
+    }
+    @Test
+    void consultarMotivoCancelacionCitaError(){
+
+        Mockito.when(maestroRepositoryMock.consultarMotivosCancelacionCita())
+                .thenReturn(Flux.error(Exception::new));
+
+        Response<?> response = webClient.get()
+                .uri("/maestros/motivosCancelacionCita")
+                .exchange()
+                .expectBody(Response.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
+        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
+
+    }
 }

@@ -531,44 +531,6 @@ import java.util.List;
         Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
     }
     @Test
-    void consultarMovilesSinConductor(){
-        List<Movil> moviles = new ArrayList<>();
-        moviles.add(Movil.builder().marca("marca").build());
-
-        Response<List<Movil>> respuestaEsperada = Response.<List<Movil>>builder()
-                .result(moviles)
-                .build();
-
-        Mockito.when(personalCrudRepositoryMock.consultarMovilesSinConductor())
-                .thenReturn(Flux.fromIterable(moviles));
-
-        Response<List<Movil>> response = webClient.get()
-                .uri("/personal/movilesSinConductor")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<Response<List<Movil>>>(){})
-                .returnResult().getResponseBody();
-
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(respuestaEsperada.getResult(), response.getResult());
-
-    }
-    @Test
-    void consultarMovilesSinConductorError(){
-        Mockito.when(personalCrudRepositoryMock.consultarMovilesSinConductor())
-                .thenReturn(Flux.error(Exception::new));
-
-        Response<?> response = webClient.get()
-                .uri("/personal/movilesSinConductor")
-                .exchange()
-                .expectBody(Response.class)
-                .returnResult().getResponseBody();
-
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(Mensajes.PETICION_FALLIDA, response.getMessage());
-        Assertions.assertEquals(StatusCode.STATUS_500, response.getStatus());
-    }
-    @Test
     void consultarMovilesByIdRegional(){
         List<Movil> moviles = new ArrayList<>();
         moviles.add(Movil.builder().marca("marca").build());

@@ -39,8 +39,9 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
             "INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
             "INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita "+
-            "WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
-    Flux<PacienteTratamientoCita> findAllTratamientosPacientes();
+            "WHERE citas.id_estado = $1 or citas.id_estado = $2 or citas.id_estado = $3 ;")
+    Flux<PacienteTratamientoCita> findAllTratamientosPacientes(
+            Integer estadoCitaConfirmada,Integer estadoCitaProgreso, Integer estadoCitaFinalizada);
 
 
     @Query("SELECT pacientes.numero_identificacion, " +
@@ -52,8 +53,10 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
             "INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
             "INNER JOIN soporte_nutricionales ON soporte_nutricionales.id_cita = citas.id_cita "+
-            "WHERE citas.id_estado = 3 or citas.id_estado = 4 or citas.id_estado = 6 ;")
-    Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientes();
+            "WHERE citas.id_estado = $1 or citas.id_estado = $2 or citas.id_estado = $3 ;")
+    Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientes(
+            Integer estadoCitaConfirmada,Integer estadoCitaProgreso, Integer estadoCitaFinalizada
+    );
 
     @Query("SELECT pacientes.numero_identificacion,pacientes.tipo_identificacion, " +
             "pacientes.nombres,pacientes.apellidos,  " +
@@ -64,10 +67,11 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             "INNER JOIN remisiones ON remisiones.numero_identificacion_paciente = pacientes.numero_identificacion " +
             "INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
             "INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $2 "+
-            "WHERE citas.fecha_programada::Date = $1 and citas.id_horario_turno = $3 and citas.id_estado = 3 or " +
-            " citas.id_estado = 4 or citas.id_estado = 6 ;")
+            "WHERE citas.fecha_programada::Date = $1 and citas.id_horario_turno = $3 and citas.id_estado = $4 or " +
+            " citas.id_estado = $5 or citas.id_estado = $6 ;")
     Flux<PacienteTratamientoCita> findAllTratamientosPacientesByTurnoRegionalHorario(
-            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno);
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno,Integer estadoCitaConfirmada,
+            Integer estadoCitaProgreso, Integer estadoCitaFinalizada);
 
 
     @Query("SELECT pacientes.numero_identificacion,pacientes.tipo_identificacion, " +
@@ -80,8 +84,9 @@ public interface PacienteRepository extends ReactiveCrudRepository<PacienteData,
             " INNER JOIN citas ON citas.id_remision = remisiones.id_remision " +
             " INNER JOIN tratamientos ON tratamientos.id_cita = citas.id_cita and citas.id_regional = $2 "+
             " INNER JOIN soporte_nutricionales ON soporte_nutricionales.id_cita = citas.id_cita " +
-            " WHERE citas.fecha_programada::Date = $1 and citas.id_horario_turno = $3 and citas.id_estado = 3 or " +
-            " citas.id_estado = 4 or citas.id_estado = 6 ;")
+            " WHERE citas.fecha_programada::Date = $1 and citas.id_horario_turno = $3 and citas.id_estado = $4 or " +
+            " citas.id_estado = $5 or citas.id_estado = $6 ;")
     Flux<PacienteTratamientoCita> findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
-            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno);
+            LocalDate fechaTurno, String idRegional, Integer idHorarioTurno,Integer estadoCitaConfirmada,
+            Integer estadoCitaProgreso, Integer estadoCitaFinalizada);
 }

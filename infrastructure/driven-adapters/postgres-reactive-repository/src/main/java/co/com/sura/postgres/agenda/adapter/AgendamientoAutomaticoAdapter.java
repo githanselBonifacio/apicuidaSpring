@@ -20,17 +20,21 @@ import co.com.sura.postgres.personal.repository.ProfesionalRepository;
 import co.com.sura.mapbox.entity.GeoUbicacion;
 import co.com.sura.mapbox.gateway.MapboxServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 
 import static co.com.sura.genericos.EstadosCita.AGENDADA;
 
 @Repository
+@EnableScheduling
 public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepository {
 
     private final CitaRepository citaRepository;
@@ -56,6 +60,13 @@ public class AgendamientoAutomaticoAdapter implements AgendamientoAutomaticoRepo
         this.horarioTurnoRepository = horarioTurnoRepository;
         this.mapboxService = mapboxService;
         this.autoAgendador = autoAgendador;
+    }
+    @Scheduled(cron = "0 0 2 * * *",  zone = "America/Bogota")
+    public Mono<Boolean> actualizarReporteTurno() {
+        var zone = ZoneId.of("America/Bogota");
+        var fecha = LocalDate.now(zone);
+        this.autoAgendador.depurarFechasDesplazamientoCitaByFecha(fecha);
+        return Mono.just(Boolean.TRUE);
     }
     @Override
     public Mono<Boolean> autoagendarTurnoCompleto(LocalDate fechaTurno, Integer idHorarioTurno, String idRegional) {

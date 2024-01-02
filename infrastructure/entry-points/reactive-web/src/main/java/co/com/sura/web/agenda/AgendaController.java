@@ -30,8 +30,14 @@ public class AgendaController {
     private AgendaUseCase agendaUseCase;
 
     //profesionales en turno
-    @GetMapping(value = "/profesionalesByTurnoRegional")
-    public Mono<Response<List<Profesional>>> getProfesionalesbyTurnoRegional(
+    /**
+     * consulta profesionales disponibles para asignar en turno
+     * @param fechaTurno fecha del turno (LocalDate)
+     * @param idRegional id regional (String)
+     * @return profesionales disponibles para asignar en turno (Response<List<co.com.sura.personal.entity.Profesional.class>>)
+     * */
+    @GetMapping(value = "/profesionalesDisponiblesByTurnoRegional")
+    public Mono<Response<List<Profesional>>> getProfesionalesDisponiblesByTurnoRegional(
              @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
              @RequestParam String idRegional){
         return agendaUseCase.consultarProfesionalesByTurnoRegional(fechaTurno, idRegional)
@@ -52,6 +58,13 @@ public class AgendaController {
                 )));
     }
 
+    /**
+     * consulta profesionales asignados en él en turno
+     * @param fechaTurno fecha del turno (LocalDate)
+     * @param idRegional id regional (String)
+     * @param idHorarioTurno id horario turno (Integer)
+     * @return profesionales asignados en turno (Response<List<co.com.sura.personal.entity.Profesional.class>>)
+     * */
     @GetMapping(value = "/profesionalesFromTurnoRegional")
     public Mono<Response<List<Profesional>>> getProfesionalesfromTurnoRegional(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -74,6 +87,11 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * consulta todos los profesionales en una regional
+     * @param idRegional id regional (String)
+     * @return profesionales pertenecientes la regional (Response<List<co.com.sura.personal.entity.Profesional.class>>)
+     * */
     @GetMapping(value = "/profesionales/{idRegional}")
     public Mono<Response<List<Profesional>>> getProfesionalesByRegional(@PathVariable String idRegional){
         return agendaUseCase.consultarProfesionalesByRegional(idRegional)
@@ -94,7 +112,11 @@ public class AgendaController {
                 )));
     }
 
-
+    /**
+     * inserta un registro a tabla turnoProfesional
+     * @param turnoProfesional turno a insertar (co.com.sura.personal.entity.TurnoProfesional)
+     * @return crea el turno (Response<Boolean>)
+     * */
     @PostMapping(value = "/asignarProfesionalTurno")
     public Mono<Response<Boolean>> asignarProfesionalTurno(@RequestBody TurnoProfesional turnoProfesional){
         return agendaUseCase.asignarProfesionalTurno(turnoProfesional)
@@ -116,6 +138,11 @@ public class AgendaController {
                 )));
     }
 
+    /**
+     * elimina un registro a tabla turnoProfesional
+     * @param turnoProfesional turno a eliminar (co.com.sura.personal.entity.TurnoProfesional)
+     * @return elimina el turno (Response<Boolean>)
+     * */
     @PostMapping(value = "/desasignarProfesionalTurno")
     public Mono<Response<Boolean>> desasignarProfesionalTurno(@RequestBody TurnoProfesional turnoProfesional){
         return agendaUseCase.desasignarProfesionalTurno(turnoProfesional)
@@ -136,8 +163,17 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
-
     //turno
+
+    /**
+     * desagendar todas las citas en este turno
+     * @param fechaTurno fecha del turno (LocalDate)
+     * @param idRegional id regional (String)
+     * @param idHorarioTurno id horario turno (Integer)
+     * @return elimina el turno (Response<Boolean>)
+     * @apiNote solo es posible ejecutar cuando todas las citas están en estado agendado,
+     * si hay en estado progreso o finalizada no es posible desagendar de manera masiva
+     * */
     @PutMapping(value = "/desagendarTurnoCompleto")
     public Mono<Response<Boolean>> desagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -158,6 +194,15 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * autoagendar todas las citas en este turno
+     * @param fechaTurno fecha del turno (LocalDate)
+     * @param idRegional id regional (String)
+     * @param idHorarioTurno id horario turno (Integer)
+     * @return elimina el turno (Response<Boolean>)
+     * @apiNote si en el turno hay citas confirmadas, en progreso o finalizadas,
+     * no se puede autoagendar con el algoritmo genético, se lanzará una exepción
+     * */
     @PutMapping(value = "/autoagendarTurnoCompleto")
     public Mono<Response<Boolean>> autoagendarTurnoCompleto(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -176,13 +221,19 @@ public class AgendaController {
                         StatusCode.STATUS_500,
                         Mensajes.ERROR_AUTOAGENDADO,
                         Mensajes.ERROR_AUTOAGENDADO,
-                        e.getMessage()
-                )))
+                        e.getMessage())))
                 .timeout(Duration.ofSeconds(TIMEOUT));
     }
    //actividades
+    /**
+     * consulta actividades asignadas en él en turno por profesional
+     * @param fechaTurno fecha del turno (LocalDate)
+     * @param idRegional id regional (String)
+     * @param idHorarioTurno id horario turno (Integer)
+     * @return actividades asignados en turno (Response<List<co.com.sura.agenda.entity.Actividad.class>>)
+     * */
     @GetMapping(value = "/actividadesByprofesionalesRegionalHorario")
-    public Mono<Response<List<Actividad>>> getActividadesByProfesionalesCiudadHorario(
+    public Mono<Response<List<Actividad>>> getActividadesByProfesionalesRegionalHorario(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
             @RequestParam Integer idHorarioTurno,
             @RequestParam String idRegional){
@@ -203,6 +254,13 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * consulta desplazamientos asignados en él en turno
+     * @param fechaTurno fecha del turno (LocalDate)
+     * @param idRegional id regional (String)
+     * @param idHorarioTurno id horario turno (Integer)
+     * @return desplazamientos asignados en turno (Response<List<co.com.sura.moviles.entity.Desplazamiento.class>>)
+     * */
     @GetMapping(value = "/desplazamientoVisita")
     public Mono<Response<List<Desplazamiento>>> getDesplazamientoByIdCitaPartida(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -225,7 +283,13 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
-
+    /**
+     * consulta citas en turno
+     * @param fechaTurno fecha del turno (LocalDate)
+     * @param idRegional id regional (String)
+     * @param idHorarioTurno id horario turno (Integer)
+     * @return citas en turno (Response<List<co.com.sura.agenda.entity.Cita.class>>)
+     * */
     @GetMapping(value = "/citas")
     public Mono<Response<List<Cita>>> getCitasByTurnoRegional(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,
@@ -249,6 +313,14 @@ public class AgendaController {
                 )));
 
     }
+    /**
+     * reprogramar horario de cita
+     * @param cita cita a reprogramar (co.com.sura.agenda.entity.Cita.class)
+     * @return reprogramar cita (Response<Boolean>>)
+     * @apiNote solo se modifica la hora programada en la fecha programada de la cita,
+     * no se puede cambiar el día en la fecha
+     * @apiNote se valida que la nueva hora no tenga cruce con otra cita y que este dentro del horario del turno
+     * */
     @PutMapping(value = "/reprogramarCita")
     public Mono<Response<Boolean>> reprogramarCita(
           @RequestBody Cita cita) {
@@ -271,6 +343,13 @@ public class AgendaController {
                 )));
 
     }
+    /**
+     * confirmar cita
+     * @param idCita id de cita a confirmar (String)
+     * @return estado confirmado (Response<Boolean>>)
+     * @apiNote se confirma la cita cuando se actualiza el idEstado de la cita al correspondiente
+     * @apiNote se valida que la cita este en estado agendado de lo contrario lanza una exepción
+     * */
     @PutMapping(value = "/confirmarCita")
     public Mono<Response<Boolean>> confirmarCita(@RequestParam String idCita){
         return agendaUseCase.confirmarCita(idCita)
@@ -289,6 +368,13 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * confirmar una lista de citas en un turno
+     * @param citas id de cita a confirmar (List<co.com.sura.agenda.entity.Cita>)
+     * @return estado confirmado de las citas(Response<Boolean>>)
+     * @apiNote se confirma la cita cuando se actualizan todos los idEstado de la cita al correspondiente
+     * @apiNote solo se confirman las citas en estado agendadas, las demás citas no se les realiza cambios
+     * */
     @PostMapping(value = "/confirmarCitasTurno")
     public Mono<Response<Boolean>> confirmarCitasTurno(@RequestBody List<Cita> citas){
         return agendaUseCase.confirmarCitasTurno(citas)
@@ -307,6 +393,13 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * iniciar atención cita, actualizar ha estado 'en progreso'
+     * @param idCita id de cita a iniciar (String)
+     * @return estado confirmado (Response<Boolean>>)
+     * @apiNote se inicia atención de la cita cuando se actualiza el idEstado de la cita al correspondiente
+     * @apiNote se valida que la cita este en estado confirmado de lo contrario lanza una exepción
+     * */
     @PutMapping(value = "/iniciarAtencionCita")
     public Mono<Response<Boolean>> iniciarAtencionCita(@RequestParam String idCita){
         return agendaUseCase.iniciarAtencionCita(idCita)
@@ -325,6 +418,13 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * finalizar cita , actualizar a estado 'finalizada'
+     * @param idCita id de cita a finalizar (String)
+     * @return estado confirmado (Response<Boolean>>)
+     * @apiNote se finaliza la cita cuando se actualiza el idEstado de la cita al correspondiente
+     * @apiNote se valida que la cita este en estado en progreso de lo contrario lanza una exepción
+     * */
     @PutMapping(value = "/finalizarAtencionCita")
     public Mono<Response<Boolean>> finalizarAtencionCita(@RequestParam String idCita){
         return agendaUseCase.finalizarAtencionCita(idCita)
@@ -343,6 +443,13 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * cancelar cita , actualizar a estado 'cancelada'
+     * @param idCita id de cita a cancelar (String)
+     * @return estado cancelado (Response<Boolean>>)
+     * @apiNote se cancela la cita cuando se actualiza el idEstado de la cita al correspondiente
+     * @apiNote se valida que la cita este en estado en sin agendar o agendada de lo contrario lanza una exepción
+     * */
     @PutMapping(value = "cancelarCita")
     public Mono<Response<Boolean>> cancelarCita(
             @RequestParam String idCita,
@@ -363,6 +470,12 @@ public class AgendaController {
                         e.getMessage()
                 )));
     }
+    /**
+     * asignar profesional a una cita
+     * @param cita cita a asinar (co.com.sura.agenda.entity.Cita.class)
+     * @return asignar profesional (Response<Boolean>>)
+     * @apiNote la cita debe tener el idProfesional que se asignará a la cita
+     * */
     @PutMapping(value = "/asignarProfesionalCita")
     public Mono<Response<Boolean>> asignarProfesionalCita(
             @RequestBody Cita cita){
@@ -388,6 +501,16 @@ public class AgendaController {
 
 
     }
+    /**
+     * desasignar profesional a una cita
+     * @param idCita id de cita a desasinar (String)
+     * @param idProfesional idProfesional que tiene asignado la cita (String)
+     * @param fechaTurno fecha turno de la cita (LocalDate)
+     * @param idRegional id regional del turno (String)
+     * @param idHorarioTurno id horario del turno (Integer)
+     * @return desasignar profesional (Response<Boolean>>)
+     * @apiNote se recalculan nuevamente los desplazamientos del profeisonal en el turno con las citas restantes
+     * */
     @PutMapping(value = "/desasignarProfesionalCita")
     public Mono<Response<Boolean>> desasignarProfesionalCita(
             @RequestParam String idCita,
@@ -413,6 +536,11 @@ public class AgendaController {
 
     }
     //tratamientos
+    /**
+     * consultar tratamientos en cita
+     * @param idCita id de cita  (String)
+     * @return lista de tratamientos (List<co.com.sura.remision.entity.datosremision.Tratamiento.class>)
+     * */
     @GetMapping(value = "/tratamientos")
     public Mono<Response<List<Tratamiento>>> consultarTratamientosByCita(@RequestParam String idCita) {
         return agendaUseCase.consultarTratamientosByCita(idCita)
@@ -433,7 +561,11 @@ public class AgendaController {
                 )));
 
     }
-
+    /**
+     * consultar procedimientos en cita
+     * @param idCita id de cita  (String)
+     * @return lista de tratamientos (List<co.com.sura.remision.entity.procedimientos.Procedimientos.class>)
+     * */
     @GetMapping(value = "/procedimientos")
     public Mono<Response<Procedimientos>> consultarProcedimientosByIdCita(@RequestParam String idCita){
         return agendaUseCase.consultarProcedimietosByIdCita(idCita)

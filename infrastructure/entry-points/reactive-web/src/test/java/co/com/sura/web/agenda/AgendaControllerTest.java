@@ -77,7 +77,7 @@ import java.util.*;
         Mockito.when(personalCrudRepositoryMock.consultarProfesionalByTurnoRegional(fechaTurno,idRegional))
                 .thenReturn(Flux.fromIterable(profesionales));
 
-        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/profesionalesByTurnoRegional")
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/profesionalesDisponiblesByTurnoRegional")
                 .queryParam("fechaTurno", fechaTurno)
                 .queryParam("idRegional", idRegional);
 
@@ -96,7 +96,7 @@ import java.util.*;
         Mockito.when(personalCrudRepositoryMock.consultarProfesionalByTurnoRegional(fechaTurno,idRegional))
                 .thenReturn(Flux.error(Exception::new));
 
-        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/profesionalesByTurnoRegional")
+        UriComponentsBuilder builderUrl = UriComponentsBuilder.fromPath("/agenda/profesionalesDisponiblesByTurnoRegional")
                 .queryParam("fechaTurno", fechaTurno)
                 .queryParam("idRegional", idRegional);
 

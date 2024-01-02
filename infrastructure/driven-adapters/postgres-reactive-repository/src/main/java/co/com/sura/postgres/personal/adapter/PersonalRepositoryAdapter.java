@@ -52,8 +52,8 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
 
 
     @Override
-    public Flux<Profesional> consultarProfesionalByTurnoRegional(LocalDate fechaTurno, String idCiudad) {
-        return profesionalRepository.findByTurnoRegional(fechaTurno,idCiudad)
+    public Flux<Profesional> consultarProfesionalByTurnoRegional(LocalDate fechaTurno, String idRegional) {
+        return profesionalRepository.findByTurnoRegional(fechaTurno,idRegional)
                 .map(ConverterPersonal:: convertToProfesional);
     }
 
@@ -96,11 +96,6 @@ public class PersonalRepositoryAdapter implements PersonalCrudRepository {
     @Override
     public Flux<Movil> consultarMoviles() {
         return movilRepository.findAll()
-                .map(ConverterPersonal::convertToMovil);
-    }
-    @Override
-    public Flux<Movil> consultarMovilesSinConductor() {
-        return movilRepository.findAllWithoutConductor()
                 .map(ConverterPersonal::convertToMovil);
     }
     @Override

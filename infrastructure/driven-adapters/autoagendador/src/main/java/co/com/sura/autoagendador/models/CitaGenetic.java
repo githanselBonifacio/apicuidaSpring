@@ -30,7 +30,8 @@ public class CitaGenetic implements Comparable<CitaGenetic>, Cloneable{
         List<Integer> sizes = encontrarSumandos(citas.size(), numeroDiviciones);
         Collections.shuffle(citas);
         if (sizes.stream().mapToInt(Integer::intValue).sum() != citas.size()) {
-            throw new IllegalArgumentException("Sum of sizes must equal length of list.");
+            throw new IllegalArgumentException("La suma de los tamaños debe ser igual a la longitud de la lista." +
+                    "Valide que se tengan profesionales asignados al turno");
         }
         List<List<CitaGenetic>> listasAgrupadas = new ArrayList<>();
         var start = 0;

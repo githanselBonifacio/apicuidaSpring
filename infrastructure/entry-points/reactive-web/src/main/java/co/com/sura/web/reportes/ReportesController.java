@@ -22,6 +22,12 @@ public class ReportesController {
     @Autowired
     private ReportesUseCase reportesUseCase;
 
+    /**
+     * consultar reporte de turno anual
+     * @param anio año de consulta (Integer)
+     * @param idRegional  id regional de consulta (String)
+     * @return reporte anual (Response<ReporteTurnoAnual>)
+     * */
     @GetMapping("/turno/anual")
     public Mono<Response<ReporteTurnoAnual>> consultarReporteAnual(
             @RequestParam Integer anio,
@@ -43,6 +49,13 @@ public class ReportesController {
                 )));
     }
 
+    /**
+     * consultar reporte de turno mensual
+     * @param anio año de consulta (Integer)
+     * @param numeroMes numero del mes consultado (Integer)
+     * @param idRegional  id regional de consulta (String)
+     * @return reporte mensual (Response<ReporteTurnoMensual>)
+     * */
     @GetMapping("/turno/mensual")
     public Mono<Response<ReporteTurnoMensual>> consultarReporteMensual(
             @RequestParam Integer anio,
@@ -64,6 +77,12 @@ public class ReportesController {
                         e.getMessage()
                 )));
     }
+    /**
+     * consultar reporte de cancelación citas anual
+     * @param anio año de consulta (Integer)
+     * @param idRegional  id regional de consulta (String)
+     * @return reporte mensual (Response<ReporteCancelacionCitaAnual>)
+     * */
     @GetMapping("/cancelacionCitas/anual")
     public Mono<Response<ReporteCancelacionCitaAnual>> consultarReporteCancelacionCitaAnual(
             @RequestParam Integer anio,
@@ -85,6 +104,13 @@ public class ReportesController {
                 )));
     }
 
+    /**
+     * consultar reporte de cancelación citas mensual
+     * @param anio año de consulta (Integer)
+     * @param numeroMes numero del mes consultado (Integer)
+     * @param idRegional  id regional de consulta (String)
+     * @return reporte mensual (Response<ReporteCancelacionCitaMensual>)
+     * */
     @GetMapping("/cancelacionCitas/mensual")
     public Mono<Response<ReporteCancelacionCitaMensual>> consultarReporteCancelacionCitaMensual(
             @RequestParam Integer anio,

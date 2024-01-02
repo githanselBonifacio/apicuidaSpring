@@ -1,6 +1,7 @@
 package co.com.sura.farmacia;
 
 import co.com.sura.agenda.entity.PacienteTratamientoCita;
+import co.com.sura.genericos.EstadosCita;
 import co.com.sura.postgres.farmacia.adapter.FarmaciaAdapter;
 import co.com.sura.postgres.remision.repository.datospaciente.PacienteRepository;
 import co.com.sura.postgres.remision.repository.procedimientos.SoporteNutricionalRepository;
@@ -42,10 +43,12 @@ import java.util.List;
                 .notificado(Boolean.FALSE)
                 .build());
 
-        Mockito.when(pacienteRepositoryMock.findAllTratamientosPacientes())
-                .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
+        Mockito.when(pacienteRepositoryMock.findAllTratamientosPacientes(
+             EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado(),EstadosCita.FINALIZADA.getEstado()))
+          .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
 
-        Mockito.when(pacienteRepositoryMock.findAllSoporteNutricionalPacientes())
+        Mockito.when(pacienteRepositoryMock.findAllSoporteNutricionalPacientes(
+            EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado(),EstadosCita.FINALIZADA.getEstado()))
                 .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
 
         Flux<PacienteTratamientoCita> response = farmaciaAdapter.consultarAllPacienteWithMedicamentosToFarmacia();
@@ -71,11 +74,17 @@ import java.util.List;
                 .build());
 
         Mockito.when(pacienteRepositoryMock.findAllTratamientosPacientesByTurnoRegionalHorario(
-                fecha,idRegional,idHorarioTurno))
+                fecha,idRegional,idHorarioTurno,
+                EstadosCita.CONFIRMADA.getEstado(),
+                EstadosCita.EN_PROGRESO.getEstado(),
+                EstadosCita.FINALIZADA.getEstado()))
                 .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
 
         Mockito.when(pacienteRepositoryMock.findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
-                        fecha,idRegional,idHorarioTurno))
+                fecha,idRegional,idHorarioTurno,
+                EstadosCita.CONFIRMADA.getEstado(),
+                EstadosCita.EN_PROGRESO.getEstado(),
+                EstadosCita.FINALIZADA.getEstado()))
                 .thenReturn(Flux.fromIterable(pacienteTratamientoCitas));
 
         Flux<PacienteTratamientoCita> response = farmaciaAdapter

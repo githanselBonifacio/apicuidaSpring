@@ -60,9 +60,7 @@ public class PersonalUseCase {
     public Flux<Movil> consultarMoviles(){
         return personalRepository.consultarMoviles();
     }
-    public Flux<Movil> consultarMovilesSinConductor(){
-        return personalRepository.consultarMovilesSinConductor();
-    }
+
     public Flux<Movil> consultarMovilesByIdRegional(String idRegional){
         return personalRepository.consultarMovilesByIdRegional(idRegional);
     }

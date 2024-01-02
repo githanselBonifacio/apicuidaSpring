@@ -28,6 +28,10 @@ public class PersonalController {
     private PersonalUseCase personalUseCase;
 
     //profesionales
+    /**
+     * consultar profesionales
+     * @return lista de profesionales (List<co.com.sura.personal.entity.Profesional.class>)
+     * */
     @GetMapping(value = "/profesionales")
     public Mono<Response<List<Profesional>>> getProfesionales(){
         return personalUseCase.consultarProfesional()
@@ -47,6 +51,11 @@ public class PersonalController {
                         e.getMessage()
                 )));
     }
+    /**
+     * consultar profesionales by regional
+     * @param idRegional id regional consultada (String)
+     * @return lista de profesionales (List<co.com.sura.personal.entity.Profesional.class>)
+     * */
     @GetMapping(value = "/profesionales/{idRegional}")
     public Mono<Response<List<Profesional>>> getProfesionalesByRegional(@PathVariable String idRegional){
         return personalUseCase.consultarProfesionalByRegional(idRegional)
@@ -66,6 +75,11 @@ public class PersonalController {
                         e.getMessage()
                 )));
     }
+    /**
+     * crear profesional
+     * @param profesional profesional a crear (co.com.sura.personal.entity.Profesional.class)
+     * @return profesional creado  (co.com.sura.personal.entity.Profesional.class)
+     * */
     @PostMapping(value = "/crearProfesional")
     public Mono<Response<Profesional>> crearConductor(@RequestBody Profesional profesional) {
         return personalUseCase.crearProfesional(profesional)
@@ -86,6 +100,11 @@ public class PersonalController {
 
     }
 
+    /**
+     * actualizar profesional
+     * @param profesional profesional a actualizar (co.com.sura.personal.entity.Profesional.class)
+     * @return profesional actualizado  (co.com.sura.personal.entity.Profesional.class)
+     * */
     @PutMapping(value = "/actualizarProfesional")
     public Mono<Response<Profesional>> actualizarConductor(@RequestBody Profesional profesional) {
         return personalUseCase.actualizarProfesional(profesional)
@@ -106,6 +125,10 @@ public class PersonalController {
 
     }
     //conductores
+    /**
+     * consultar conductores
+     * @return lista de conductores (List<co.com.sura.personal.entity.Conductor.class>)
+     * */
     @GetMapping(value = "/conductores")
     public Mono<Response<List<Conductor>>> getConductores(){
         return personalUseCase.consultarConductores()
@@ -125,6 +148,11 @@ public class PersonalController {
                         e.getMessage()
                 )));
     }
+    /**
+     * crear conductor
+     * @param conductor conductor a crear (co.com.sura.personal.entity.Conductor.class)
+     * @return conductor creado  (co.com.sura.personal.entity.Conductor.class)
+     * */
     @PostMapping(value = "/crearConductor")
     public Mono<Response<Conductor>> crearConductor(@RequestBody Conductor conductor) {
         return personalUseCase.crearConductor(conductor)
@@ -144,7 +172,11 @@ public class PersonalController {
                 )));
 
     }
-
+    /**
+     * crear actualizar
+     * @param conductor conductor a actualizar (co.com.sura.personal.entity.Conductor.class)
+     * @return conductor actualizado  (co.com.sura.personal.entity.Conductor.class)
+     * */
     @PutMapping(value = "/actualizarConductor")
     public Mono<Response<Conductor>> actualizarConductor(@RequestBody Conductor conductor) {
         return personalUseCase.actualizarConductor(conductor)
@@ -165,6 +197,11 @@ public class PersonalController {
 
     }
     //moviles
+    /**
+     * crear movil
+     * @param movil movil a crear (co.com.sura.personal.entity.Movil.class)
+     * @return movil creado  (co.com.sura.personal.entity.Movil.class)
+     * */
     @PostMapping(value = "/crearMovil")
     public Mono<Response<Movil>> crearMovil(@RequestBody Movil movil) {
         return personalUseCase.crearMovil(movil)
@@ -184,7 +221,11 @@ public class PersonalController {
                 )));
 
     }
-
+    /**
+     * actualizar movil
+     * @param movil movil a actualizar (co.com.sura.personal.entity.Movil.class)
+     * @return movil actualizado  (co.com.sura.personal.entity.Movil.class)
+     * */
     @PutMapping(value = "/actualizarMovil")
     public Mono<Response<Movil>> actualizarMovil(@RequestBody Movil movil) {
         return personalUseCase.actualizarMovil(movil)
@@ -204,6 +245,10 @@ public class PersonalController {
                 )));
 
     }
+    /**
+     * consultar moviles
+     * @return lista de moviles (List<co.com.sura.personal.entity.Movil.class>)
+     * */
     @GetMapping(value = "/moviles")
     public Mono<Response<List<Movil>>> consultarMoviles(){
         return personalUseCase.consultarMoviles()
@@ -222,24 +267,12 @@ public class PersonalController {
                         e.getMessage()
                 )));
     }
-    @GetMapping(value = "movilesSinConductor")
-    public Mono<Response<List<Movil>>> consultarMovilesSinConductor(){
-        return personalUseCase.consultarMovilesSinConductor()
-                .collectList()
-                .map(movil->ResponseFactory.createStatus(
-                        movil,
-                        StatusCode.STATUS_200,
-                        Mensajes.PETICION_EXITOSA,
-                        Mensajes.PETICION_EXITOSA,
-                        Mensajes.PETICION_EXITOSA))
-                .onErrorResume(e -> Mono.just(ResponseFactory.createStatus(
-                        null,
-                        StatusCode.STATUS_500,
-                        Mensajes.PETICION_FALLIDA,
-                        Mensajes.PETICION_FALLIDA,
-                        e.getMessage()
-                )));
-    }
+
+    /**
+     * consultar moviles by regional
+     * @param idRegional id regional consultada (String)
+     * @return lista de moviles (List<co.com.sura.personal.entity.Movil.class>)
+     * */
     @GetMapping(value = "/movilesByRegional/{idRegional}")
     public Mono<Response<List<Movil>>> consultarMovilesByIdRegional(@PathVariable String idRegional){
         return personalUseCase.consultarMovilesByIdRegional(idRegional)
@@ -260,6 +293,10 @@ public class PersonalController {
     }
 
     //secuencia de turnos
+    /**
+     * consultar secuencias de turnos de profesionales
+     * @return lista de secuencias (List<co.com.sura.personal.entity.SecuenciaTurno.class>)
+     * */
     @GetMapping("secuenciasTurno")
     public  Mono<Response<List<SecuenciaTurno>>> consultarSecuenciasTurno(){
         return personalUseCase.consultarSecuenciasTurno()
@@ -280,10 +317,17 @@ public class PersonalController {
                 )));
     }
 
+    /**
+     * eliminar turnos de profesionales acción masiva
+     * @param eliminarTurnosRequest lista de turnos a eliminar (List<co.com.sura.remision.dtoy.eliminarTurnosRequest.class>)
+     * @return resultado de eliminación (List<co.com.sura.personal.entity.ResultadoActualizacionTurno.class>)
+     * @apiNote si el turno del profesional a eliminar tiene citas asignadas no se podra modificar
+     * y se notificará en la respuesta
+     * */
     @PostMapping("eliminarTurnosProfesionalesAccionMasiva")
     public Mono<Response<List<ResultadoActualizacionTurno>>> eliminarTurnosProfesionalesAccionMasiva(
-            @RequestBody List<EliminarTurnoProfesionalRequest> request){
-        return personalUseCase.eliminarTurnosProfesionalAccionMasiva(request)
+            @RequestBody List<EliminarTurnoProfesionalRequest> eliminarTurnosRequest){
+        return personalUseCase.eliminarTurnosProfesionalAccionMasiva(eliminarTurnosRequest)
                 .collectList()
                 .map(resultado -> ResponseFactory.createStatus(
                         resultado,
@@ -300,10 +344,17 @@ public class PersonalController {
                         e.getMessage()
                 )));
     }
+    /**
+     * asignar turnos de profesionales acción masiva
+     * @param turnoProfesionales lista de turnos a eliminar (List<co.com.sura.remision.dtoy.eliminarTurnosRequest.class>)
+     * @return resultado de asignación (List<co.com.sura.personal.entity.ResultadoActualizacionTurno.class>)
+     * @apiNote si el turno del profesional a asignar o actualizar tiene citas asignadas no se podra modificar
+     * y se notificará en la respuesta
+     * */
     @PostMapping("asignarTurnosProfesionalesAccionMasiva")
     public Mono<Response<List<ResultadoActualizacionTurno>>> asignarTurnosProfesionalesAccionMasiva(
-            @RequestBody List<TurnoProfesional> request){
-        return personalUseCase.asignarTurnosProfesionalAccionMasiva(request)
+            @RequestBody List<TurnoProfesional> turnoProfesionales){
+        return personalUseCase.asignarTurnosProfesionalAccionMasiva(turnoProfesionales)
                 .collectList()
                 .map(resultado -> ResponseFactory.createStatus(
                         resultado,
@@ -320,6 +371,11 @@ public class PersonalController {
                         e.getMessage()
                 )));
     }
+    /**
+     * crear secuencia de turnos de profesionales
+     * @param secuenciaTurno secuencia a crear
+     * @return secuencia creada (Response<Boolean>)
+     * */
     @PostMapping("secuenciasTurno")
     public Mono<Response<Boolean>> configurarSecuenciaTurno(@RequestBody SecuenciaTurno secuenciaTurno){
         return personalUseCase.configurarSecuenciaTurno(secuenciaTurno)
@@ -339,6 +395,12 @@ public class PersonalController {
                 )));
     }
     //horarios de profesionales
+    /**
+     * consultar profesionales con sus turnos
+     * @param fechaTurno fecha de turno consultado (LocalDate)
+     * @param idRegional id de regional consultada (String)
+     * @return lista de profesionales (List<co.com.sura.personal.entity.ProfesionalWithTurno.class>)
+     * */
     @GetMapping(value = "horarioTurno")
     public Mono<Response<List<ProfesionalWithTurno>>> consultarProfesionalesTurnos(
             @RequestParam("fechaTurno") String fechaTurno,
@@ -361,6 +423,11 @@ public class PersonalController {
                 )));
     }
 
+    /**
+     * actualizar turnos profesionales con sus turnos
+     * @param turnosProfesional turnos que se actualizan (List<co.com.sura.personal.entity.TurnoProfesional.class>)
+     * @return lista de profesionales (Response<Boolean>)
+     * */
     @PutMapping(value = "/actualizarTurnoProfesional")
     public Mono<Response<Boolean>> actualizarTurnoProfesional( @RequestBody List<TurnoProfesional> turnosProfesional){
         return personalUseCase.actualizarTurnosByProfesional(turnosProfesional)

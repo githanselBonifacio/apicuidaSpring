@@ -152,5 +152,20 @@ class MaestrosUseCaseTest {
                 .expectComplete()
                 .verify();
     }
+    @Test
+    void consultarMotivosCancelacionCita(){
+        List<MotivoCancelacionCita> motivoCancelacionCitas = new ArrayList<>();
+        motivoCancelacionCitas.add(MotivoCancelacionCita.builder().build());
+        motivoCancelacionCitas.add(MotivoCancelacionCita.builder().build());
 
+        Mockito.when(maestroRepositoryMock.consultarMotivosCancelacionCita())
+                .thenReturn(Flux.fromIterable(motivoCancelacionCitas));
+
+        Flux<MotivoCancelacionCita> motivosCancelacionCita = crudMaestroUseCase.consultarMotivosCancelacionCita();
+
+        StepVerifier.create(motivosCancelacionCita)
+                .expectNextCount(2)
+                .expectComplete()
+                .verify();
+    }
 }

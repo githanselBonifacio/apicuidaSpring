@@ -28,7 +28,7 @@ public interface PersonalCrudRepository {
     Mono<Movil>                      crearMovil(Movil movil);
     Mono<Movil>                      actualizarMovil(Movil movil);
     Flux<Movil>                      consultarMoviles();
-    Flux<Movil>                      consultarMovilesSinConductor();
+
     Flux<Movil>                      consultarMovilesByIdRegional(String idRegional);
 
     //conductores

@@ -21,6 +21,15 @@ public class MovilesController {
     @Autowired
     private MovilesUseCase movilesUseCase;
 
+
+    /**
+     * consultar desplazamientos en turno
+     * @return lista de desplazamientos
+     * (Response<List<co.com.sura.moviles.entity.Desplazamiento.class>>)
+     * @param fechaTurno fecha turno de la cita (LocalDate)
+     * @param idRegional id regional del turno (String)
+     * @param idHorarioTurno id horario del turno (Integer)
+     * */
     @GetMapping(value = "/desplazamientoVisita")
     public Mono<Response<List<Desplazamiento>>> getDesplazamientoByTurnoRegional(
             @RequestParam("fechaTurno") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaTurno,

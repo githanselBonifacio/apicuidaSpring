@@ -37,4 +37,10 @@ public class ConverterMaestros  extends Converter {
                 convertirObjetoAJson(profesionData),Profesion.class
         );
     }
+    public static MotivoCancelacionCita converToMotivoCancelacionCita(MotivoCancelacionCitaData motivoCancelacionCitaData){
+        return deserializarJson(
+                convertirObjetoAJson(motivoCancelacionCitaData),MotivoCancelacionCita.class
+        );
+    }
 }
+

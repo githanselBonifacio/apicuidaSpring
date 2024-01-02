@@ -174,23 +174,6 @@ class PersonalUserCaseTest {
     }
 
     @Test
-    void consultarMovilesSinConductor(){
-        List<Movil> moviles = new ArrayList<>();
-        moviles.add(Movil.builder().build());
-        moviles.add(Movil.builder().build());
-
-        Mockito.when(personalCrudRepositoryMock.consultarMovilesSinConductor())
-                .thenReturn(Flux.fromIterable(moviles));
-
-        Flux<Movil> consultaMoviles = personalUseCaseMock
-                .consultarMovilesSinConductor();
-
-        StepVerifier.create(consultaMoviles)
-                .expectNextCount(2)
-                .expectComplete()
-                .verify();
-    }
-    @Test
     void consultarMovilesByIdRegional(){
         List<Movil> moviles = new ArrayList<>();
         moviles.add(Movil.builder().build());

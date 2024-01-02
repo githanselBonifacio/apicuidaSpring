@@ -26,6 +26,12 @@ public class RemisionController {
     private RemisionUseCase adminUseCase;
 
     //remision
+    /**
+     * crear remisión
+     * @param crearRemisionCitasRequest request recibida para crear todos los registros en todas las tablas en base de datos
+     *                                  (co.com.sura.remision.dto.CrearRemisionCitasRequest.class)
+     * @return remisión creada
+     * */
     @PostMapping(value = "/crearRemisionCitas")
     public Mono<Response<Boolean>> crearRemisioCitas(@RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest) {
         return adminUseCase.crearRemisionCitas(
@@ -48,6 +54,12 @@ public class RemisionController {
 
                 )));
     }
+    /**
+     * actualizar remisión
+     * @param crearRemisionCitasRequest request recibida para actualizar todos los registros en todas las tablas en base de datos
+     *                                  (co.com.sura.remision.dto.CrearRemisionCitasRequest.class)
+     * @return remisión actualizada
+     * */
     @PostMapping("/actualizarRemisionPorNovedad")
     public Mono<Response<Boolean>> actualizarRemisionPorNovedad(
             @RequestBody CrearRemisionCitasRequest crearRemisionCitasRequest){
@@ -69,6 +81,10 @@ public class RemisionController {
                         e.getMessage()
                 )));
     }
+    /**
+     * consultar todas las remisiones
+     * @return remisiones (Response<List<co.com.sura.remision.entity.Remision>)
+     * */
     @GetMapping(value = "")
     public Mono<Response<List<Remision>>> consultarRemisiones(){
         return adminUseCase.consultarRemisiones()
@@ -90,6 +106,11 @@ public class RemisionController {
 
     }
 
+    /**
+     * consultar datos de atención de remisión
+     * @param idRemision id remisión consultada
+     * @return remisiones (Response<co.com.sura.remision.entity.DatosAtencionPaciente>)
+     * */
     @GetMapping(value = "datosAtencionPaciente/{idRemision}")
     public Mono<Response<DatosAtencionPaciente>> consultarDatosAtencionPacienteByRemision(
             @PathVariable String idRemision){
@@ -110,6 +131,11 @@ public class RemisionController {
                 )));
     }
 
+    /**
+     * consultar paciente by remisión
+     * @param idRemision id remisión consultada
+     * @return remisiones (Response<co.com.sura.remision.entity.Paciente>)
+     * */
     @GetMapping(value = "pacienteRemision/{idRemision}")
     public Mono<Response<Paciente>> consultarPacienteFromRemision(@PathVariable String idRemision){
         return adminUseCase.consultarPacienteFromRemision(idRemision)
@@ -129,6 +155,11 @@ public class RemisionController {
                 )));
     }
     //remisiones
+    /**
+     * consultar historial de cambios de remisión
+     * @param idRemision id remisión consultada
+     * @return remisiones (Response<List<co.com.sura.remision.entity.RegistroHistorialRemision>>)
+     * */
     @GetMapping(value = "historial/{idRemision}")
     public Mono<Response<List<RegistroHistorialRemision>>> consultarHistorialRemisionById(
             @PathVariable String idRemision){
@@ -150,6 +181,11 @@ public class RemisionController {
                 )));
     }
 
+    /**
+     * consultar datos actuales de remisión
+     * @param idRemision id remisión consultada
+     * @return remisiones (Response<List<co.com.sura.remision.entity.RegistroHistorialRemision>>)
+     * */
     @GetMapping(value = "/{idRemision}")
     public Mono<Response<RegistroHistorialRemision>> consultarAllDataRemisionById(@PathVariable String idRemision){
         return adminUseCase.consultarDataActualRemision(idRemision)
@@ -170,7 +206,11 @@ public class RemisionController {
     }
 
 
-
+    /**
+     * egresar remisión por ID remisión
+     * @param idRemision id remision a egresar (String)
+     * @return remision egresada (Response<Boolea>)
+     * */
     @PutMapping(value="/egresar")
     public Mono<Response<Boolean>> egresarRemisionById(@RequestParam String idRemision) {
         return adminUseCase.egresarRemisionById(idRemision)

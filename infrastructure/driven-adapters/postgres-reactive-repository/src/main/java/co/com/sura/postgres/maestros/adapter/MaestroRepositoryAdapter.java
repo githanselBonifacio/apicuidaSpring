@@ -1,16 +1,8 @@
 package co.com.sura.postgres.maestros.adapter;
 
-import co.com.sura.maestros.entity.EstadoCita;
-import co.com.sura.maestros.entity.HorarioTurno;
+import co.com.sura.maestros.entity.*;
 import co.com.sura.maestros.gateway.MaestroRepository;
-import co.com.sura.maestros.entity.Profesion;
-import co.com.sura.maestros.entity.Regional;
-import co.com.sura.maestros.entity.TipoIdentificacion;
-import co.com.sura.postgres.maestros.repository.EstadoCitaRepository;
-import co.com.sura.postgres.maestros.repository.HorarioTurnoRepository;
-import co.com.sura.postgres.maestros.repository.ProfesionRepository;
-import co.com.sura.postgres.maestros.repository.RegionalesRepository;
-import co.com.sura.postgres.maestros.repository.TipoIdentificacionRepository;
+import co.com.sura.postgres.maestros.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -27,16 +19,19 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     private final EstadoCitaRepository estadoCitaRepository;
     private final ProfesionRepository profesionRepository;
 
+    private final MotivoCancelacionCitaRepository motivoCancelacionCitaRepository;
     @Autowired
     public MaestroRepositoryAdapter(RegionalesRepository regionalesRepository,
                                     HorarioTurnoRepository horarioTurnoRepository,
                                     TipoIdentificacionRepository tipoIdentificacionRepository,
-                                    EstadoCitaRepository estadoCitaRepository, ProfesionRepository profesionRepository){
+                                    EstadoCitaRepository estadoCitaRepository, ProfesionRepository profesionRepository,
+                                    MotivoCancelacionCitaRepository motivoCancelacionCitaRepository){
         this.regionalesRepository = regionalesRepository;
         this.horarioTurnoRepository = horarioTurnoRepository;
         this.tipoIdentificacionRepository = tipoIdentificacionRepository;
         this.estadoCitaRepository = estadoCitaRepository;
         this.profesionRepository = profesionRepository;
+        this.motivoCancelacionCitaRepository = motivoCancelacionCitaRepository;
     }
 
     @Override
@@ -92,5 +87,11 @@ public class MaestroRepositoryAdapter implements MaestroRepository {
     public Flux<Profesion> consultarProfesiones() {
         return profesionRepository.findAll()
                 .map(ConverterMaestros::converToProfesionData);
+    }
+
+    @Override
+    public Flux<MotivoCancelacionCita> consultarMotivosCancelacionCita() {
+        return motivoCancelacionCitaRepository.findAll()
+                .map(ConverterMaestros::converToMotivoCancelacionCita);
     }
 }

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,4 +15,5 @@ public class DesplazamientoMap {
     private String pos1;
     private String pos2;
     private Integer tiempo;
+    private LocalDate fecha;
 }

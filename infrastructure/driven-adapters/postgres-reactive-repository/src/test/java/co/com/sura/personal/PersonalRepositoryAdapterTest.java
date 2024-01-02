@@ -317,19 +317,6 @@ class PersonalRepositoryAdapterTest {
                 .expectNext(movil)
                 .verifyComplete();
     }
-    @Test
-    void consultarMovilesSinConductor(){
-        List<MovilData> movilesData = new ArrayList<>(){{add(movilData);}};
-
-        Mockito.when(movilRepositoryMock.findAllWithoutConductor())
-                .thenReturn(Flux.fromIterable(movilesData));
-
-        Flux<Movil> response = personalRepositoryAdapter.consultarMovilesSinConductor();
-
-        StepVerifier.create(response)
-                .expectNext(movil)
-                .verifyComplete();
-    }
 
     @Test
     void consultarMovilesByIdRegional(){

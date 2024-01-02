@@ -2,6 +2,7 @@ package co.com.sura.postgres.farmacia.adapter;
 
 import co.com.sura.agenda.entity.PacienteTratamientoCita;
 import co.com.sura.farmacia.gateway.FarmaciaRepository;
+import co.com.sura.genericos.EstadosCita;
 import co.com.sura.postgres.remision.repository.datospaciente.PacienteRepository;
 import co.com.sura.postgres.remision.repository.procedimientos.SoporteNutricionalRepository;
 import co.com.sura.postgres.remision.repository.tratamientos.TratamientoRepository;
@@ -36,12 +37,15 @@ public class FarmaciaAdapter implements FarmaciaRepository {
     //farmacia
     @Override
     public Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmacia() {
-        return pacienteRepository.findAllTratamientosPacientes()
-                .map(pacienteTratamientoCita -> {
+      return pacienteRepository.findAllTratamientosPacientes(
+              EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado(),EstadosCita.FINALIZADA.getEstado())
+              .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
                             return pacienteTratamientoCita;
                         })
-                .mergeWith(pacienteRepository.findAllSoporteNutricionalPacientes()
+              .mergeWith(pacienteRepository.findAllSoporteNutricionalPacientes(
+              EstadosCita.CONFIRMADA.getEstado(),EstadosCita.EN_PROGRESO.getEstado(),EstadosCita.FINALIZADA.getEstado()
+                        )
                         .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
                             return pacienteTratamientoCita;
@@ -54,13 +58,21 @@ public class FarmaciaAdapter implements FarmaciaRepository {
     @Override
     public Flux<PacienteTratamientoCita> consultarAllPacienteWithMedicamentosToFarmaciaByFilter(
             LocalDate fechaTurno, String idRegional,Integer idHorarioTurno) {
-        return pacienteRepository.findAllTratamientosPacientesByTurnoRegionalHorario(fechaTurno,idRegional,idHorarioTurno)
+        return pacienteRepository.findAllTratamientosPacientesByTurnoRegionalHorario(
+                        fechaTurno,idRegional,idHorarioTurno,
+                        EstadosCita.CONFIRMADA.getEstado(),
+                        EstadosCita.EN_PROGRESO.getEstado(),
+                        EstadosCita.FINALIZADA.getEstado())
+
                 .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(APLICACION_MEDICAMENTO.getTipo());
                             return pacienteTratamientoCita;
                         }
                 ).mergeWith(pacienteRepository.findAllSoporteNutricionalPacientesByTurnoRegionalHorario(
-                                fechaTurno,idRegional,idHorarioTurno)
+                        fechaTurno,idRegional,idHorarioTurno,
+                        EstadosCita.CONFIRMADA.getEstado(),
+                        EstadosCita.EN_PROGRESO.getEstado(),
+                        EstadosCita.FINALIZADA.getEstado())
                         .map(pacienteTratamientoCita -> {
                             pacienteTratamientoCita.setTipo(SOPORTE_NUTRICIONAL.getTipo());
                             return pacienteTratamientoCita;

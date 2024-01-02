@@ -24,4 +24,6 @@ public interface MaestroRepository {
     //profesiones
     Flux<Profesion> consultarProfesiones();
 
+    Flux<MotivoCancelacionCita> consultarMotivosCancelacionCita();
+
 }
