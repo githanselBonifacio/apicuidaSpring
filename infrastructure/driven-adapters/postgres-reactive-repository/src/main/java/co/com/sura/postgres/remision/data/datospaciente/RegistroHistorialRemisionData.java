@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 public class RegistroHistorialRemisionData {
     @Id
     @Column("id_historial")
-    private Integer id;
+    private String id;
 
     @Column("fecha_aplicacion_novedad")
     private LocalDateTime fechaAplicacionNovedad;

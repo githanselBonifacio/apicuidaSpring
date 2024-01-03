@@ -59,14 +59,17 @@ public class HistorialRemisionAdapter implements HistorialRemisionRepository {
     }
 
     public Mono<Void> insertRegistro(RegistroHistorialRemisionData registroHistorialRemisionData){
-        return registroHistorialRemisionRepository.save(registroHistorialRemisionData)
+        return  registroHistorialRemisionRepository.save(registroHistorialRemisionData)
                 .then();
     }
     public  Mono<RegistroHistorialRemisionData> buildRegistroActualRemision(
-            String idRemision, LocalDateTime fechaAplicarNovedad){
+            String idRemision, LocalDateTime fechaAplicarNovedad,String idHistorial){
 
         return consultarDatosRemisionActual(idRemision,fechaAplicarNovedad)
-                .map(ConverterRemision::convertToRegistroHistoriaRemisionData);
+                .map(ConverterRemision::convertToRegistroHistoriaRemisionData)
+                .map(registroHistorialRemisionData -> registroHistorialRemisionData.toBuilder()
+                        .id(idHistorial)
+                        .build());
     }
 
     @Override
@@ -130,4 +133,8 @@ public class HistorialRemisionAdapter implements HistorialRemisionRepository {
                 .flatMap(registroHistorialRemisionMono -> registroHistorialRemisionMono);
     }
 
+    public Mono<Void> eliminarByIdHistorial(String idHistorial){
+        return registroHistorialRemisionRepository.deleteById(idHistorial)
+                .then();
+    }
 }

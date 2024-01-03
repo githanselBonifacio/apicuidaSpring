@@ -243,28 +243,28 @@ class PlanManejoRemisionAdapterTest {
     @Test
     void eliminarPlanManejoByidRemision(){
 
-        Mockito.when(soporteNutricionalRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(soporteNutricionalRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(tomaMuestraRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(tomaMuestraRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(sondajeRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(sondajeRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(fototerapiaRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(fototerapiaRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(curacionRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(curacionRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(secrecionRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(secrecionRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(canalizacionRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(canalizacionRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(tratamientoRepositoryMock.deleteByIDRemision(idRemision))
+        Mockito.when(tratamientoRepositoryMock.deleteByIdRemision(idRemision))
                 .thenReturn(Mono.empty());
         Mono<Void> response  = planManejoRemisionAdapter.eliminarPlanManejoByidRemision(idRemision);
 

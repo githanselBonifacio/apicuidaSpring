@@ -25,6 +25,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,9 +51,9 @@ class RemisionRepositoryAdapterTest {
     @Mock
     private HistorialRemisionAdapter historialRemisionAdapterMock;
 
+
     @InjectMocks
     private RemisionRepositoryAdapter remisionRepositoryAdapter;
-
 
     @Test
     void consultarRemisiones() {
@@ -109,8 +110,8 @@ class RemisionRepositoryAdapterTest {
         Mockito.when(datosAtencionPacienteRepositoryMock.save(datosAtencionPacienteData))
                 .thenReturn(Mono.just(datosAtencionPacienteData));
 
-        Mockito.when(remisionDiagnosticoRepositoryMock.insertMultiplesDiagnosticos(remisionDiagnosticoDataList))
-                .thenReturn(Mono.empty());
+        Mockito.when(remisionDiagnosticoRepositoryMock.saveAll(remisionDiagnosticoDataList))
+                .thenReturn(Flux.fromIterable(remisionDiagnosticoDataList));
 
         Mockito.when(planManejoRemisionAdapterMock.registrarPlanManejo(remisionRequest, citaRequests, 0))
                 .thenReturn(Mono.empty());
@@ -119,7 +120,7 @@ class RemisionRepositoryAdapterTest {
                 .thenReturn(Mono.just(ubicacionData));
 
 
-        //crear crear remision
+        //crear remision
         Mono<Boolean> response = remisionRepositoryAdapter.crearRemisionCita(
                 remisionRequest, citaRequests);
 
@@ -142,7 +143,7 @@ class RemisionRepositoryAdapterTest {
                 .thenReturn(Mono.just(Boolean.TRUE));
 
 
-        //crear crear remision
+        //crear remision
         Mono<Boolean> response = remisionRepositoryAdapter.crearRemisionCita(
                 remisionRequest, citaRequests);
 
@@ -189,8 +190,8 @@ class RemisionRepositoryAdapterTest {
         Mockito.when(datosAtencionPacienteRepositoryMock.save(datosAtencionPacienteData))
                 .thenReturn(Mono.just(datosAtencionPacienteData));
 
-        Mockito.when(remisionDiagnosticoRepositoryMock.insertMultiplesDiagnosticos(remisionDiagnosticoDataList))
-                .thenReturn(Mono.empty());
+        Mockito.when(remisionDiagnosticoRepositoryMock.saveAll(remisionDiagnosticoDataList))
+                .thenReturn(Flux.fromIterable(remisionDiagnosticoDataList));
 
         Mockito.when(planManejoRemisionAdapterMock.registrarPlanManejo(remisionRequest, citaRequests, 0))
                 .thenReturn(Mono.empty());
@@ -202,7 +203,7 @@ class RemisionRepositoryAdapterTest {
                 .thenReturn(Mono.just(ubicacionData));
 
 
-        //crear crear remision
+        //crear remision
         Mono<Boolean> response = remisionRepositoryAdapter.crearRemisionCita(
                 remisionRequest, citaRequests);
 
@@ -215,18 +216,24 @@ class RemisionRepositoryAdapterTest {
     @Test
     void actualizarRemisionCita() {
         //Data request
+
         RemisionTestData remisionTestData = new RemisionTestData();
         RemisionRequest remisionRequest = remisionTestData.remisionRequest;
         List<CitaRequest> citaRequests = remisionTestData.citasRequest;
+
         NovedadRequest novedadRequest = NovedadRequest.builder()
                 .motivoNovedad("novedad")
-                .fechaAplicarNovedad(LocalDateTime.now())
+                .fechaAplicarNovedad(LocalDateTime.now().minusDays(1))
                 .build();
-
-        //Data repository
+        String idHistorial = remisionRequest.getIdRemision().concat(String.valueOf(
+                novedadRequest.getFechaAplicarNovedad().toEpochSecond(ZoneOffset.UTC)
+        ));
+        String idCita = remisionRequest.getIdRemision()+"-1";
+                //Data repository
         RemisionData remisionData = remisionTestData.remisionData;
         RegistroHistorialRemisionData  registroHistorialData = RegistroHistorialRemisionData
                 .builder()
+                .id(idHistorial)
                 .idRemision(remisionRequest.getIdRemision())
                 .fechaRegistro(LocalDateTime.now())
                 .build();
@@ -247,19 +254,23 @@ class RemisionRepositoryAdapterTest {
         //mocks paciente
         Mockito.when(pacienteRepositoryMock.save(pacienteData))
                 .thenReturn(Mono.just(pacienteData));
+
         //citas
         Mockito.when(citaRepositoryMock.findLastNumberIdCita(remisionRequest.getIdRemision()))
-                        .thenReturn(Mono.just(1));
+                        .thenReturn(Mono.just(0));
 
-        Mockito.when(citaRepositoryMock.findAllByIdRemision(remisionRequest.getIdRemision()))
+       Mockito.when(citaRepositoryMock.deleteById(idCita))
+                .thenReturn(Mono.empty());
+
+       Mockito.when(citaRepositoryMock.findAllByIdRemision(remisionRequest.getIdRemision()))
                 .thenReturn(Flux.fromIterable(new ArrayList<>(){{add(CitaData.builder()
-                        .idCita(idRemision+"-1")
+                        .idCita(remisionRequest.getIdRemision()+"-1")
                         .idEstado(EstadosCita.SIN_AGENDAR.getEstado())
                         .fechaProgramada(LocalDateTime.now())
                         .build());}}));
 
         Mockito.when(historialRemisionAdapterMock.buildRegistroActualRemision(
-                remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad()))
+                remisionRequest.getIdRemision(),novedadRequest.getFechaAplicarNovedad(),idHistorial))
                 .thenReturn(Mono.just( registroHistorialData));
 
         Mockito.when(historialRemisionAdapterMock.insertRegistro(registroHistorialData))
@@ -268,14 +279,24 @@ class RemisionRepositoryAdapterTest {
         Mockito.when(datosAtencionPacienteRepositoryMock.updateDatosAtencion(datosAtencionPacienteData))
                 .thenReturn(Mono.empty());
 
-        Mockito.when(remisionDiagnosticoRepositoryMock.saveAll(remisionDiagnosticoDataList))
-                .thenReturn(Flux.empty());
+       Mockito.when(remisionDiagnosticoRepositoryMock.save(remisionDiagnosticoDataList.get(0)))
+                .thenReturn(Mono.just(remisionDiagnosticoDataList.get(0)));
 
         Mockito.when(ubicacionRepositoryMock.save(ubicacionData))
                 .thenReturn(Mono.just(ubicacionData));
-        //actualizar  remision
+
+
+        //plan de manejo adapter
+       Mockito.when(planManejoRemisionAdapterMock.eliminarPlanManejoByidCita(idCita))
+                .thenReturn(Mono.empty());
+
+        Mockito.when(planManejoRemisionAdapterMock.registrarPlanManejo(remisionRequest,citaRequests,0))
+                .thenReturn(Mono.empty());
+
+        //actualizar remision
         Mono<Boolean> response = remisionRepositoryAdapter.actualizarRemisionPorNovedad(
                 remisionRequest, citaRequests,novedadRequest);
+
 
         StepVerifier.create(response)
                 .expectNext(Boolean.TRUE)

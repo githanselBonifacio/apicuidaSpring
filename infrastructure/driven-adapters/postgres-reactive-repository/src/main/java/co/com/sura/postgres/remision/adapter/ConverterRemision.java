@@ -46,10 +46,7 @@ import co.com.sura.postgres.remision.data.datospaciente.UbicacionData;
 import io.r2dbc.postgresql.codec.Json;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -120,7 +117,7 @@ public class ConverterRemision extends Converter {
         var ubicacionRequest = remisionRequest.getDatosAtencionPaciente().getUbicacion();
         return new UbicacionData()
                 .toBuilder()
-                .idUbicacion(remisionRequest.getNumeroIdentificacion()+"_ubicacion")
+                .idUbicacion(remisionRequest.getNumeroIdentificacion().concat("-ubicacion"))
                 .latitud(ubicacionRequest.getLatitud())
                 .longitud(ubicacionRequest.getLongitud())
                 .direccion(ubicacionRequest.getDireccion())
@@ -148,7 +145,7 @@ public class ConverterRemision extends Converter {
                 .tipoAfiliacion(remisionRequest.getTipoAfiliacion().getNombre())
                 .nombreAseguradora(remisionRequest.getTipoAfiliacion().getNombreAseguradora())
                 .fechaNacimiento(remisionRequest.getFechaNacimiento())
-                .idUbicacion(remisionRequest.getNumeroIdentificacion()+"_ubicacion")
+                .idUbicacion(remisionRequest.getNumeroIdentificacion().concat("-ubicacion"))
                 .build();
     }
     public static List<RemisionDiagnosticoData> extraerRemisionDiagnosticoData(
@@ -527,7 +524,6 @@ public class ConverterRemision extends Converter {
     }
     public static  RegistroHistorialRemisionData convertToRegistroHistoriaRemisionData(
             RegistroHistorialRemision registroHistorialRemision){
-
         var builder = new RegistroHistorialRemisionData().toBuilder()
                 .idRemision(registroHistorialRemision.getIdRemision())
                 .fechaAplicacionNovedad(registroHistorialRemision.getFechaAplicacionNovedad())

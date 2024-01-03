@@ -33,9 +33,9 @@ public class ReporteCancelacionCitaMensual{
                       .map(r-> r.getRegistros().get(0))
                       .collect(Collectors.toList());
                  return  new RegistroCancelacionCitaMensual(grouped.key(), calcularTotalCantidad(registros), registros);
-                   })
-             )
+                   }))
             .collectList()
+            .map(RegistroCancelacionCitaMensual::ordenarByDia)
             .doOnNext(reporte::setReportes)
             .thenReturn(reporte);
     }

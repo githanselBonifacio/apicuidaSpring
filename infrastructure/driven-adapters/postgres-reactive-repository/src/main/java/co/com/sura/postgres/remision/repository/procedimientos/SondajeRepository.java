@@ -10,7 +10,7 @@ public interface SondajeRepository extends ReactiveCrudRepository<SondajeData,In
     Flux<SondajeData> findByIdCita(String idCita);
 
     @Query("DELETE From sondajes WHERE id_cita LIKE concat($1 ,'-%')")
-    Mono<Void> deleteByIDRemision(String idRemision);
+    Mono<Void> deleteByIdRemision(String idRemision);
 
     @Query("DELETE From sondajes WHERE id_cita = $1")
     Mono<Void> deleteByIdCita(String idCita);

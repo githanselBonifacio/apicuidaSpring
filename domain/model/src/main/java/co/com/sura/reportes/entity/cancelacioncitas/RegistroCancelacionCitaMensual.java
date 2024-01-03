@@ -7,7 +7,9 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -20,4 +22,9 @@ public class RegistroCancelacionCitaMensual{
     private Integer totalCitasCanceladas;
     private List<RegistroCancelacionCita> registros;
 
+    public static List<RegistroCancelacionCitaMensual> ordenarByDia(List<RegistroCancelacionCitaMensual> registros){
+        return registros.stream()
+                .sorted(Comparator.comparing(registro->Integer.parseInt(registro.getDia())))
+                .collect(Collectors.toList());
+    }
 }

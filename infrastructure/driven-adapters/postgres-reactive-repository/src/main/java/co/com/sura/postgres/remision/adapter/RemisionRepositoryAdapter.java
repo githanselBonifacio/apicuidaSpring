@@ -23,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -86,8 +86,8 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
 
                  }
                  return inserts
-                           .then(Mono.from(ubicacionRepository.save(ubicacionData)))
-                           .then(Mono.from(pacienteRepository.save(pacienteData))).then();
+                           .then(ubicacionRepository.save(ubicacionData))
+                           .then(pacienteRepository.save(pacienteData)).then();
                });
         }
     }
@@ -102,16 +102,18 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 .extraerRemisionDiagnosticoData(remisionRequest.getDiagnosticos(), remisionRequest.getIdRemision());
 
        if(esNovedad){
-           return   Mono.from(remisionRepository.save(remisionData))
-                  .then(Mono.from(datosAtencionPacienteRepository.updateDatosAtencion(datosAtencionPacienteData)))
-                   .then(Mono.from(remisionDiagnosticoRepository.saveAll(diagnosticosData)))
+           return  remisionRepository.save(remisionData)
+                  .then(datosAtencionPacienteRepository.updateDatosAtencion(datosAtencionPacienteData))
+                   .thenMany(Flux.fromIterable(diagnosticosData)
+                           .map(remisionDiagnosticoRepository::save))
                    .then();
 
        }else {
-           return  Mono.from(remisionRepository.insertNuevaRemision(remisionData.getIdRemision()))
-                   .then(Mono.from(remisionRepository.save(remisionData)))
-                   .then(Mono.from(datosAtencionPacienteRepository.save(datosAtencionPacienteData)))
-                   .then(Mono.from(remisionDiagnosticoRepository.insertMultiplesDiagnosticos(diagnosticosData)));
+           return  remisionRepository.insertNuevaRemision(remisionData.getIdRemision())
+                   .then(remisionRepository.save(remisionData))
+                   .then(datosAtencionPacienteRepository.save(datosAtencionPacienteData))
+                   .then(Mono.from(remisionDiagnosticoRepository.saveAll(diagnosticosData)))
+                   .then();
        }
     }
 
@@ -148,9 +150,11 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         String idRemision = remisionRequest.getIdRemision();
         LocalDateTime fechaAplicacionNovedad = novedadRequest.getFechaAplicarNovedad();
 
+        String idHistorial = idRemision.concat(String.valueOf(novedadRequest.getFechaAplicarNovedad()
+                .toEpochSecond(ZoneOffset.UTC)));
+
         citasRequest.removeIf(
-                citaRequest -> citaRequest.getFechaInicio()
-                        .isBefore(novedadRequest.getFechaAplicarNovedad()));
+                citaRequest -> citaRequest.getFechaInicio().isBefore(novedadRequest.getFechaAplicarNovedad()));
 
         var ultimoId= new AtomicInteger();
         return remisionRepository.existsById(idRemision)
@@ -164,7 +168,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 if (Boolean.TRUE.equals(validacion)){
                   return Mono.zip(
                                citaRepository.findLastNumberIdCita(idRemision).defaultIfEmpty(0),
-                               historialRemisionAdapter.buildRegistroActualRemision(idRemision, fechaAplicacionNovedad))
+                               historialRemisionAdapter.buildRegistroActualRemision(idRemision, fechaAplicacionNovedad,idHistorial))
                         .map(tuple->{
                             ultimoId.set(tuple.getT1());
                             List<CitaHistorial> citasNuevas = ConverterRemision
@@ -175,19 +179,26 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                             tuple.getT2().setCitasNuevas(ConverterRemision.convertToJsonb(citasNuevas));
                             return tuple.getT2();
                         })
+
                         .flatMap(historialRemisionAdapter::insertRegistro)
-                            .then(Mono.from(this.eliminarCitasByFechaAplicacionNovedad(
+                        .then(Mono.from(this.eliminarCitasByFechaAplicacionNovedad(
                                     idRemision, novedadRequest.getFechaAplicarNovedad())))
-                            .then(registrarPacienteRemision(remisionRequest, true))
-                            .then(registrarDatosRemision(remisionRequest, true))
-                            .then(Mono.just(citasRequest.isEmpty())
-                                 .flatMap(validarCitas-> {
-                                     if (Boolean.FALSE.equals(validarCitas)){
-                                         return planManejoRemisionAdapter
+
+                          .then(this.registrarPacienteRemision(remisionRequest, true))
+                          .then(this.registrarDatosRemision(remisionRequest, true))
+
+                        .onErrorResume(e-> historialRemisionAdapter.eliminarByIdHistorial(idHistorial)
+                                .then(Mono.error(new Throwable(e.getMessage()))))
+
+                       .then(Mono.just(citasRequest.isEmpty()))
+                          .defaultIfEmpty(Boolean.FALSE)
+                       .map(validarCitas-> {
+                                if (Boolean.FALSE.equals(validarCitas)){
+                                   return planManejoRemisionAdapter
                                                  .registrarPlanManejo(remisionRequest, citasRequest,  ultimoId.get());
-                                     }
-                                         return Mono.just(Boolean.TRUE);
-                                 }));
+                                }
+                                   return Mono.just(Boolean.TRUE);
+                             });
                     }else {
                         return Mono.just(Boolean.FALSE);
                     }
@@ -231,7 +242,7 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
                 });
     }
 
-    //datos paciente
+    //datos pacientes
     @Override
     public Mono<DatosAtencionPaciente> consultarDatosAtencionPacienteByIdRemision(String idRemision) {
         return datosAtencionPacienteRepository.findByIdRemision(idRemision)
@@ -259,9 +270,9 @@ public class RemisionRepositoryAdapter implements RemisionCrudRepository {
         return citaRepository.findAllByIdRemision(idRemision)
                 .filter(citaData -> citaData.getIdEstado()==EstadosCita.SIN_AGENDAR.getEstado() ||
                         citaData.getIdEstado()==EstadosCita.AGENDADA.getEstado())
-                .filter(citaData -> fechaAplicacionNovedad.isAfter(citaData.getFechaProgramada()))
-                .flatMap(citaData -> citaRepository.delete(citaData)
-                        .then(planManejoRemisionAdapter.eliminarPlanManejoByidCita(citaData.getIdCita())))
+                .filter(citaData -> fechaAplicacionNovedad.isBefore(citaData.getFechaProgramada()))
+                .flatMap(citaData -> planManejoRemisionAdapter.eliminarPlanManejoByidCita(citaData.getIdCita())
+                        .then(citaRepository.deleteById(citaData.getIdCita())))
                 .then();
 
     }

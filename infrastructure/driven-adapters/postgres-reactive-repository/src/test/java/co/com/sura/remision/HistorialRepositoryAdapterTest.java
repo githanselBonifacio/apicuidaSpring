@@ -193,13 +193,17 @@ import java.util.stream.Collectors;
     void insertRegistro(){
         RegistroHistorialRemisionData registroHistorialRemisionData  = RegistroHistorialRemisionData
                 .builder()
+                .id("id")
                 .build();
+
 
         Mockito.when(registroHistorialRemisionRepositoryMock.save(registroHistorialRemisionData))
                 .thenReturn(Mono.just(registroHistorialRemisionData));
 
         Mono<Void> response = historialRemisionAdapter
                 .insertRegistro(registroHistorialRemisionData);
+
+
 
         StepVerifier.create(response)
                 .expectNext()

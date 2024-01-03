@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
-public interface RegistroHistorialRepository extends ReactiveCrudRepository<RegistroHistorialRemisionData,Integer> {
+public interface RegistroHistorialRepository extends ReactiveCrudRepository<RegistroHistorialRemisionData,String> {
 
     @Query("SELECT COUNT(*) " +
             "FROM public.historial_remision " +
@@ -19,4 +19,5 @@ public interface RegistroHistorialRepository extends ReactiveCrudRepository<Regi
 
     @Query("select * from  public.historial_remision WHERE id_remision = $1 ORDER BY fecha_registro DESC;")
     Flux<RegistroHistorialRemisionData> findAllByIdRemision(String idRemision);
+
 }

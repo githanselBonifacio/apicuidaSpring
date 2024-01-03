@@ -96,6 +96,7 @@ public class RemisionTestData {
                 .nombre("nombre prueba")
                 .apellido("apellido muestra")
                 .tipoIdentificacion(tipoIdentificacionRequest)
+                .numeroIdentificacion("0")
                 .datosAtencionPaciente(datosAtencionPacienteRequest)
                 .diagnosticos(diagnosticos)
                 .tipoAfiliacion(tipoAfiliacionRequest)
@@ -107,8 +108,17 @@ public class RemisionTestData {
         this.citasRequest = new ArrayList<>();
         this.citasRequest.add(
                 CitaRequest.builder()
-                        .idCita("4sds4sd-1")
                         .fechaInicio(LocalDateTime.now())
+                        .tratamientos(new ArrayList<>())
+                        .procedimientos(ProcedimientoRequest.builder()
+                                .curaciones(new ArrayList<>())
+                                .tomaMuestras(new ArrayList<>())
+                                .canalizaciones(new ArrayList<>())
+                                .sondajes(new ArrayList<>())
+                                .secreciones(new ArrayList<>())
+                                .soporteNutricionales(new ArrayList<>())
+                                .fototerapias(new ArrayList<>())
+                                .build())
                         .build());
 
         this.remisionData = RemisionData
@@ -116,6 +126,7 @@ public class RemisionTestData {
                 .idRemision(idRemision)
                 .programa(programa)
                 .idRegional(idRegional)
+                .numeroIdentificacionPaciente("0")
                 .build();
 
         this.datosAtencionPacienteData = DatosAtencionPacienteData
@@ -128,7 +139,7 @@ public class RemisionTestData {
         this.remisionDiagnosticosData.add(remisionDiagnosticoData);
 
         this.ubicacionData = UbicacionData.builder()
-                .idUbicacion("null_ubicacion")
+                .idUbicacion("0-ubicacion")
                 .direccion(direccionPrueba)
                 .municipio(municipio)
                 .idRegional(idRegional)
@@ -141,8 +152,9 @@ public class RemisionTestData {
                 .nombres("nombre prueba")
                 .apellidos("apellido muestra")
                 .tipoIdentificacion("cedula")
+                .numeroIdentificacion("0")
                 .tipoAfiliacion("tipo plan")
-                .idUbicacion("null_ubicacion")
+                .idUbicacion("0-ubicacion")
                 .build();
     }
 }

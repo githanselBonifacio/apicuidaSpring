@@ -11,7 +11,7 @@ public interface TomaMuestraRepository extends ReactiveCrudRepository<TomaMuestr
     Flux<TomaMuestraData> findByIdCita(String idCita);
 
     @Query("DELETE From toma_muestras WHERE id_cita LIKE concat($1 ,'-%')")
-    Mono<Void> deleteByIDRemision(String idRemision);
+    Mono<Void> deleteByIdRemision(String idRemision);
 
     @Query("DELETE From toma_muestras WHERE id_cita = $1")
     Mono<Void> deleteByIdCita(String idCita);
